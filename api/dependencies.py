@@ -14,6 +14,7 @@ from storage.embedding_store import EmbeddingStore
 from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
+from media.media_loader import MediaLoader
 
 @lru_cache
 def get_face_preprocessor() -> FacePreprocessor:
@@ -88,4 +89,11 @@ def get_challenge_service() -> ChallengeService:
     return ChallengeService(
         store=get_challenge_store(),
         expires_in_seconds=120,
+    )
+
+@lru_cache
+def get_media_loader() -> MediaLoader:
+    return MediaLoader(
+        temp_dir=settings.media_temp_dir,
+        s3_region_name=settings.s3_region_name,
     )

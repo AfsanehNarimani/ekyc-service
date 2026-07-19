@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from pydantic_settings import BaseSettings
@@ -23,6 +25,9 @@ class Settings(BaseSettings):
 
     reference_dir: Path = project_root / "data" / "references"
     embedding_dir: Path = project_root / "data" / "embeddings"
+    media_temp_dir: Path = project_root / "data" / "tmp" / "media"
+
+    s3_region_name: str | None = None
 
     face_match_threshold: float = 0.55
     detector_threshold: float = 0.5

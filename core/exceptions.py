@@ -12,3 +12,6 @@ class MultipleFacesDetectedError(EKYCError):
 
 class InvalidVideoError(EKYCError):
     pass
+
+class MediaLoadError(EKYCError):
+    pass
