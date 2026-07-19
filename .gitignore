@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+.env
+
+# Local model weights
+models/**/*.onnx
+models/**/*.pth
+models/**/*.pt
+models/**/*.ckpt
+
+# Local user data
+data/
+uploads/
+logs/
+
+# macOS
+.DS_Store
