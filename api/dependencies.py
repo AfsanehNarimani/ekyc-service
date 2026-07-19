@@ -12,7 +12,8 @@ from services.enrollment_service import EnrollmentService
 from services.image_verification_service import ImageVerificationService
 from storage.embedding_store import EmbeddingStore
 from storage.reference_image_store import ReferenceImageStore
-
+from liveness.challenge_service import ChallengeService
+from liveness.challenge_store import ChallengeStore
 
 @lru_cache
 def get_face_preprocessor() -> FacePreprocessor:
@@ -75,4 +76,16 @@ def get_image_verification_service() -> ImageVerificationService:
         embedder=get_face_embedder(),
         embedding_store=get_embedding_store(),
         matcher=get_face_matcher(),
+    )
+
+@lru_cache
+def get_challenge_store() -> ChallengeStore:
+    return ChallengeStore()
+
+
+@lru_cache
+def get_challenge_service() -> ChallengeService:
+    return ChallengeService(
+        store=get_challenge_store(),
+        expires_in_seconds=120,
     )
