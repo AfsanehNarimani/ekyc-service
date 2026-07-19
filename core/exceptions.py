@@ -8,3 +8,7 @@ class NoFaceDetectedError(EKYCError):
 
 class MultipleFacesDetectedError(EKYCError):
     pass
+
+
+class InvalidVideoError(EKYCError):
+    pass
