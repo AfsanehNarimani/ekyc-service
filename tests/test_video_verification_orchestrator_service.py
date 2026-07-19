@@ -3,11 +3,11 @@ from pathlib import Path
 from PIL import Image
 
 from core.action_check_result import ActionCheckResult
-from liveness.expected_action_policy import ExpectedActionPolicy
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
 from core.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
+from liveness.expected_action_policy import ExpectedActionPolicy
 from services.video_verification_orchestrator_service import (
     VideoVerificationOrchestratorService,
 )
@@ -107,7 +107,33 @@ class FakeFinalDecisionService:
         )
 
 
+class FakeMediaCleanupService:
+    def __init__(self) -> None:
+        self.cleaned_paths = []
+
+    def cleanup_temp_files(
+        self,
+        paths,
+        trace_id: str,
+    ) -> None:
+        self.cleaned_paths.extend(paths)
+
+
+def make_expected_action_policy() -> ExpectedActionPolicy:
+    return ExpectedActionPolicy(
+        required_actions=[
+            LivenessAction.CENTER,
+            LivenessAction.LEFT,
+            LivenessAction.RIGHT,
+            LivenessAction.UP,
+            LivenessAction.DOWN,
+        ]
+    )
+
+
 def test_video_verification_orchestrator_runs_full_flow():
+    media_cleanup_service = FakeMediaCleanupService()
+
     service = VideoVerificationOrchestratorService(
         media_loader=FakeMediaLoader(),
         image_file_loader=FakeImageFileLoader(),
@@ -115,15 +141,8 @@ def test_video_verification_orchestrator_runs_full_flow():
         action_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
         final_decision_service=FakeFinalDecisionService(),
-        expected_action_policy=ExpectedActionPolicy(
-            required_actions=[
-                LivenessAction.CENTER,
-                LivenessAction.LEFT,
-                LivenessAction.RIGHT,
-                LivenessAction.UP,
-                LivenessAction.DOWN,
-            ]
-        ),
+        expected_action_policy=make_expected_action_policy(),
+        media_cleanup_service=media_cleanup_service,
     )
 
     result = service.verify(
@@ -142,9 +161,15 @@ def test_video_verification_orchestrator_runs_full_flow():
         liveness_level=2,
     )
 
+    assert result.trace_id == "trace-1"
     assert result.challenge_id == "challenge-1"
     assert result.face_match.is_match is True
     assert result.action_check.passed is True
     assert result.liveness.passed is True
     assert result.final_decision.approved is True
-    assert result.trace_id == "trace-1"
+
+    assert len(media_cleanup_service.cleaned_paths) == 2
+    assert media_cleanup_service.cleaned_paths == [
+        Path("/tmp/fake.jpg"),
+        Path("/tmp/fake.mp4"),
+    ]

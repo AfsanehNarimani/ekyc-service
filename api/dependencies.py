@@ -17,6 +17,7 @@ from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction
+from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from face.face_match_threshold_policy import FaceMatchThresholdPolicy
 from services.video_face_match_service import VideoFaceMatchService
@@ -225,6 +226,7 @@ def get_video_verification_orchestrator_service() -> (
         liveness_service=get_video_liveness_service(),
         final_decision_service=get_video_final_decision_service(),
         expected_action_policy=get_expected_action_policy(),
+        media_cleanup_service=get_media_cleanup_service(),
     )
 
 @lru_cache
@@ -246,3 +248,7 @@ def get_expected_action_policy() -> ExpectedActionPolicy:
             LivenessAction.DOWN,
         ]
     )
+
+@lru_cache
+def get_media_cleanup_service() -> MediaCleanupService:
+    return MediaCleanupService()
