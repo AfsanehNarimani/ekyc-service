@@ -6,6 +6,7 @@ from api.dependencies import (
     get_video_action_check_service,
     get_video_face_match_service,
     get_video_liveness_service,
+get_video_final_decision_service,
 )
 from api.video_verification_schemas import VerifyVideoRequest
 from core.exceptions import (
@@ -19,6 +20,7 @@ from media.media_loader import MediaLoader
 from services.video_action_check_service import VideoActionCheckService
 from services.video_face_match_service import VideoFaceMatchService
 from services.video_liveness_service import VideoLivenessService
+from services.video_final_decision_service import VideoFinalDecisionService
 
 router = APIRouter(
     prefix="/api",
@@ -36,6 +38,9 @@ def verify_video(
         get_video_action_check_service
     ),
     liveness_service: VideoLivenessService = Depends(get_video_liveness_service),
+    final_decision_service: VideoFinalDecisionService = Depends(
+        get_video_final_decision_service
+),
 ):
     try:
         national_id_image_path = media_loader.load_to_file(
@@ -67,10 +72,10 @@ def verify_video(
             strictness_level=request.liveness_level,
         )
 
-        final_approved = (
-            face_match_result.is_match
-            and action_check_result.passed
-            and liveness_result.passed
+        final_decision = final_decision_service.decide(
+            face_match_passed=face_match_result.is_match,
+            actions_passed=action_check_result.passed,
+            liveness_passed=liveness_result.passed,
         )
 
         return {
@@ -118,11 +123,12 @@ def verify_video(
                 "skipped_frames": action_check_result.skipped_frames,
             },
             "final_decision": {
-                "approved": final_approved,
-                "face_match_passed": face_match_result.is_match,
-                "actions_passed": action_check_result.passed,
-                "liveness_passed": liveness_result.passed,
-                "status": "approved" if final_approved else "rejected",
+                "approved": final_decision.approved,
+                "status": final_decision.status,
+                "rejection_reasons": final_decision.rejection_reasons,
+                "face_match_passed": final_decision.face_match_passed,
+                "actions_passed": final_decision.actions_passed,
+                "liveness_passed": final_decision.liveness_passed,
             },
         }
 

@@ -145,6 +145,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
 
     assert body["final_decision"]["approved"] is True
     assert body["final_decision"]["status"] == "approved"
+    assert body["final_decision"]["rejection_reasons"] == []
     assert body["final_decision"]["face_match_passed"] is True
     assert body["final_decision"]["actions_passed"] is True
     assert body["final_decision"]["liveness_passed"] is True

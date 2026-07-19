@@ -26,6 +26,7 @@ from liveness.liveness_threshold_policy import (
     LivenessThresholds,
 )
 from services.video_liveness_service import VideoLivenessService
+from services.video_final_decision_service import VideoFinalDecisionService
 
 
 @lru_cache
@@ -194,3 +195,7 @@ def get_video_action_check_service() -> VideoActionCheckService:
         validator=SingleFaceValidator(),
         classifier=get_head_pose_action_classifier(),
     )
+
+@lru_cache
+def get_video_final_decision_service() -> VideoFinalDecisionService:
+    return VideoFinalDecisionService()
