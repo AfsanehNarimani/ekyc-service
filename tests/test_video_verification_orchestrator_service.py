@@ -91,11 +91,7 @@ class FakeFinalDecisionService:
         actions_passed: bool,
         liveness_passed: bool,
     ) -> FinalDecision:
-        approved = (
-            face_match_passed
-            and actions_passed
-            and liveness_passed
-        )
+        approved = face_match_passed and actions_passed and liveness_passed
 
         return FinalDecision(
             approved=approved,

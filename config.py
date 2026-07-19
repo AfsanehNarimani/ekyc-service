@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "eKYC Service"
 
     log_level: str = "INFO"
-    
+
     project_root: Path = Path(__file__).resolve().parent
 
     default_face_model: str = "edgeface"
@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     liveness_pose_variation_level_1: float = 10.0
     liveness_pose_variation_level_2: float = 18.0
     liveness_pose_variation_level_3: float = 25.0
+
+    passive_liveness_threshold_level_1: float = 0.40
+    passive_liveness_threshold_level_2: float = 0.60
+    passive_liveness_threshold_level_3: float = 0.80
 
 
 settings = Settings()

@@ -54,9 +54,7 @@ def verify_video(
     response_mapper: VideoVerificationResponseMapper = Depends(
         get_video_verification_response_mapper
     ),
-    error_response_factory: ErrorResponseFactory = Depends(
-        get_error_response_factory
-    ),
+    error_response_factory: ErrorResponseFactory = Depends(get_error_response_factory),
 ) -> VerifyVideoResponse | JSONResponse:
     trace_id = request.trace_id or uuid.uuid4().hex
     started_at = time.perf_counter()
@@ -144,10 +142,10 @@ def verify_video(
 
     except Exception:
         logger.exception(
-        "trace_id=%s challenge_id=%s error_code=internal_server_error",
-        trace_id,
-        request.challenge_id,
-    )
+            "trace_id=%s challenge_id=%s error_code=internal_server_error",
+            trace_id,
+            request.challenge_id,
+        )
     return error_response_factory.build(
         status_code=500,
         code="internal_server_error",
@@ -155,6 +153,7 @@ def verify_video(
         trace_id=trace_id,
         processing_time_ms=_elapsed_ms(started_at),
     )
+
 
 def _elapsed_ms(
     started_at: float,

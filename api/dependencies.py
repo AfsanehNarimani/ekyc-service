@@ -37,7 +37,10 @@ from liveness.liveness_threshold_policy import (
 from services.video_liveness_service import VideoLivenessService
 from services.video_final_decision_service import VideoFinalDecisionService
 from api.video_verification_response_mapper import VideoVerificationResponseMapper
-
+from liveness.passive_liveness_threshold_policy import (
+    PassiveLivenessThresholdPolicy,
+)
+from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
 
 
 @lru_cache
@@ -103,6 +106,7 @@ def get_image_verification_service() -> ImageVerificationService:
         matcher=get_face_matcher(),
     )
 
+
 @lru_cache
 def get_challenge_store() -> ChallengeStore:
     return ChallengeStore()
@@ -115,12 +119,14 @@ def get_challenge_service() -> ChallengeService:
         expires_in_seconds=120,
     )
 
+
 @lru_cache
 def get_media_loader() -> MediaLoader:
     return MediaLoader(
         temp_dir=settings.media_temp_dir,
         s3_region_name=settings.s3_region_name,
     )
+
 
 @lru_cache
 def get_video_frame_extractor() -> VideoFrameExtractor:
@@ -139,6 +145,7 @@ def get_face_match_threshold_policy() -> FaceMatchThresholdPolicy:
             3: settings.face_match_threshold_level_3,
         }
     )
+
 
 @lru_cache
 def get_liveness_threshold_policy() -> LivenessThresholdPolicy:
@@ -172,6 +179,7 @@ def get_video_liveness_service() -> VideoLivenessService:
         threshold_policy=get_liveness_threshold_policy(),
     )
 
+
 @lru_cache
 def get_video_face_match_service() -> VideoFaceMatchService:
     return VideoFaceMatchService(
@@ -181,9 +189,11 @@ def get_video_face_match_service() -> VideoFaceMatchService:
         threshold_policy=get_face_match_threshold_policy(),
     )
 
+
 @lru_cache
 def get_image_file_loader() -> ImageFileLoader:
     return ImageFileLoader()
+
 
 @lru_cache
 def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
@@ -207,13 +217,16 @@ def get_video_action_check_service() -> VideoActionCheckService:
         classifier=get_head_pose_action_classifier(),
     )
 
+
 @lru_cache
 def get_video_final_decision_service() -> VideoFinalDecisionService:
     return VideoFinalDecisionService()
 
+
 @lru_cache
 def get_verification_config_service() -> VerificationConfigService:
     return VerificationConfigService()
+
 
 @lru_cache
 def get_video_verification_orchestrator_service() -> (
@@ -230,13 +243,16 @@ def get_video_verification_orchestrator_service() -> (
         media_cleanup_service=get_media_cleanup_service(),
     )
 
+
 @lru_cache
 def get_video_verification_response_mapper() -> VideoVerificationResponseMapper:
     return VideoVerificationResponseMapper()
 
+
 @lru_cache
 def get_error_response_factory() -> ErrorResponseFactory:
     return ErrorResponseFactory()
+
 
 @lru_cache
 def get_expected_action_policy() -> ExpectedActionPolicy:
@@ -250,10 +266,29 @@ def get_expected_action_policy() -> ExpectedActionPolicy:
         ]
     )
 
+
 @lru_cache
 def get_media_cleanup_service() -> MediaCleanupService:
     return MediaCleanupService()
 
+
 @lru_cache
 def get_readiness_service() -> ReadinessService:
     return ReadinessService()
+
+@lru_cache
+def get_passive_liveness_threshold_policy() -> PassiveLivenessThresholdPolicy:
+    return PassiveLivenessThresholdPolicy(
+        level_to_threshold={
+            1: settings.passive_liveness_threshold_level_1,
+            2: settings.passive_liveness_threshold_level_2,
+            3: settings.passive_liveness_threshold_level_3,
+        }
+    )
+
+
+@lru_cache
+def get_passive_liveness_checker() -> StubPassiveLivenessChecker:
+    return StubPassiveLivenessChecker(
+        threshold_policy=get_passive_liveness_threshold_policy(),
+    )

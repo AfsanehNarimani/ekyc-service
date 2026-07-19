@@ -111,6 +111,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
     assert body["final_decision"]["actions_passed"] is True
     assert body["final_decision"]["liveness_passed"] is True
 
+
 class FakeFailingVideoVerificationOrchestratorService:
     def verify(
         self,
@@ -161,6 +162,7 @@ def test_verify_video_endpoint_returns_standard_error_response():
     assert "Media file not found" in body["error"]["message"]
     assert body["error"]["details"] == {}
 
+
 class FakeUnexpectedFailingVideoVerificationOrchestratorService:
     def verify(
         self,
@@ -173,7 +175,6 @@ class FakeUnexpectedFailingVideoVerificationOrchestratorService:
         liveness_level,
     ):
         raise RuntimeError("database password or internal path should not leak")
-
 
     def test_verify_video_endpoint_returns_safe_internal_error_response():
         app.dependency_overrides[get_video_verification_orchestrator_service] = (
@@ -214,6 +215,7 @@ class FakeUnexpectedFailingVideoVerificationOrchestratorService:
         assert "database password" not in body["error"]["message"]
         assert body["error"]["details"] == {}
         assert body["processing_time_ms"] == 123.45
+
 
 class FakeInvalidActionVideoVerificationOrchestratorService:
     def verify(

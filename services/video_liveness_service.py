@@ -102,12 +102,8 @@ class VideoLivenessService:
             dtype=np.float32,
         )
 
-        pitch_range = float(
-            np.max(pose_array[:, 0]) - np.min(pose_array[:, 0])
-        )
-        yaw_range = float(
-            np.max(pose_array[:, 1]) - np.min(pose_array[:, 1])
-        )
+        pitch_range = float(np.max(pose_array[:, 0]) - np.min(pose_array[:, 0]))
+        yaw_range = float(np.max(pose_array[:, 1]) - np.min(pose_array[:, 1]))
 
         return max(
             pitch_range,

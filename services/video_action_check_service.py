@@ -76,9 +76,9 @@ class VideoActionCheckService:
         return compact_actions
 
     def _find_missing_actions_in_order(
-            self,
-            expected_actions: list[LivenessAction],
-            observed_actions: list[LivenessAction],
+        self,
+        expected_actions: list[LivenessAction],
+        observed_actions: list[LivenessAction],
     ) -> list[LivenessAction]:
         observed_action_set = set(observed_actions)
 

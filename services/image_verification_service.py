@@ -31,7 +31,9 @@ class ImageVerificationService:
         self.person_id_validator.validate(person_id)
 
         if not self.embedding_store.exists(person_id):
-            raise FileNotFoundError(f"No enrolled embedding found for person_id={person_id}")
+            raise FileNotFoundError(
+                f"No enrolled embedding found for person_id={person_id}"
+            )
 
         aligned_face = self.preprocessor.preprocess(image)
         candidate_embedding = self.embedder.extract(aligned_face)

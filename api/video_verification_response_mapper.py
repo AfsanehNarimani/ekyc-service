@@ -11,9 +11,7 @@ class VideoVerificationResponseMapper:
             ok=True,
             trace_id=result.trace_id,
             challenge_id=result.challenge_id,
-            expected_actions=[
-                action.value for action in result.expected_actions
-            ],
+            expected_actions=[action.value for action in result.expected_actions],
             face_match={
                 "passed": result.face_match.is_match,
                 "score": result.face_match.score,
@@ -30,9 +28,7 @@ class VideoVerificationResponseMapper:
                 "skipped_frames": result.liveness.skipped_frames,
                 "min_required_frames": result.liveness.min_required_frames,
                 "pose_variation_score": result.liveness.pose_variation_score,
-                "min_pose_variation_score": (
-                    result.liveness.min_pose_variation_score
-                ),
+                "min_pose_variation_score": (result.liveness.min_pose_variation_score),
                 "reason": result.liveness.reason,
             },
             action_check={

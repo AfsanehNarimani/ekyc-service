@@ -23,9 +23,7 @@ def test_liveness_threshold_policy_returns_thresholds():
 
 
 def test_liveness_threshold_policy_rejects_unknown_level():
-    policy = LivenessThresholdPolicy(
-        level_to_thresholds={}
-    )
+    policy = LivenessThresholdPolicy(level_to_thresholds={})
 
     with pytest.raises(ValueError):
         policy.get_thresholds(9)
