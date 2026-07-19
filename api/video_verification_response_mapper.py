@@ -9,6 +9,7 @@ class VideoVerificationResponseMapper:
     ) -> VerifyVideoResponse:
         return VerifyVideoResponse(
             ok=True,
+            trace_id=result.trace_id,
             challenge_id=result.challenge_id,
             expected_actions=[
                 action.value for action in result.expected_actions

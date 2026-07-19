@@ -1,3 +1,6 @@
+import logging
+import uuid
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
@@ -21,6 +24,8 @@ from core.exceptions import (
 from services.video_verification_orchestrator_service import (
     VideoVerificationOrchestratorService,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/api",
@@ -49,8 +54,11 @@ def verify_video(
         get_error_response_factory
     ),
 ) -> VerifyVideoResponse | JSONResponse:
+    trace_id = request.trace_id or uuid.uuid4().hex
+
     try:
         result = service.verify(
+            trace_id=trace_id,
             challenge_id=request.challenge_id,
             expected_actions=request.expected_actions,
             national_id_image_uri=request.national_id_image_uri,
@@ -62,36 +70,71 @@ def verify_video(
         return response_mapper.to_response(result)
 
     except ValueError as error:
+        logger.warning(
+            "trace_id=%s challenge_id=%s error_code=invalid_request message=%s",
+            trace_id,
+            request.challenge_id,
+            error,
+        )
         return error_response_factory.build(
             status_code=400,
             code="invalid_request",
             message=str(error),
+            trace_id=trace_id,
         )
 
     except FileNotFoundError as error:
+        logger.warning(
+            "trace_id=%s challenge_id=%s error_code=media_file_not_found message=%s",
+            trace_id,
+            request.challenge_id,
+            error,
+        )
         return error_response_factory.build(
             status_code=404,
             code="media_file_not_found",
             message=f"Media file not found: {error}",
+            trace_id=trace_id,
         )
 
     except MediaLoadError as error:
+        logger.warning(
+            "trace_id=%s challenge_id=%s error_code=media_load_failed message=%s",
+            trace_id,
+            request.challenge_id,
+            error,
+        )
         return error_response_factory.build(
             status_code=422,
             code="media_load_failed",
             message=str(error),
+            trace_id=trace_id,
         )
 
     except InvalidVideoError as error:
+        logger.warning(
+            "trace_id=%s challenge_id=%s error_code=invalid_video message=%s",
+            trace_id,
+            request.challenge_id,
+            error,
+        )
         return error_response_factory.build(
             status_code=422,
             code="invalid_video",
             message=str(error),
+            trace_id=trace_id,
         )
 
     except NoUsableVideoFrameError as error:
+        logger.warning(
+            "trace_id=%s challenge_id=%s error_code=no_usable_video_frame message=%s",
+            trace_id,
+            request.challenge_id,
+            error,
+        )
         return error_response_factory.build(
             status_code=422,
             code="no_usable_video_frame",
             message=str(error),
+            trace_id=trace_id,
         )

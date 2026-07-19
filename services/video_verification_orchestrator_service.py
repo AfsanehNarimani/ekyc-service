@@ -1,3 +1,5 @@
+import logging
+
 from core.liveness_action import LivenessAction
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
@@ -7,6 +9,8 @@ from services.video_action_check_service import VideoActionCheckService
 from services.video_face_match_service import VideoFaceMatchService
 from services.video_final_decision_service import VideoFinalDecisionService
 from services.video_liveness_service import VideoLivenessService
+
+logger = logging.getLogger(__name__)
 
 
 class VideoVerificationOrchestratorService:
@@ -28,6 +32,7 @@ class VideoVerificationOrchestratorService:
 
     def verify(
         self,
+        trace_id: str,
         challenge_id: str,
         expected_actions: list[LivenessAction],
         national_id_image_uri: str,
@@ -35,6 +40,12 @@ class VideoVerificationOrchestratorService:
         face_match_level: int,
         liveness_level: int,
     ) -> VideoVerificationResult:
+        logger.info(
+            "trace_id=%s challenge_id=%s step=verification_started",
+            trace_id,
+            challenge_id,
+        )
+
         national_id_image_path = self.media_loader.load_to_file(
             reference=MediaReference(national_id_image_uri),
             suffix=".jpg",
@@ -54,14 +65,38 @@ class VideoVerificationOrchestratorService:
             strictness_level=face_match_level,
         )
 
+        logger.info(
+            "trace_id=%s challenge_id=%s step=face_match_done passed=%s score=%.4f",
+            trace_id,
+            challenge_id,
+            face_match_result.is_match,
+            face_match_result.score,
+        )
+
         action_check_result = self.action_check_service.check_actions(
             video_path=video_path,
             expected_actions=expected_actions,
         )
 
+        logger.info(
+            "trace_id=%s challenge_id=%s step=action_check_done passed=%s missing=%s",
+            trace_id,
+            challenge_id,
+            action_check_result.passed,
+            [action.value for action in action_check_result.missing_actions],
+        )
+
         liveness_result = self.liveness_service.check_liveness(
             video_path=video_path,
             strictness_level=liveness_level,
+        )
+
+        logger.info(
+            "trace_id=%s challenge_id=%s step=liveness_done passed=%s reason=%s",
+            trace_id,
+            challenge_id,
+            liveness_result.passed,
+            liveness_result.reason,
         )
 
         final_decision = self.final_decision_service.decide(
@@ -70,7 +105,16 @@ class VideoVerificationOrchestratorService:
             liveness_passed=liveness_result.passed,
         )
 
+        logger.info(
+            "trace_id=%s challenge_id=%s step=verification_finished approved=%s reasons=%s",
+            trace_id,
+            challenge_id,
+            final_decision.approved,
+            final_decision.rejection_reasons,
+        )
+
         return VideoVerificationResult(
+            trace_id=trace_id,
             challenge_id=challenge_id,
             expected_actions=expected_actions,
             face_match=face_match_result,

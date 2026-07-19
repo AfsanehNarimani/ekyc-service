@@ -11,14 +11,16 @@ class ErrorResponseFactory:
         status_code: int,
         code: str,
         message: str,
+        trace_id: str | None = None,
         details: dict[str, Any] | None = None,
     ) -> JSONResponse:
         response = ErrorResponse(
+            trace_id=trace_id,
             error={
                 "code": code,
                 "message": message,
                 "details": details or {},
-            }
+            },
         )
 
         return JSONResponse(

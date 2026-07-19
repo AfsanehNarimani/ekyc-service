@@ -11,4 +11,5 @@ class ErrorDetailResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     ok: bool = False
+    trace_id: str | None = None
     error: ErrorDetailResponse

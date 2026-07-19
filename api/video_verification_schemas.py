@@ -4,6 +4,7 @@ from core.liveness_action import LivenessAction
 
 
 class VerifyVideoRequest(BaseModel):
+    trace_id: str | None = Field(default=None, min_length=1)
     challenge_id: str = Field(min_length=1)
     expected_actions: list[LivenessAction] = Field(min_length=1)
     national_id_image_uri: str = Field(min_length=1)
@@ -54,6 +55,7 @@ class FinalDecisionResponse(BaseModel):
 
 class VerifyVideoResponse(BaseModel):
     ok: bool
+    trace_id: str
     challenge_id: str
     expected_actions: list[str]
     face_match: FaceMatchResponse

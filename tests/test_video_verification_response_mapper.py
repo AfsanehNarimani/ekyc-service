@@ -9,6 +9,7 @@ from api.video_verification_response_mapper import VideoVerificationResponseMapp
 
 def test_video_verification_response_mapper_maps_result_to_response():
     result = VideoVerificationResult(
+        trace_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
             LivenessAction.CENTER,
@@ -78,3 +79,5 @@ def test_video_verification_response_mapper_maps_result_to_response():
     ]
     assert response.liveness.reason == "passed_basic_liveness"
     assert response.final_decision.approved is True
+
+    assert response.trace_id == "trace-1"

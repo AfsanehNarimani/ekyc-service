@@ -4,6 +4,7 @@ from api.video_verification_schemas import VerifyVideoResponse
 def test_verify_video_response_schema_accepts_valid_response():
     response = VerifyVideoResponse(
         ok=True,
+        trace_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
             "center",
@@ -71,3 +72,4 @@ def test_verify_video_response_schema_accepts_valid_response():
     assert response.ok is True
     assert response.final_decision.approved is True
     assert response.face_match.model_name == "edgeface"
+    assert response.trace_id == "trace-1"

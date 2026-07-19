@@ -117,6 +117,7 @@ def test_video_verification_orchestrator_runs_full_flow():
     )
 
     result = service.verify(
+        trace_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
             LivenessAction.CENTER,
@@ -136,3 +137,4 @@ def test_video_verification_orchestrator_runs_full_flow():
     assert result.action_check.passed is True
     assert result.liveness.passed is True
     assert result.final_decision.approved is True
+    assert result.trace_id == "trace-1"

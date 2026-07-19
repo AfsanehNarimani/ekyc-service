@@ -13,6 +13,7 @@ from core.video_verification_result import VideoVerificationResult
 class FakeVideoVerificationOrchestratorService:
     def verify(
         self,
+        trace_id: str,
         challenge_id: str,
         expected_actions: list[LivenessAction],
         national_id_image_uri: str,
@@ -21,6 +22,7 @@ class FakeVideoVerificationOrchestratorService:
         liveness_level: int,
     ) -> VideoVerificationResult:
         return VideoVerificationResult(
+            trace_id=trace_id,
             challenge_id=challenge_id,
             expected_actions=expected_actions,
             face_match=VideoFaceMatchResult(
@@ -111,6 +113,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
 class FakeFailingVideoVerificationOrchestratorService:
     def verify(
         self,
+        trace_id: str,
         challenge_id,
         expected_actions,
         national_id_image_uri,

@@ -8,6 +8,8 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     app_name: str = "eKYC Service"
 
+    log_level: str = "INFO"
+    
     project_root: Path = Path(__file__).resolve().parent
 
     default_face_model: str = "edgeface"

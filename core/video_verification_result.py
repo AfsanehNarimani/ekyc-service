@@ -9,6 +9,7 @@ from core.video_liveness_result import VideoLivenessResult
 
 @dataclass(frozen=True, slots=True)
 class VideoVerificationResult:
+    trace_id: str
     challenge_id: str
     expected_actions: list[LivenessAction]
     face_match: VideoFaceMatchResult
