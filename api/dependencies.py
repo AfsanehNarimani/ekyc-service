@@ -18,6 +18,9 @@ from media.media_loader import MediaLoader
 from face.face_match_threshold_policy import FaceMatchThresholdPolicy
 from services.video_face_match_service import VideoFaceMatchService
 from video.video_frame_extractor import VideoFrameExtractor
+from media.image_file_loader import ImageFileLoader
+from liveness.head_pose_action_classifier import HeadPoseActionClassifier
+from services.video_action_check_service import VideoActionCheckService
 
 
 @lru_cache
@@ -128,4 +131,30 @@ def get_video_face_match_service() -> VideoFaceMatchService:
         embedder=get_face_embedder(),
         frame_extractor=get_video_frame_extractor(),
         threshold_policy=get_face_match_threshold_policy(),
+    )
+
+@lru_cache
+def get_image_file_loader() -> ImageFileLoader:
+    return ImageFileLoader()
+
+@lru_cache
+def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
+    return HeadPoseActionClassifier(
+        yaw_threshold=settings.head_pose_yaw_threshold,
+        pitch_threshold=settings.head_pose_pitch_threshold,
+        neutral_yaw_threshold=settings.head_pose_neutral_yaw_threshold,
+        neutral_pitch_threshold=settings.head_pose_neutral_pitch_threshold,
+    )
+
+
+@lru_cache
+def get_video_action_check_service() -> VideoActionCheckService:
+    return VideoActionCheckService(
+        frame_extractor=get_video_frame_extractor(),
+        detector=InsightFaceDetector(
+            det_thresh=settings.detector_threshold,
+            providers=["CPUExecutionProvider"],
+        ),
+        validator=SingleFaceValidator(),
+        classifier=get_head_pose_action_classifier(),
     )

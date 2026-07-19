@@ -39,5 +39,10 @@ class Settings(BaseSettings):
     face_match_threshold_level_2: float = 0.55
     face_match_threshold_level_3: float = 0.65
 
+    head_pose_yaw_threshold: float = 15.0
+    head_pose_pitch_threshold: float = 10.0
+    head_pose_neutral_yaw_threshold: float = 8.0
+    head_pose_neutral_pitch_threshold: float = 8.0
+
 
 settings = Settings()

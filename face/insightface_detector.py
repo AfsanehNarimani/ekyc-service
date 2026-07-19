@@ -37,11 +37,24 @@ class InsightFaceDetector:
 
         detections = []
         for face in faces:
+            pose = getattr(
+                face,
+                "pose",
+                None,
+            )
+
+            pose_tuple = None
+            if pose is not None:
+                pose_tuple = tuple(
+                    float(value) for value in pose
+                )
+
             detections.append(
                 FaceDetection(
                     bbox=tuple(float(value) for value in face.bbox),
                     landmarks=face.kps.astype(np.float32),
                     score=float(face.det_score),
+                    pose=pose_tuple,
                 )
             )
 

@@ -8,3 +8,4 @@ class FaceDetection:
     bbox: tuple[float, float, float, float]
     landmarks: np.ndarray
     score: float
+    pose: tuple[float, float, float] | None = None
