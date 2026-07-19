@@ -24,6 +24,7 @@ from services.video_face_match_service import VideoFaceMatchService
 from video.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
+from services.readiness_service import ReadinessService
 from services.verification_config_service import VerificationConfigService
 from services.video_verification_orchestrator_service import (
     VideoVerificationOrchestratorService,
@@ -252,3 +253,7 @@ def get_expected_action_policy() -> ExpectedActionPolicy:
 @lru_cache
 def get_media_cleanup_service() -> MediaCleanupService:
     return MediaCleanupService()
+
+@lru_cache
+def get_readiness_service() -> ReadinessService:
+    return ReadinessService()
