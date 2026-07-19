@@ -5,6 +5,7 @@ from PIL import Image
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
+from core.passive_liveness_result import PassiveLivenessResult
 from core.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
 from liveness.expected_action_policy import ExpectedActionPolicy
@@ -84,14 +85,37 @@ class FakeVideoLivenessService:
         )
 
 
+class FakePassiveLivenessChecker:
+    def check(
+        self,
+        video_path: Path,
+        strictness_level: int,
+    ) -> PassiveLivenessResult:
+        return PassiveLivenessResult(
+            passed=True,
+            score=1.0,
+            threshold=0.6,
+            model_name="stub_passive_liveness",
+            processed_frames=0,
+            skipped_frames=0,
+            reason="stub_passive_liveness_passed",
+        )
+
+
 class FakeFinalDecisionService:
     def decide(
         self,
         face_match_passed: bool,
         actions_passed: bool,
         liveness_passed: bool,
+        passive_liveness_passed: bool,
     ) -> FinalDecision:
-        approved = face_match_passed and actions_passed and liveness_passed
+        approved = (
+            face_match_passed
+            and actions_passed
+            and liveness_passed
+            and passive_liveness_passed
+        )
 
         return FinalDecision(
             approved=approved,
@@ -100,6 +124,7 @@ class FakeFinalDecisionService:
             face_match_passed=face_match_passed,
             actions_passed=actions_passed,
             liveness_passed=liveness_passed,
+            passive_liveness_passed=passive_liveness_passed,
         )
 
 
@@ -136,6 +161,7 @@ def test_video_verification_orchestrator_runs_full_flow():
         face_match_service=FakeVideoFaceMatchService(),
         action_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
+        passive_liveness_checker=FakePassiveLivenessChecker(),
         final_decision_service=FakeFinalDecisionService(),
         expected_action_policy=make_expected_action_policy(),
         media_cleanup_service=media_cleanup_service,
@@ -162,11 +188,14 @@ def test_video_verification_orchestrator_runs_full_flow():
     assert result.face_match.is_match is True
     assert result.action_check.passed is True
     assert result.liveness.passed is True
+    assert result.passive_liveness.passed is True
+    assert result.passive_liveness.model_name == "stub_passive_liveness"
     assert result.final_decision.approved is True
+    assert result.final_decision.passive_liveness_passed is True
+    assert result.processing_time_ms >= 0
 
     assert len(media_cleanup_service.cleaned_paths) == 2
     assert media_cleanup_service.cleaned_paths == [
         Path("/tmp/fake.jpg"),
         Path("/tmp/fake.mp4"),
     ]
-    assert result.processing_time_ms >= 0

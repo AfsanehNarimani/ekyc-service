@@ -32,6 +32,15 @@ def test_verify_video_response_schema_accepts_valid_response():
             "min_pose_variation_score": 18.0,
             "reason": "passed_basic_liveness",
         },
+        passive_liveness={
+            "passed": True,
+            "score": 1.0,
+            "threshold": 0.6,
+            "model_name": "stub_passive_liveness",
+            "processed_frames": 0,
+            "skipped_frames": 0,
+            "reason": "stub_passive_liveness_passed",
+        },
         action_check={
             "passed": True,
             "required_actions": [
@@ -66,12 +75,15 @@ def test_verify_video_response_schema_accepts_valid_response():
             "face_match_passed": True,
             "actions_passed": True,
             "liveness_passed": True,
+            "passive_liveness_passed": True,
         },
         processing_time_ms=123.45,
     )
 
     assert response.ok is True
-    assert response.final_decision.approved is True
-    assert response.face_match.model_name == "edgeface"
     assert response.trace_id == "trace-1"
+    assert response.final_decision.approved is True
+    assert response.final_decision.passive_liveness_passed is True
+    assert response.face_match.model_name == "edgeface"
+    assert response.passive_liveness.model_name == "stub_passive_liveness"
     assert response.processing_time_ms == 123.45

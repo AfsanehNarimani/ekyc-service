@@ -9,3 +9,4 @@ class FinalDecision:
     face_match_passed: bool
     actions_passed: bool
     liveness_passed: bool
+    passive_liveness_passed: bool

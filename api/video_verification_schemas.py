@@ -34,6 +34,16 @@ class LivenessResponse(BaseModel):
     reason: str
 
 
+class PassiveLivenessResponse(BaseModel):
+    passed: bool
+    score: float
+    threshold: float
+    model_name: str
+    processed_frames: int
+    skipped_frames: int
+    reason: str
+
+
 class ActionCheckResponse(BaseModel):
     passed: bool
     required_actions: list[str]
@@ -51,6 +61,7 @@ class FinalDecisionResponse(BaseModel):
     face_match_passed: bool
     actions_passed: bool
     liveness_passed: bool
+    passive_liveness_passed: bool
 
 
 class VerifyVideoResponse(BaseModel):
@@ -60,6 +71,7 @@ class VerifyVideoResponse(BaseModel):
     expected_actions: list[str]
     face_match: FaceMatchResponse
     liveness: LivenessResponse
+    passive_liveness: PassiveLivenessResponse
     action_check: ActionCheckResponse
     final_decision: FinalDecisionResponse
     processing_time_ms: float

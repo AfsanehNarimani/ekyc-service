@@ -7,6 +7,7 @@ class VideoFinalDecisionService:
         face_match_passed: bool,
         actions_passed: bool,
         liveness_passed: bool,
+        passive_liveness_passed: bool,
     ) -> FinalDecision:
         rejection_reasons: list[str] = []
 
@@ -19,6 +20,9 @@ class VideoFinalDecisionService:
         if not liveness_passed:
             rejection_reasons.append("liveness_failed")
 
+        if not passive_liveness_passed:
+            rejection_reasons.append("passive_liveness_failed")
+
         approved = len(rejection_reasons) == 0
 
         return FinalDecision(
@@ -28,4 +32,5 @@ class VideoFinalDecisionService:
             face_match_passed=face_match_passed,
             actions_passed=actions_passed,
             liveness_passed=liveness_passed,
+            passive_liveness_passed=passive_liveness_passed,
         )

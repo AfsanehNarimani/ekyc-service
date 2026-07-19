@@ -5,6 +5,7 @@ from app import app
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
+from core.passive_liveness_result import PassiveLivenessResult
 from core.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
 from core.video_verification_result import VideoVerificationResult
@@ -54,6 +55,15 @@ class FakeVideoVerificationOrchestratorService:
                 min_pose_variation_score=18.0,
                 reason="passed_basic_liveness",
             ),
+            passive_liveness=PassiveLivenessResult(
+                passed=True,
+                score=1.0,
+                threshold=0.6,
+                model_name="stub_passive_liveness",
+                processed_frames=0,
+                skipped_frames=0,
+                reason="stub_passive_liveness_passed",
+            ),
             final_decision=FinalDecision(
                 approved=True,
                 status="approved",
@@ -61,8 +71,54 @@ class FakeVideoVerificationOrchestratorService:
                 face_match_passed=True,
                 actions_passed=True,
                 liveness_passed=True,
+                passive_liveness_passed=True,
             ),
             processing_time_ms=123.45,
+        )
+
+
+class FakeFailingVideoVerificationOrchestratorService:
+    def verify(
+        self,
+        trace_id: str,
+        challenge_id,
+        expected_actions,
+        national_id_image_uri,
+        video_uri,
+        face_match_level,
+        liveness_level,
+    ):
+        raise FileNotFoundError(video_uri)
+
+
+class FakeUnexpectedFailingVideoVerificationOrchestratorService:
+    def verify(
+        self,
+        trace_id: str,
+        challenge_id,
+        expected_actions,
+        national_id_image_uri,
+        video_uri,
+        face_match_level,
+        liveness_level,
+    ):
+        raise RuntimeError("database password or internal path should not leak")
+
+
+class FakeInvalidActionVideoVerificationOrchestratorService:
+    def verify(
+        self,
+        trace_id: str,
+        challenge_id,
+        expected_actions,
+        national_id_image_uri,
+        video_uri,
+        face_match_level,
+        liveness_level,
+    ):
+        raise ValueError(
+            "Invalid expected_actions. Expected exactly: "
+            "['center', 'left', 'right', 'up', 'down']"
         )
 
 
@@ -76,6 +132,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
     response = client.post(
         "/api/verify-video",
         json={
+            "trace_id": "trace-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -98,11 +155,14 @@ def test_verify_video_endpoint_returns_final_approved_result():
     body = response.json()
 
     assert body["ok"] is True
+    assert body["trace_id"] == "trace-1"
     assert body["challenge_id"] == "backend-challenge-123"
 
     assert body["face_match"]["passed"] is True
     assert body["action_check"]["passed"] is True
     assert body["liveness"]["passed"] is True
+    assert body["passive_liveness"]["passed"] is True
+    assert body["passive_liveness"]["model_name"] == "stub_passive_liveness"
 
     assert body["final_decision"]["approved"] is True
     assert body["final_decision"]["status"] == "approved"
@@ -110,20 +170,8 @@ def test_verify_video_endpoint_returns_final_approved_result():
     assert body["final_decision"]["face_match_passed"] is True
     assert body["final_decision"]["actions_passed"] is True
     assert body["final_decision"]["liveness_passed"] is True
-
-
-class FakeFailingVideoVerificationOrchestratorService:
-    def verify(
-        self,
-        trace_id: str,
-        challenge_id,
-        expected_actions,
-        national_id_image_uri,
-        video_uri,
-        face_match_level,
-        liveness_level,
-    ):
-        raise FileNotFoundError(video_uri)
+    assert body["final_decision"]["passive_liveness_passed"] is True
+    assert body["processing_time_ms"] == 123.45
 
 
 def test_verify_video_endpoint_returns_standard_error_response():
@@ -136,6 +184,7 @@ def test_verify_video_endpoint_returns_standard_error_response():
     response = client.post(
         "/api/verify-video",
         json={
+            "trace_id": "trace-error-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -158,80 +207,52 @@ def test_verify_video_endpoint_returns_standard_error_response():
     body = response.json()
 
     assert body["ok"] is False
+    assert body["trace_id"] == "trace-error-1"
+    assert body["processing_time_ms"] >= 0
     assert body["error"]["code"] == "media_file_not_found"
     assert "Media file not found" in body["error"]["message"]
     assert body["error"]["details"] == {}
 
 
-class FakeUnexpectedFailingVideoVerificationOrchestratorService:
-    def verify(
-        self,
-        trace_id: str,
-        challenge_id,
-        expected_actions,
-        national_id_image_uri,
-        video_uri,
-        face_match_level,
-        liveness_level,
-    ):
-        raise RuntimeError("database password or internal path should not leak")
+def test_verify_video_endpoint_returns_safe_internal_error_response():
+    app.dependency_overrides[get_video_verification_orchestrator_service] = (
+        lambda: FakeUnexpectedFailingVideoVerificationOrchestratorService()
+    )
 
-    def test_verify_video_endpoint_returns_safe_internal_error_response():
-        app.dependency_overrides[get_video_verification_orchestrator_service] = (
-            lambda: FakeUnexpectedFailingVideoVerificationOrchestratorService()
-        )
+    client = TestClient(app)
 
-        client = TestClient(app)
+    response = client.post(
+        "/api/verify-video",
+        json={
+            "trace_id": "trace-internal-error-1",
+            "challenge_id": "backend-challenge-123",
+            "expected_actions": [
+                "center",
+                "left",
+                "right",
+                "up",
+                "down",
+            ],
+            "national_id_image_uri": "/tmp/id.jpg",
+            "video_uri": "/tmp/video.mp4",
+            "face_match_level": 2,
+            "liveness_level": 2,
+        },
+    )
 
-        response = client.post(
-            "/api/verify-video",
-            json={
-                "trace_id": "trace-internal-error-1",
-                "challenge_id": "backend-challenge-123",
-                "expected_actions": [
-                    "center",
-                    "left",
-                    "right",
-                    "up",
-                    "down",
-                ],
-                "national_id_image_uri": "/tmp/id.jpg",
-                "video_uri": "/tmp/video.mp4",
-                "face_match_level": 2,
-                "liveness_level": 2,
-            },
-        )
+    app.dependency_overrides.clear()
 
-        app.dependency_overrides.clear()
+    assert response.status_code == 500
 
-        assert response.status_code == 500
+    body = response.json()
 
-        body = response.json()
-
-        assert body["ok"] is False
-        assert body["trace_id"] == "trace-internal-error-1"
-        assert body["error"]["code"] == "internal_server_error"
-        assert body["error"]["message"] == "Unexpected internal server error."
-        assert "database password" not in body["error"]["message"]
-        assert body["error"]["details"] == {}
-        assert body["processing_time_ms"] == 123.45
-
-
-class FakeInvalidActionVideoVerificationOrchestratorService:
-    def verify(
-        self,
-        trace_id: str,
-        challenge_id,
-        expected_actions,
-        national_id_image_uri,
-        video_uri,
-        face_match_level,
-        liveness_level,
-    ):
-        raise ValueError(
-            "Invalid expected_actions. Expected exactly: "
-            "['center', 'left', 'right', 'up', 'down']"
-        )
+    assert body["ok"] is False
+    assert body["trace_id"] == "trace-internal-error-1"
+    assert body["processing_time_ms"] >= 0
+    assert body["error"]["code"] == "internal_server_error"
+    assert body["error"]["message"] == "Unexpected internal server error."
+    assert "database password" not in body["error"]["message"]
+    assert body["error"]["details"] == {}
 
 
 def test_verify_video_endpoint_rejects_invalid_expected_actions():
@@ -268,6 +289,6 @@ def test_verify_video_endpoint_rejects_invalid_expected_actions():
 
     assert body["ok"] is False
     assert body["trace_id"] == "trace-invalid-actions-1"
+    assert body["processing_time_ms"] >= 0
     assert body["error"]["code"] == "invalid_request"
     assert "Invalid expected_actions" in body["error"]["message"]
-    assert body["processing_time_ms"] >= 0

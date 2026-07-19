@@ -1,10 +1,11 @@
+from api.video_verification_response_mapper import VideoVerificationResponseMapper
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
+from core.passive_liveness_result import PassiveLivenessResult
 from core.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
 from core.video_verification_result import VideoVerificationResult
-from api.video_verification_response_mapper import VideoVerificationResponseMapper
 
 
 def test_video_verification_response_mapper_maps_result_to_response():
@@ -53,6 +54,15 @@ def test_video_verification_response_mapper_maps_result_to_response():
             min_pose_variation_score=18.0,
             reason="passed_basic_liveness",
         ),
+        passive_liveness=PassiveLivenessResult(
+            passed=True,
+            score=1.0,
+            threshold=0.6,
+            model_name="stub_passive_liveness",
+            processed_frames=0,
+            skipped_frames=0,
+            reason="stub_passive_liveness_passed",
+        ),
         final_decision=FinalDecision(
             approved=True,
             status="approved",
@@ -60,6 +70,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
             face_match_passed=True,
             actions_passed=True,
             liveness_passed=True,
+            passive_liveness_passed=True,
         ),
         processing_time_ms=123.45,
     )
@@ -67,6 +78,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
     response = VideoVerificationResponseMapper().to_response(result)
 
     assert response.ok is True
+    assert response.trace_id == "trace-1"
     assert response.challenge_id == "challenge-1"
     assert response.expected_actions == [
         "center",
@@ -79,7 +91,8 @@ def test_video_verification_response_mapper_maps_result_to_response():
         "left",
     ]
     assert response.liveness.reason == "passed_basic_liveness"
+    assert response.passive_liveness.passed is True
+    assert response.passive_liveness.model_name == "stub_passive_liveness"
     assert response.final_decision.approved is True
-
-    assert response.trace_id == "trace-1"
+    assert response.final_decision.passive_liveness_passed is True
     assert response.processing_time_ms == 123.45

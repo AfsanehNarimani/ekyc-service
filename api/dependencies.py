@@ -238,6 +238,7 @@ def get_video_verification_orchestrator_service() -> (
         face_match_service=get_video_face_match_service(),
         action_check_service=get_video_action_check_service(),
         liveness_service=get_video_liveness_service(),
+        passive_liveness_checker=get_passive_liveness_checker(),
         final_decision_service=get_video_final_decision_service(),
         expected_action_policy=get_expected_action_policy(),
         media_cleanup_service=get_media_cleanup_service(),

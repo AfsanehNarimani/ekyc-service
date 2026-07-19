@@ -1,10 +1,11 @@
 import logging
-from pathlib import Path
 import time
+from pathlib import Path
 
 from core.liveness_action import LivenessAction
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
+from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
 from liveness.expected_action_policy import ExpectedActionPolicy
 from media.image_file_loader import ImageFileLoader
 from media.media_cleanup_service import MediaCleanupService
@@ -25,6 +26,7 @@ class VideoVerificationOrchestratorService:
         face_match_service: VideoFaceMatchService,
         action_check_service: VideoActionCheckService,
         liveness_service: VideoLivenessService,
+        passive_liveness_checker: BasePassiveLivenessChecker,
         final_decision_service: VideoFinalDecisionService,
         expected_action_policy: ExpectedActionPolicy,
         media_cleanup_service: MediaCleanupService,
@@ -34,6 +36,7 @@ class VideoVerificationOrchestratorService:
         self.face_match_service = face_match_service
         self.action_check_service = action_check_service
         self.liveness_service = liveness_service
+        self.passive_liveness_checker = passive_liveness_checker
         self.final_decision_service = final_decision_service
         self.expected_action_policy = expected_action_policy
         self.media_cleanup_service = media_cleanup_service
@@ -117,10 +120,25 @@ class VideoVerificationOrchestratorService:
                 liveness_result.reason,
             )
 
+            passive_liveness_result = self.passive_liveness_checker.check(
+                video_path=video_path,
+                strictness_level=liveness_level,
+            )
+
+            logger.info(
+                "trace_id=%s challenge_id=%s step=passive_liveness_done passed=%s score=%.4f reason=%s",
+                trace_id,
+                challenge_id,
+                passive_liveness_result.passed,
+                passive_liveness_result.score,
+                passive_liveness_result.reason,
+            )
+
             final_decision = self.final_decision_service.decide(
                 face_match_passed=face_match_result.is_match,
                 actions_passed=action_check_result.passed,
                 liveness_passed=liveness_result.passed,
+                passive_liveness_passed=passive_liveness_result.passed,
             )
 
             processing_time_ms = round(
@@ -144,6 +162,7 @@ class VideoVerificationOrchestratorService:
                 face_match=face_match_result,
                 action_check=action_check_result,
                 liveness=liveness_result,
+                passive_liveness=passive_liveness_result,
                 final_decision=final_decision,
                 processing_time_ms=processing_time_ms,
             )
