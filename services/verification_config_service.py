@@ -49,4 +49,18 @@ class VerificationConfigService:
                     ),
                 },
             },
+            "passive_liveness_levels": {
+                "1": {
+                    "name": "relaxed",
+                    "threshold": settings.passive_liveness_threshold_level_1,
+                },
+                "2": {
+                    "name": "normal",
+                    "threshold": settings.passive_liveness_threshold_level_2,
+                },
+                "3": {
+                    "name": "strict",
+                    "threshold": settings.passive_liveness_threshold_level_3,
+                },
+            },
         }

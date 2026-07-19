@@ -20,5 +20,9 @@ def test_verification_config_endpoint_returns_config():
         "up",
         "down",
     ]
+
     assert body["face_match_levels"]["2"]["name"] == "normal"
     assert body["liveness_levels"]["2"]["name"] == "normal"
+
+    assert body["passive_liveness_levels"]["2"]["name"] == "normal"
+    assert body["passive_liveness_levels"]["2"]["threshold"] == 0.6

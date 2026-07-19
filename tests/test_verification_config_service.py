@@ -21,3 +21,8 @@ def test_verification_config_service_returns_supported_levels():
     assert config["liveness_levels"]["1"]["name"] == "relaxed"
     assert config["liveness_levels"]["2"]["name"] == "normal"
     assert config["liveness_levels"]["3"]["name"] == "strict"
+
+    assert config["passive_liveness_levels"]["1"]["name"] == "relaxed"
+    assert config["passive_liveness_levels"]["2"]["name"] == "normal"
+    assert config["passive_liveness_levels"]["3"]["name"] == "strict"
+    assert config["passive_liveness_levels"]["2"]["threshold"] == 0.6
