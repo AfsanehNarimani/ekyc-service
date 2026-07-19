@@ -15,6 +15,10 @@ from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
 from media.media_loader import MediaLoader
+from face.face_match_threshold_policy import FaceMatchThresholdPolicy
+from services.video_face_match_service import VideoFaceMatchService
+from video.video_frame_extractor import VideoFrameExtractor
+
 
 @lru_cache
 def get_face_preprocessor() -> FacePreprocessor:
@@ -96,4 +100,32 @@ def get_media_loader() -> MediaLoader:
     return MediaLoader(
         temp_dir=settings.media_temp_dir,
         s3_region_name=settings.s3_region_name,
+    )
+
+@lru_cache
+def get_video_frame_extractor() -> VideoFrameExtractor:
+    return VideoFrameExtractor(
+        frame_interval_seconds=settings.video_frame_interval_seconds,
+        max_frames=settings.video_max_frames,
+    )
+
+
+@lru_cache
+def get_face_match_threshold_policy() -> FaceMatchThresholdPolicy:
+    return FaceMatchThresholdPolicy(
+        level_to_threshold={
+            1: settings.face_match_threshold_level_1,
+            2: settings.face_match_threshold_level_2,
+            3: settings.face_match_threshold_level_3,
+        }
+    )
+
+
+@lru_cache
+def get_video_face_match_service() -> VideoFaceMatchService:
+    return VideoFaceMatchService(
+        preprocessor=get_face_preprocessor(),
+        embedder=get_face_embedder(),
+        frame_extractor=get_video_frame_extractor(),
+        threshold_policy=get_face_match_threshold_policy(),
     )

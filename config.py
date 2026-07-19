@@ -32,5 +32,12 @@ class Settings(BaseSettings):
     face_match_threshold: float = 0.55
     detector_threshold: float = 0.5
 
+    video_frame_interval_seconds: float = 1.0
+    video_max_frames: int = 30
+
+    face_match_threshold_level_1: float = 0.45
+    face_match_threshold_level_2: float = 0.55
+    face_match_threshold_level_3: float = 0.65
+
 
 settings = Settings()
