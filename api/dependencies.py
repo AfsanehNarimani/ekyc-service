@@ -20,6 +20,10 @@ from services.video_face_match_service import VideoFaceMatchService
 from video.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
+from services.verification_config_service import VerificationConfigService
+from services.video_verification_orchestrator_service import (
+    VideoVerificationOrchestratorService,
+)
 from services.video_action_check_service import VideoActionCheckService
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,
@@ -27,10 +31,8 @@ from liveness.liveness_threshold_policy import (
 )
 from services.video_liveness_service import VideoLivenessService
 from services.video_final_decision_service import VideoFinalDecisionService
-from services.verification_config_service import VerificationConfigService
-from services.video_verification_orchestrator_service import (
-    VideoVerificationOrchestratorService,
-)
+from api.video_verification_response_mapper import VideoVerificationResponseMapper
+
 
 
 @lru_cache
@@ -220,3 +222,7 @@ def get_video_verification_orchestrator_service() -> (
         liveness_service=get_video_liveness_service(),
         final_decision_service=get_video_final_decision_service(),
     )
+
+@lru_cache
+def get_video_verification_response_mapper() -> VideoVerificationResponseMapper:
+    return VideoVerificationResponseMapper()
