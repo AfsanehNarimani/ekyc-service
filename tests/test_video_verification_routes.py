@@ -62,6 +62,7 @@ class FakeVideoVerificationOrchestratorService:
                 actions_passed=True,
                 liveness_passed=True,
             ),
+            processing_time_ms=123.45,
         )
 
 
@@ -212,6 +213,7 @@ class FakeUnexpectedFailingVideoVerificationOrchestratorService:
         assert body["error"]["message"] == "Unexpected internal server error."
         assert "database password" not in body["error"]["message"]
         assert body["error"]["details"] == {}
+        assert body["processing_time_ms"] == 123.45
 
 class FakeInvalidActionVideoVerificationOrchestratorService:
     def verify(

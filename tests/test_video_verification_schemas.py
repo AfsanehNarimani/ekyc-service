@@ -67,9 +67,11 @@ def test_verify_video_response_schema_accepts_valid_response():
             "actions_passed": True,
             "liveness_passed": True,
         },
+        processing_time_ms=123.45,
     )
 
     assert response.ok is True
     assert response.final_decision.approved is True
     assert response.face_match.model_name == "edgeface"
     assert response.trace_id == "trace-1"
+    assert response.processing_time_ms == 123.45

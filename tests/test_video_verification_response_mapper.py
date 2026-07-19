@@ -61,6 +61,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
             actions_passed=True,
             liveness_passed=True,
         ),
+        processing_time_ms=123.45,
     )
 
     response = VideoVerificationResponseMapper().to_response(result)
@@ -81,3 +82,4 @@ def test_video_verification_response_mapper_maps_result_to_response():
     assert response.final_decision.approved is True
 
     assert response.trace_id == "trace-1"
+    assert response.processing_time_ms == 123.45

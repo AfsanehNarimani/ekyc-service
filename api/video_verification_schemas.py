@@ -62,3 +62,4 @@ class VerifyVideoResponse(BaseModel):
     liveness: LivenessResponse
     action_check: ActionCheckResponse
     final_decision: FinalDecisionResponse
+    processing_time_ms: float

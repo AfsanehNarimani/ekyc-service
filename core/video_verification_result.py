@@ -16,3 +16,4 @@ class VideoVerificationResult:
     action_check: ActionCheckResult
     liveness: VideoLivenessResult
     final_decision: FinalDecision
+    processing_time_ms: float

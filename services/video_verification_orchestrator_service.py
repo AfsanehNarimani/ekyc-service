@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import time
 
 from core.liveness_action import LivenessAction
 from core.media_reference import MediaReference
@@ -47,6 +48,8 @@ class VideoVerificationOrchestratorService:
         face_match_level: int,
         liveness_level: int,
     ) -> VideoVerificationResult:
+        started_at = time.perf_counter()
+
         logger.info(
             "trace_id=%s challenge_id=%s step=verification_started",
             trace_id,
@@ -120,12 +123,18 @@ class VideoVerificationOrchestratorService:
                 liveness_passed=liveness_result.passed,
             )
 
+            processing_time_ms = round(
+                (time.perf_counter() - started_at) * 1000,
+                2,
+            )
+
             logger.info(
-                "trace_id=%s challenge_id=%s step=verification_finished approved=%s reasons=%s",
+                "trace_id=%s challenge_id=%s step=verification_finished approved=%s reasons=%s processing_time_ms=%.2f",
                 trace_id,
                 challenge_id,
                 final_decision.approved,
                 final_decision.rejection_reasons,
+                processing_time_ms,
             )
 
             return VideoVerificationResult(
@@ -136,6 +145,7 @@ class VideoVerificationOrchestratorService:
                 action_check=action_check_result,
                 liveness=liveness_result,
                 final_decision=final_decision,
+                processing_time_ms=processing_time_ms,
             )
 
         finally:

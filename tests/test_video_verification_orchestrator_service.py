@@ -173,3 +173,4 @@ def test_video_verification_orchestrator_runs_full_flow():
         Path("/tmp/fake.jpg"),
         Path("/tmp/fake.mp4"),
     ]
+    assert result.processing_time_ms >= 0

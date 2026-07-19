@@ -60,4 +60,5 @@ class VideoVerificationResponseMapper:
                 "actions_passed": result.final_decision.actions_passed,
                 "liveness_passed": result.final_decision.liveness_passed,
             },
+            processing_time_ms=result.processing_time_ms,
         )
