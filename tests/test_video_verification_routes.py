@@ -9,6 +9,7 @@ from api.dependencies import (
     get_media_loader,
     get_video_action_check_service,
     get_video_face_match_service,
+    get_video_liveness_service,
 )
 from app import app
 from core.liveness_action import LivenessAction
@@ -78,7 +79,25 @@ class FakeVideoActionCheckService:
         )
 
 
-def test_verify_video_endpoint_returns_face_match_and_action_check_result():
+class FakeVideoLivenessService:
+    def check_liveness(
+        self,
+        video_path: Path,
+        strictness_level: int,
+    ):
+        return SimpleNamespace(
+            passed=True,
+            strictness_level=strictness_level,
+            processed_frames=10,
+            skipped_frames=0,
+            min_required_frames=5,
+            pose_variation_score=30.0,
+            min_pose_variation_score=18.0,
+            reason="passed_basic_liveness",
+        )
+
+
+def test_verify_video_endpoint_returns_final_approved_result():
     app.dependency_overrides[get_media_loader] = lambda: FakeMediaLoader()
     app.dependency_overrides[get_image_file_loader] = lambda: FakeImageFileLoader()
     app.dependency_overrides[get_video_face_match_service] = (
@@ -86,6 +105,9 @@ def test_verify_video_endpoint_returns_face_match_and_action_check_result():
     )
     app.dependency_overrides[get_video_action_check_service] = (
         lambda: FakeVideoActionCheckService()
+    )
+    app.dependency_overrides[get_video_liveness_service] = (
+        lambda: FakeVideoLivenessService()
     )
 
     client = TestClient(app)
@@ -118,26 +140,11 @@ def test_verify_video_endpoint_returns_face_match_and_action_check_result():
     assert body["challenge_id"] == "backend-challenge-123"
 
     assert body["face_match"]["passed"] is True
-    assert body["face_match"]["score"] == 0.76
-    assert body["face_match"]["model_name"] == "edgeface"
-
     assert body["action_check"]["passed"] is True
-    assert body["action_check"]["required_actions"] == [
-        "center",
-        "left",
-        "right",
-        "up",
-        "down",
-    ]
-    assert body["action_check"]["compact_actions"] == [
-        "center",
-        "left",
-        "right",
-        "up",
-        "down",
-    ]
-    assert body["action_check"]["missing_actions"] == []
+    assert body["liveness"]["passed"] is True
 
-    assert body["liveness"]["status"] == "pending_implementation"
-    assert body["final_decision"]["approved"] is False
-    assert body["final_decision"]["would_approve_without_liveness"] is True
+    assert body["final_decision"]["approved"] is True
+    assert body["final_decision"]["status"] == "approved"
+    assert body["final_decision"]["face_match_passed"] is True
+    assert body["final_decision"]["actions_passed"] is True
+    assert body["final_decision"]["liveness_passed"] is True

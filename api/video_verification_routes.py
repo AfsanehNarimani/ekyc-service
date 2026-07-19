@@ -5,6 +5,7 @@ from api.dependencies import (
     get_media_loader,
     get_video_action_check_service,
     get_video_face_match_service,
+    get_video_liveness_service,
 )
 from api.video_verification_schemas import VerifyVideoRequest
 from core.exceptions import (
@@ -17,6 +18,7 @@ from media.image_file_loader import ImageFileLoader
 from media.media_loader import MediaLoader
 from services.video_action_check_service import VideoActionCheckService
 from services.video_face_match_service import VideoFaceMatchService
+from services.video_liveness_service import VideoLivenessService
 
 router = APIRouter(
     prefix="/api",
@@ -33,6 +35,7 @@ def verify_video(
     action_check_service: VideoActionCheckService = Depends(
         get_video_action_check_service
     ),
+    liveness_service: VideoLivenessService = Depends(get_video_liveness_service),
 ):
     try:
         national_id_image_path = media_loader.load_to_file(
@@ -59,9 +62,15 @@ def verify_video(
             expected_actions=request.expected_actions,
         )
 
+        liveness_result = liveness_service.check_liveness(
+            video_path=video_path,
+            strictness_level=request.liveness_level,
+        )
+
         final_approved = (
             face_match_result.is_match
             and action_check_result.passed
+            and liveness_result.passed
         )
 
         return {
@@ -80,8 +89,16 @@ def verify_video(
                 "skipped_frames": face_match_result.skipped_frames,
             },
             "liveness": {
-                "status": "pending_implementation",
-                "strictness_level": request.liveness_level,
+                "passed": liveness_result.passed,
+                "strictness_level": liveness_result.strictness_level,
+                "processed_frames": liveness_result.processed_frames,
+                "skipped_frames": liveness_result.skipped_frames,
+                "min_required_frames": liveness_result.min_required_frames,
+                "pose_variation_score": liveness_result.pose_variation_score,
+                "min_pose_variation_score": (
+                    liveness_result.min_pose_variation_score
+                ),
+                "reason": liveness_result.reason,
             },
             "action_check": {
                 "passed": action_check_result.passed,
@@ -101,12 +118,11 @@ def verify_video(
                 "skipped_frames": action_check_result.skipped_frames,
             },
             "final_decision": {
-                "status": "pending_liveness",
-                "approved": False,
+                "approved": final_approved,
                 "face_match_passed": face_match_result.is_match,
                 "actions_passed": action_check_result.passed,
-                "liveness_passed": None,
-                "would_approve_without_liveness": final_approved,
+                "liveness_passed": liveness_result.passed,
+                "status": "approved" if final_approved else "rejected",
             },
         }
 
