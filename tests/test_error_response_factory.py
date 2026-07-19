@@ -9,6 +9,7 @@ def test_error_response_factory_builds_standard_error_response():
         code="media_file_not_found",
         message="Media file not found",
         trace_id="trace-1",
+        processing_time_ms=12.34,
         details={"path": "/tmp/missing.mp4"},
     )
 
@@ -18,6 +19,7 @@ def test_error_response_factory_builds_standard_error_response():
     assert body == {
         "ok": False,
         "trace_id": "trace-1",
+        "processing_time_ms": 12.34,
         "error": {
             "code": "media_file_not_found",
             "message": "Media file not found",

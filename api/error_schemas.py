@@ -12,4 +12,5 @@ class ErrorDetailResponse(BaseModel):
 class ErrorResponse(BaseModel):
     ok: bool = False
     trace_id: str | None = None
+    processing_time_ms: float | None = None
     error: ErrorDetailResponse

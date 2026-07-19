@@ -268,3 +268,4 @@ def test_verify_video_endpoint_rejects_invalid_expected_actions():
     assert body["trace_id"] == "trace-invalid-actions-1"
     assert body["error"]["code"] == "invalid_request"
     assert "Invalid expected_actions" in body["error"]["message"]
+    assert body["processing_time_ms"] >= 0

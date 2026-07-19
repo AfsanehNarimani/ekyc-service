@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+import time
 import uuid
 
 from fastapi import APIRouter, Depends
@@ -56,6 +59,7 @@ def verify_video(
     ),
 ) -> VerifyVideoResponse | JSONResponse:
     trace_id = request.trace_id or uuid.uuid4().hex
+    started_at = time.perf_counter()
 
     try:
         result = service.verify(
@@ -82,6 +86,7 @@ def verify_video(
             code="invalid_request",
             message=str(error),
             trace_id=trace_id,
+            processing_time_ms=_elapsed_ms(started_at),
         )
 
     except FileNotFoundError as error:
@@ -96,6 +101,7 @@ def verify_video(
             code="media_file_not_found",
             message=f"Media file not found: {error}",
             trace_id=trace_id,
+            processing_time_ms=_elapsed_ms(started_at),
         )
 
     except MediaLoadError as error:
@@ -110,6 +116,7 @@ def verify_video(
             code="media_load_failed",
             message=str(error),
             trace_id=trace_id,
+            processing_time_ms=_elapsed_ms(started_at),
         )
 
     except InvalidVideoError as error:
@@ -124,6 +131,7 @@ def verify_video(
             code="invalid_video",
             message=str(error),
             trace_id=trace_id,
+            processing_time_ms=_elapsed_ms(started_at),
         )
 
     except NoUsableVideoFrameError as error:
@@ -145,4 +153,13 @@ def verify_video(
         code="internal_server_error",
         message="Unexpected internal server error.",
         trace_id=trace_id,
+        processing_time_ms=_elapsed_ms(started_at),
+    )
+
+def _elapsed_ms(
+    started_at: float,
+) -> float:
+    return round(
+        (time.perf_counter() - started_at) * 1000,
+        2,
     )
