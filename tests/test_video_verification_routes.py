@@ -1,113 +1,71 @@
-from pathlib import Path
-from types import SimpleNamespace
-
 from fastapi.testclient import TestClient
-from PIL import Image
 
-from api.dependencies import (
-    get_image_file_loader,
-    get_media_loader,
-    get_video_action_check_service,
-    get_video_face_match_service,
-    get_video_liveness_service,
-)
+from api.dependencies import get_video_verification_orchestrator_service
 from app import app
+from core.action_check_result import ActionCheckResult
+from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
+from core.video_face_match_result import VideoFaceMatchResult
+from core.video_liveness_result import VideoLivenessResult
+from core.video_verification_result import VideoVerificationResult
 
 
-class FakeMediaLoader:
-    def load_to_file(
+class FakeVideoVerificationOrchestratorService:
+    def verify(
         self,
-        reference,
-        suffix: str,
-    ) -> Path:
-        return Path(f"/tmp/fake{suffix}")
-
-
-class FakeImageFileLoader:
-    def load(
-        self,
-        path: Path,
-    ) -> Image.Image:
-        return Image.new("RGB", (112, 112))
-
-
-class FakeVideoFaceMatchService:
-    def match_id_card_to_video(
-        self,
-        national_id_image,
-        video_path: Path,
-        strictness_level: int,
-    ):
-        return SimpleNamespace(
-            is_match=True,
-            score=0.76,
-            best_score=0.82,
-            threshold=0.55,
-            model_name="edgeface",
-            processed_frames=10,
-            skipped_frames=2,
-        )
-
-
-class FakeVideoActionCheckService:
-    def check_actions(
-        self,
-        video_path: Path,
+        challenge_id: str,
         expected_actions: list[LivenessAction],
-    ):
-        return SimpleNamespace(
-            passed=True,
-            required_actions=expected_actions,
-            observed_actions=[
-                LivenessAction.CENTER,
-                LivenessAction.LEFT,
-                LivenessAction.RIGHT,
-                LivenessAction.UP,
-                LivenessAction.DOWN,
-            ],
-            compact_actions=[
-                LivenessAction.CENTER,
-                LivenessAction.LEFT,
-                LivenessAction.RIGHT,
-                LivenessAction.UP,
-                LivenessAction.DOWN,
-            ],
-            missing_actions=[],
-            processed_frames=10,
-            skipped_frames=0,
-        )
-
-
-class FakeVideoLivenessService:
-    def check_liveness(
-        self,
-        video_path: Path,
-        strictness_level: int,
-    ):
-        return SimpleNamespace(
-            passed=True,
-            strictness_level=strictness_level,
-            processed_frames=10,
-            skipped_frames=0,
-            min_required_frames=5,
-            pose_variation_score=30.0,
-            min_pose_variation_score=18.0,
-            reason="passed_basic_liveness",
+        national_id_image_uri: str,
+        video_uri: str,
+        face_match_level: int,
+        liveness_level: int,
+    ) -> VideoVerificationResult:
+        return VideoVerificationResult(
+            challenge_id=challenge_id,
+            expected_actions=expected_actions,
+            face_match=VideoFaceMatchResult(
+                is_match=True,
+                score=0.76,
+                best_score=0.82,
+                threshold=0.55,
+                model_name="edgeface",
+                processed_frames=10,
+                skipped_frames=2,
+                frame_scores=[0.76],
+            ),
+            action_check=ActionCheckResult(
+                passed=True,
+                required_actions=expected_actions,
+                observed_actions=expected_actions,
+                compact_actions=expected_actions,
+                missing_actions=[],
+                processed_frames=10,
+                skipped_frames=0,
+            ),
+            liveness=VideoLivenessResult(
+                passed=True,
+                strictness_level=liveness_level,
+                processed_frames=10,
+                skipped_frames=0,
+                min_required_frames=5,
+                pose_variation_score=30.0,
+                min_pose_variation_score=18.0,
+                reason="passed_basic_liveness",
+            ),
+            final_decision=FinalDecision(
+                approved=True,
+                status="approved",
+                rejection_reasons=[],
+                face_match_passed=True,
+                actions_passed=True,
+                liveness_passed=True,
+            ),
         )
 
 
 def test_verify_video_endpoint_returns_final_approved_result():
-    app.dependency_overrides[get_media_loader] = lambda: FakeMediaLoader()
-    app.dependency_overrides[get_image_file_loader] = lambda: FakeImageFileLoader()
-    app.dependency_overrides[get_video_face_match_service] = (
-        lambda: FakeVideoFaceMatchService()
-    )
-    app.dependency_overrides[get_video_action_check_service] = (
-        lambda: FakeVideoActionCheckService()
-    )
-    app.dependency_overrides[get_video_liveness_service] = (
-        lambda: FakeVideoLivenessService()
+    app.dependency_overrides[get_video_verification_orchestrator_service] = (
+        lambda: FakeVideoVerificationOrchestratorService()
     )
 
     client = TestClient(app)
