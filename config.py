@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     head_pose_yaw_threshold: float = 15.0
     head_pose_pitch_threshold: float = 10.0
     head_pose_neutral_yaw_threshold: float = 8.0
-    head_pose_neutral_pitch_threshold: float = 8.0
+    head_pose_neutral_pitch_threshold: float = 10.0
 
 
 settings = Settings()
