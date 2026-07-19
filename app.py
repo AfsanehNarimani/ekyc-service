@@ -1,10 +1,12 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 
 from api.challenge_routes import router as challenge_router
 from api.config_routes import router as config_router
 from api.ekyc_routes import router as ekyc_router
+from api.exception_handlers import request_validation_exception_handler
 from api.video_verification_routes import router as video_verification_router
 from config import settings
 
@@ -14,6 +16,11 @@ logging.basicConfig(
 )
 
 app = FastAPI(title=settings.app_name)
+
+app.add_exception_handler(
+    RequestValidationError,
+    request_validation_exception_handler,
+)
 
 app.include_router(challenge_router)
 app.include_router(config_router)
