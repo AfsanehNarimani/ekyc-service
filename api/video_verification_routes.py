@@ -8,7 +8,10 @@ from api.dependencies import (
     get_video_liveness_service,
 get_video_final_decision_service,
 )
-from api.video_verification_schemas import VerifyVideoRequest
+from api.video_verification_schemas import (
+    VerifyVideoRequest,
+    VerifyVideoResponse,
+)
 from core.exceptions import (
     InvalidVideoError,
     MediaLoadError,
@@ -28,7 +31,10 @@ router = APIRouter(
 )
 
 
-@router.post("/verify-video")
+@router.post(
+    "/verify-video",
+    response_model=VerifyVideoResponse,
+)
 def verify_video(
     request: VerifyVideoRequest,
     media_loader: MediaLoader = Depends(get_media_loader),
