@@ -27,6 +27,7 @@ from liveness.liveness_threshold_policy import (
 )
 from services.video_liveness_service import VideoLivenessService
 from services.video_final_decision_service import VideoFinalDecisionService
+from services.verification_config_service import VerificationConfigService
 
 
 @lru_cache
@@ -199,3 +200,7 @@ def get_video_action_check_service() -> VideoActionCheckService:
 @lru_cache
 def get_video_final_decision_service() -> VideoFinalDecisionService:
     return VideoFinalDecisionService()
+
+@lru_cache
+def get_verification_config_service() -> VerificationConfigService:
+    return VerificationConfigService()
