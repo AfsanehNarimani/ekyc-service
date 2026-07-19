@@ -212,3 +212,57 @@ class FakeUnexpectedFailingVideoVerificationOrchestratorService:
         assert body["error"]["message"] == "Unexpected internal server error."
         assert "database password" not in body["error"]["message"]
         assert body["error"]["details"] == {}
+
+class FakeInvalidActionVideoVerificationOrchestratorService:
+    def verify(
+        self,
+        trace_id: str,
+        challenge_id,
+        expected_actions,
+        national_id_image_uri,
+        video_uri,
+        face_match_level,
+        liveness_level,
+    ):
+        raise ValueError(
+            "Invalid expected_actions. Expected exactly: "
+            "['center', 'left', 'right', 'up', 'down']"
+        )
+
+
+def test_verify_video_endpoint_rejects_invalid_expected_actions():
+    app.dependency_overrides[get_video_verification_orchestrator_service] = (
+        lambda: FakeInvalidActionVideoVerificationOrchestratorService()
+    )
+
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/verify-video",
+        json={
+            "trace_id": "trace-invalid-actions-1",
+            "challenge_id": "backend-challenge-123",
+            "expected_actions": [
+                "center",
+                "right",
+                "left",
+                "up",
+                "down",
+            ],
+            "national_id_image_uri": "/tmp/id.jpg",
+            "video_uri": "/tmp/video.mp4",
+            "face_match_level": 2,
+            "liveness_level": 2,
+        },
+    )
+
+    app.dependency_overrides.clear()
+
+    assert response.status_code == 400
+
+    body = response.json()
+
+    assert body["ok"] is False
+    assert body["trace_id"] == "trace-invalid-actions-1"
+    assert body["error"]["code"] == "invalid_request"
+    assert "Invalid expected_actions" in body["error"]["message"]

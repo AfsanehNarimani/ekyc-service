@@ -3,6 +3,7 @@ from pathlib import Path
 from PIL import Image
 
 from core.action_check_result import ActionCheckResult
+from liveness.expected_action_policy import ExpectedActionPolicy
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
 from core.video_face_match_result import VideoFaceMatchResult
@@ -114,6 +115,15 @@ def test_video_verification_orchestrator_runs_full_flow():
         action_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
         final_decision_service=FakeFinalDecisionService(),
+        expected_action_policy=ExpectedActionPolicy(
+            required_actions=[
+                LivenessAction.CENTER,
+                LivenessAction.LEFT,
+                LivenessAction.RIGHT,
+                LivenessAction.UP,
+                LivenessAction.DOWN,
+            ]
+        ),
     )
 
     result = service.verify(

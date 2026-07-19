@@ -1,5 +1,6 @@
 import logging
 
+from liveness.expected_action_policy import ExpectedActionPolicy
 from core.liveness_action import LivenessAction
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
@@ -22,6 +23,7 @@ class VideoVerificationOrchestratorService:
         action_check_service: VideoActionCheckService,
         liveness_service: VideoLivenessService,
         final_decision_service: VideoFinalDecisionService,
+        expected_action_policy: ExpectedActionPolicy,
     ) -> None:
         self.media_loader = media_loader
         self.image_file_loader = image_file_loader
@@ -29,6 +31,7 @@ class VideoVerificationOrchestratorService:
         self.action_check_service = action_check_service
         self.liveness_service = liveness_service
         self.final_decision_service = final_decision_service
+        self.expected_action_policy = expected_action_policy
 
     def verify(
         self,
@@ -45,6 +48,8 @@ class VideoVerificationOrchestratorService:
             trace_id,
             challenge_id,
         )
+
+        self.expected_action_policy.validate(expected_actions)
 
         national_id_image_path = self.media_loader.load_to_file(
             reference=MediaReference(national_id_image_uri),

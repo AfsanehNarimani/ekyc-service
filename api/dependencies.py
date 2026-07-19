@@ -10,11 +10,13 @@ from face.face_preprocessor import FacePreprocessor
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
 from services.enrollment_service import EnrollmentService
+from liveness.expected_action_policy import ExpectedActionPolicy
 from services.image_verification_service import ImageVerificationService
 from storage.embedding_store import EmbeddingStore
 from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
+from core.liveness_action import LivenessAction
 from media.media_loader import MediaLoader
 from face.face_match_threshold_policy import FaceMatchThresholdPolicy
 from services.video_face_match_service import VideoFaceMatchService
@@ -222,6 +224,7 @@ def get_video_verification_orchestrator_service() -> (
         action_check_service=get_video_action_check_service(),
         liveness_service=get_video_liveness_service(),
         final_decision_service=get_video_final_decision_service(),
+        expected_action_policy=get_expected_action_policy(),
     )
 
 @lru_cache
@@ -231,3 +234,15 @@ def get_video_verification_response_mapper() -> VideoVerificationResponseMapper:
 @lru_cache
 def get_error_response_factory() -> ErrorResponseFactory:
     return ErrorResponseFactory()
+
+@lru_cache
+def get_expected_action_policy() -> ExpectedActionPolicy:
+    return ExpectedActionPolicy(
+        required_actions=[
+            LivenessAction.CENTER,
+            LivenessAction.LEFT,
+            LivenessAction.RIGHT,
+            LivenessAction.UP,
+            LivenessAction.DOWN,
+        ]
+    )
