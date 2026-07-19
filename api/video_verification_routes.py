@@ -1,9 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
 from api.dependencies import (
+    get_error_response_factory,
     get_video_verification_orchestrator_service,
     get_video_verification_response_mapper,
 )
+from api.error_response_factory import ErrorResponseFactory
+from api.error_schemas import ErrorResponse
 from api.video_verification_response_mapper import VideoVerificationResponseMapper
 from api.video_verification_schemas import (
     VerifyVideoRequest,
@@ -27,6 +31,11 @@ router = APIRouter(
 @router.post(
     "/verify-video",
     response_model=VerifyVideoResponse,
+    responses={
+        400: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
 )
 def verify_video(
     request: VerifyVideoRequest,
@@ -36,7 +45,10 @@ def verify_video(
     response_mapper: VideoVerificationResponseMapper = Depends(
         get_video_verification_response_mapper
     ),
-):
+    error_response_factory: ErrorResponseFactory = Depends(
+        get_error_response_factory
+    ),
+) -> VerifyVideoResponse | JSONResponse:
     try:
         result = service.verify(
             challenge_id=request.challenge_id,
@@ -50,31 +62,36 @@ def verify_video(
         return response_mapper.to_response(result)
 
     except ValueError as error:
-        raise HTTPException(
+        return error_response_factory.build(
             status_code=400,
-            detail=str(error),
-        ) from error
+            code="invalid_request",
+            message=str(error),
+        )
 
     except FileNotFoundError as error:
-        raise HTTPException(
+        return error_response_factory.build(
             status_code=404,
-            detail=f"Media file not found: {error}",
-        ) from error
+            code="media_file_not_found",
+            message=f"Media file not found: {error}",
+        )
 
     except MediaLoadError as error:
-        raise HTTPException(
+        return error_response_factory.build(
             status_code=422,
-            detail=str(error),
-        ) from error
+            code="media_load_failed",
+            message=str(error),
+        )
 
     except InvalidVideoError as error:
-        raise HTTPException(
+        return error_response_factory.build(
             status_code=422,
-            detail=str(error),
-        ) from error
+            code="invalid_video",
+            message=str(error),
+        )
 
     except NoUsableVideoFrameError as error:
-        raise HTTPException(
+        return error_response_factory.build(
             status_code=422,
-            detail=str(error),
-        ) from error
+            code="no_usable_video_frame",
+            message=str(error),
+        )

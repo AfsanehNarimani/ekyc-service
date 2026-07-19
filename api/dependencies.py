@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from config import settings
 from face.base_embedder import BaseFaceEmbedder
+from api.error_response_factory import ErrorResponseFactory
 from face.face_aligner import FaceAligner
 from face.face_embedder_factory import FaceEmbedderFactory
 from face.face_matcher import FaceMatcher
@@ -226,3 +227,7 @@ def get_video_verification_orchestrator_service() -> (
 @lru_cache
 def get_video_verification_response_mapper() -> VideoVerificationResponseMapper:
     return VideoVerificationResponseMapper()
+
+@lru_cache
+def get_error_response_factory() -> ErrorResponseFactory:
+    return ErrorResponseFactory()
