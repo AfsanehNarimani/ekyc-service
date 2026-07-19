@@ -45,9 +45,7 @@ class InsightFaceDetector:
 
             pose_tuple = None
             if pose is not None:
-                pose_tuple = tuple(
-                    float(value) for value in pose
-                )
+                pose_tuple = tuple(float(value) for value in pose)
 
             detections.append(
                 FaceDetection(

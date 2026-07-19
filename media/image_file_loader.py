@@ -14,6 +14,4 @@ class ImageFileLoader:
             with Image.open(path) as image:
                 return image.convert("RGB").copy()
         except UnidentifiedImageError as error:
-            raise MediaLoadError(
-                f"Could not load image file: {path}"
-            ) from error
+            raise MediaLoadError(f"Could not load image file: {path}") from error

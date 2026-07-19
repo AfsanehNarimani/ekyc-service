@@ -29,6 +29,7 @@ app.include_router(ekyc_router)
 app.include_router(video_verification_router)
 app.include_router(readiness_router)
 
+
 @app.get("/health")
 def health_check():
     return {"ok": True, "service": settings.app_name}
