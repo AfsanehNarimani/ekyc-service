@@ -44,5 +44,13 @@ class Settings(BaseSettings):
     head_pose_neutral_yaw_threshold: float = 8.0
     head_pose_neutral_pitch_threshold: float = 10.0
 
+    liveness_min_frames_level_1: int = 3
+    liveness_min_frames_level_2: int = 5
+    liveness_min_frames_level_3: int = 8
+
+    liveness_pose_variation_level_1: float = 10.0
+    liveness_pose_variation_level_2: float = 18.0
+    liveness_pose_variation_level_3: float = 25.0
+
 
 settings = Settings()

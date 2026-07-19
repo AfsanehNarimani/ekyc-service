@@ -21,6 +21,11 @@ from video.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 from services.video_action_check_service import VideoActionCheckService
+from liveness.liveness_threshold_policy import (
+    LivenessThresholdPolicy,
+    LivenessThresholds,
+)
+from services.video_liveness_service import VideoLivenessService
 
 
 @lru_cache
@@ -123,6 +128,37 @@ def get_face_match_threshold_policy() -> FaceMatchThresholdPolicy:
         }
     )
 
+@lru_cache
+def get_liveness_threshold_policy() -> LivenessThresholdPolicy:
+    return LivenessThresholdPolicy(
+        level_to_thresholds={
+            1: LivenessThresholds(
+                min_required_frames=settings.liveness_min_frames_level_1,
+                min_pose_variation_score=settings.liveness_pose_variation_level_1,
+            ),
+            2: LivenessThresholds(
+                min_required_frames=settings.liveness_min_frames_level_2,
+                min_pose_variation_score=settings.liveness_pose_variation_level_2,
+            ),
+            3: LivenessThresholds(
+                min_required_frames=settings.liveness_min_frames_level_3,
+                min_pose_variation_score=settings.liveness_pose_variation_level_3,
+            ),
+        }
+    )
+
+
+@lru_cache
+def get_video_liveness_service() -> VideoLivenessService:
+    return VideoLivenessService(
+        frame_extractor=get_video_frame_extractor(),
+        detector=InsightFaceDetector(
+            det_thresh=settings.detector_threshold,
+            providers=["CPUExecutionProvider"],
+        ),
+        validator=SingleFaceValidator(),
+        threshold_policy=get_liveness_threshold_policy(),
+    )
 
 @lru_cache
 def get_video_face_match_service() -> VideoFaceMatchService:
