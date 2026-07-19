@@ -40,6 +40,7 @@ router = APIRouter(
         400: {"model": ErrorResponse},
         404: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
+        500: {"model": ErrorResponse},
     },
 )
 def verify_video(
@@ -132,9 +133,16 @@ def verify_video(
             request.challenge_id,
             error,
         )
-        return error_response_factory.build(
-            status_code=422,
-            code="no_usable_video_frame",
-            message=str(error),
-            trace_id=trace_id,
-        )
+
+    except Exception:
+        logger.exception(
+        "trace_id=%s challenge_id=%s error_code=internal_server_error",
+        trace_id,
+        request.challenge_id,
+    )
+    return error_response_factory.build(
+        status_code=500,
+        code="internal_server_error",
+        message="Unexpected internal server error.",
+        trace_id=trace_id,
+    )

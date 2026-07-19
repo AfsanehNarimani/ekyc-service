@@ -159,3 +159,56 @@ def test_verify_video_endpoint_returns_standard_error_response():
     assert body["error"]["code"] == "media_file_not_found"
     assert "Media file not found" in body["error"]["message"]
     assert body["error"]["details"] == {}
+
+class FakeUnexpectedFailingVideoVerificationOrchestratorService:
+    def verify(
+        self,
+        trace_id: str,
+        challenge_id,
+        expected_actions,
+        national_id_image_uri,
+        video_uri,
+        face_match_level,
+        liveness_level,
+    ):
+        raise RuntimeError("database password or internal path should not leak")
+
+
+    def test_verify_video_endpoint_returns_safe_internal_error_response():
+        app.dependency_overrides[get_video_verification_orchestrator_service] = (
+            lambda: FakeUnexpectedFailingVideoVerificationOrchestratorService()
+        )
+
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/verify-video",
+            json={
+                "trace_id": "trace-internal-error-1",
+                "challenge_id": "backend-challenge-123",
+                "expected_actions": [
+                    "center",
+                    "left",
+                    "right",
+                    "up",
+                    "down",
+                ],
+                "national_id_image_uri": "/tmp/id.jpg",
+                "video_uri": "/tmp/video.mp4",
+                "face_match_level": 2,
+                "liveness_level": 2,
+            },
+        )
+
+        app.dependency_overrides.clear()
+
+        assert response.status_code == 500
+
+        body = response.json()
+
+        assert body["ok"] is False
+        assert body["trace_id"] == "trace-internal-error-1"
+        assert body["error"]["code"] == "internal_server_error"
+        assert body["error"]["message"] == "Unexpected internal server error."
+        assert "database password" not in body["error"]["message"]
+        assert body["error"]["details"] == {}
