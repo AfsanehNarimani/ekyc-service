@@ -61,6 +61,9 @@ def test_readiness_service_passes_when_passive_model_exists(
     face_model_path = tmp_path / "face_model.onnx"
     face_model_path.write_text("fake face model")
 
+    passive_v1se_model_path = tmp_path / "passive_v1se_model.onnx"
+    passive_v1se_model_path.write_text("fake passive v1se model")
+
     passive_model_path = tmp_path / "passive_model.onnx"
     passive_model_path.write_text("fake passive model")
 
@@ -75,6 +78,12 @@ def test_readiness_service_passes_when_passive_model_exists(
     monkeypatch.setattr(settings, "media_temp_dir", tmp_path / "media")
     monkeypatch.setattr(settings, "reference_dir", tmp_path / "references")
     monkeypatch.setattr(settings, "embedding_dir", tmp_path / "embeddings")
+
+    monkeypatch.setattr(
+        settings,
+        "passive_liveness_v1se_model_path",
+        passive_v1se_model_path,
+    )
 
     result = ReadinessService().check()
 
@@ -92,6 +101,9 @@ def test_readiness_service_fails_when_passive_model_is_missing(
     face_model_path = tmp_path / "face_model.onnx"
     face_model_path.write_text("fake face model")
 
+    passive_v1se_model_path = tmp_path / "passive_v1se_model.onnx"
+    passive_v1se_model_path.write_text("fake passive v1se model")
+
     monkeypatch.setattr(settings, "default_face_model", "edgeface")
     monkeypatch.setattr(settings, "edgeface_model_path", face_model_path)
     monkeypatch.setattr(settings, "passive_liveness_backend", "onnx")
@@ -103,6 +115,12 @@ def test_readiness_service_fails_when_passive_model_is_missing(
     monkeypatch.setattr(settings, "media_temp_dir", tmp_path / "media")
     monkeypatch.setattr(settings, "reference_dir", tmp_path / "references")
     monkeypatch.setattr(settings, "embedding_dir", tmp_path / "embeddings")
+
+    monkeypatch.setattr(
+        settings,
+        "passive_liveness_v1se_model_path",
+        passive_v1se_model_path,
+    )
 
     result = ReadinessService().check()
 

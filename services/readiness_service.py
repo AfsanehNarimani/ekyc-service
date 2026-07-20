@@ -113,7 +113,7 @@ class ReadinessService:
             return ReadinessCheck(
                 name="passive_liveness_model",
                 passed=True,
-                message="model file is not required for stub backend",
+                message="model files are not required for stub backend",
             )
 
         if backend != "onnx":
@@ -123,19 +123,28 @@ class ReadinessService:
                 message=f"unsupported passive liveness backend: {backend}",
             )
 
-        model_path = settings.passive_liveness_model_path
+        model_paths = {
+            "minifasnet_v2": settings.passive_liveness_model_path,
+            "minifasnet_v1se": settings.passive_liveness_v1se_model_path,
+        }
 
-        if model_path.exists() and model_path.is_file():
+        missing_models = [
+            model_name
+            for model_name, model_path in model_paths.items()
+            if not model_path.exists() or not model_path.is_file()
+        ]
+
+        if not missing_models:
             return ReadinessCheck(
                 name="passive_liveness_model",
                 passed=True,
-                message="passive liveness model file exists",
+                message="all passive liveness model files exist",
             )
 
         return ReadinessCheck(
             name="passive_liveness_model",
             passed=False,
-            message="passive liveness model file is missing",
+            message=("missing passive liveness models: " + ", ".join(missing_models)),
         )
 
     def _check_passive_liveness_decision_mode(self) -> ReadinessCheck:

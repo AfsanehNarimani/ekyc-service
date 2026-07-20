@@ -9,7 +9,9 @@ from core.passive_liveness_result import PassiveLivenessResult
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
-from liveness.onnx_passive_liveness_model import ONNXPassiveLivenessModel
+from liveness.passive_liveness_scoring_model import (
+    PassiveLivenessScoringModel,
+)
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
@@ -22,10 +24,11 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
         frame_extractor: VideoFrameExtractor,
         detector: InsightFaceDetector,
         validator: SingleFaceValidator,
-        model: ONNXPassiveLivenessModel,
+        model: PassiveLivenessScoringModel,
         threshold_policy: PassiveLivenessThresholdPolicy,
         frame_interval_seconds: float,
         max_frames: int,
+        model_name: str = "onnx_passive_liveness",
         neutral_yaw_threshold: float = 30.0,
         neutral_pitch_threshold: float = 30.0,
     ) -> None:
@@ -36,6 +39,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
         self.threshold_policy = threshold_policy
         self.frame_interval_seconds = frame_interval_seconds
         self.max_frames = max_frames
+        self.model_name = model_name
         self.neutral_yaw_threshold = neutral_yaw_threshold
         self.neutral_pitch_threshold = neutral_pitch_threshold
 
@@ -83,7 +87,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 passed=False,
                 score=0.0,
                 threshold=threshold,
-                model_name="onnx_passive_liveness",
+                model_name=self.model_name,
                 processed_frames=0,
                 skipped_frames=skipped_frames,
                 reason="no_neutral_usable_frame_for_passive_liveness",
@@ -97,7 +101,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
             passed=passed,
             score=final_score,
             threshold=threshold,
-            model_name="onnx_passive_liveness",
+            model_name=self.model_name,
             processed_frames=len(frame_scores),
             skipped_frames=skipped_frames,
             reason=("passed_passive_liveness" if passed else "failed_passive_liveness"),

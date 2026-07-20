@@ -44,6 +44,9 @@ from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
 from liveness.onnx_passive_liveness_model import ONNXPassiveLivenessModel
 from liveness.passive_liveness_preprocessor import PassiveLivenessPreprocessor
 from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
+from liveness.passive_liveness_ensemble_model import (
+    PassiveLivenessEnsembleModel,
+)
 
 
 @lru_cache
@@ -326,6 +329,35 @@ def get_onnx_passive_liveness_model() -> ONNXPassiveLivenessModel:
 
 
 @lru_cache
+def get_passive_liveness_v1se_preprocessor() -> PassiveLivenessPreprocessor:
+    return PassiveLivenessPreprocessor(
+        input_width=settings.passive_liveness_input_width,
+        input_height=settings.passive_liveness_input_height,
+        crop_scale=settings.passive_liveness_v1se_crop_scale,
+    )
+
+
+@lru_cache
+def get_onnx_passive_liveness_v1se_model() -> ONNXPassiveLivenessModel:
+    return ONNXPassiveLivenessModel(
+        model_path=settings.passive_liveness_v1se_model_path,
+        preprocessor=get_passive_liveness_v1se_preprocessor(),
+        real_class_index=settings.passive_liveness_real_class_index,
+    )
+
+
+@lru_cache
+def get_passive_liveness_ensemble_model() -> PassiveLivenessEnsembleModel:
+    return PassiveLivenessEnsembleModel(
+        models=[
+            get_onnx_passive_liveness_model(),
+            get_onnx_passive_liveness_v1se_model(),
+        ],
+        real_class_index=settings.passive_liveness_real_class_index,
+    )
+
+
+@lru_cache
 def get_face_detector() -> InsightFaceDetector:
     return InsightFaceDetector()
 
@@ -341,10 +373,11 @@ def get_onnx_passive_liveness_checker() -> ONNXPassiveLivenessChecker:
         frame_extractor=get_video_frame_extractor(),
         detector=get_face_detector(),
         validator=get_single_face_validator(),
-        model=get_onnx_passive_liveness_model(),
+        model=get_passive_liveness_ensemble_model(),
         threshold_policy=get_passive_liveness_threshold_policy(),
         frame_interval_seconds=settings.passive_liveness_frame_interval_seconds,
         max_frames=settings.passive_liveness_max_frames,
+        model_name=settings.passive_liveness_model_name,
         neutral_yaw_threshold=30.0,
         neutral_pitch_threshold=30.0,
     )

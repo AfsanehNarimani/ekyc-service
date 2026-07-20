@@ -77,5 +77,10 @@ class Settings(BaseSettings):
     passive_liveness_frame_interval_seconds: float = 1.0
     passive_liveness_max_frames: int = 20
 
+    passive_liveness_v1se_crop_scale: float = 4.0
+    passive_liveness_v1se_model_path: Path = (
+        project_root / "models" / "passive_liveness" / "minifasnet_v1se.onnx"
+    )
+
 
 settings = Settings()
