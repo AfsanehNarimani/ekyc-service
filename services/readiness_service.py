@@ -21,6 +21,8 @@ class ReadinessService:
     def check(self) -> ReadinessResult:
         checks = [
             self._check_default_face_model(),
+            self._check_passive_liveness_model(),
+            self._check_passive_liveness_decision_mode(),
             self._check_directory(
                 name="media_temp_dir",
                 path=settings.media_temp_dir,
@@ -103,3 +105,55 @@ class ReadinessService:
                 passed=False,
                 message="directory is not writable or cannot be created",
             )
+
+    def _check_passive_liveness_model(self) -> ReadinessCheck:
+        backend = settings.passive_liveness_backend
+
+        if backend == "stub":
+            return ReadinessCheck(
+                name="passive_liveness_model",
+                passed=True,
+                message="model file is not required for stub backend",
+            )
+
+        if backend != "onnx":
+            return ReadinessCheck(
+                name="passive_liveness_model",
+                passed=False,
+                message=f"unsupported passive liveness backend: {backend}",
+            )
+
+        model_path = settings.passive_liveness_model_path
+
+        if model_path.exists() and model_path.is_file():
+            return ReadinessCheck(
+                name="passive_liveness_model",
+                passed=True,
+                message="passive liveness model file exists",
+            )
+
+        return ReadinessCheck(
+            name="passive_liveness_model",
+            passed=False,
+            message="passive liveness model file is missing",
+        )
+
+    def _check_passive_liveness_decision_mode(self) -> ReadinessCheck:
+        decision_mode = settings.passive_liveness_decision_mode
+        supported_modes = {
+            "report_only",
+            "enforce",
+        }
+
+        if decision_mode in supported_modes:
+            return ReadinessCheck(
+                name="passive_liveness_decision_mode",
+                passed=True,
+                message=f"decision mode is {decision_mode}",
+            )
+
+        return ReadinessCheck(
+            name="passive_liveness_decision_mode",
+            passed=False,
+            message=f"unsupported decision mode: {decision_mode}",
+        )
