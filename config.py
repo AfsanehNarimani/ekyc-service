@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic_settings import BaseSettings
-
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
+
     app_name: str = "eKYC Service"
 
     log_level: str = "INFO"
@@ -60,7 +65,7 @@ class Settings(BaseSettings):
 
     passive_liveness_backend: str = "stub"
     passive_liveness_model_name: str = "minifasnet_v2"
-    passive_liveness_real_class_index: int = 1
+    passive_liveness_real_class_index: int = 0
     passive_liveness_model_path: Path = (
         project_root / "models" / "passive_liveness" / "minifasnet_v2.onnx"
     )

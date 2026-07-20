@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import cv2
 import numpy as np
 
 from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
@@ -45,18 +46,20 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
 
         frames = self.frame_extractor.extract(
             video_path=video_path,
-            frame_interval_seconds=self.frame_interval_seconds,
-            max_frames=self.max_frames,
         )
 
         for frame in frames:
             try:
                 detections = self.detector.detect(frame.image)
                 detection = self.validator.validate(detections)
+
+                frame_bgr = self._pil_rgb_to_bgr(frame.image)
+
                 score = self.model.predict_real_score(
-                    frame_bgr=frame.image,
+                    frame_bgr=frame_bgr,
                     detection=detection,
                 )
+
                 frame_scores.append(score)
 
             except (
@@ -92,4 +95,15 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 if passed
                 else "failed_passive_liveness"
             ),
+        )
+
+    def _pil_rgb_to_bgr(
+        self,
+        image,
+    ) -> np.ndarray:
+        frame_rgb = np.asarray(image)
+
+        return cv2.cvtColor(
+            frame_rgb,
+            cv2.COLOR_RGB2BGR,
         )

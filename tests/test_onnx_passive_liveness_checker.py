@@ -2,6 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+from PIL import Image
 
 from core.face_detection import FaceDetection
 from core.passive_liveness_result import PassiveLivenessResult
@@ -15,30 +16,21 @@ class FakeFrameExtractor:
     def extract(
         self,
         video_path: Path,
-        frame_interval_seconds: float,
-        max_frames: int,
     ):
+        image = Image.fromarray(
+            np.zeros(
+                (
+                    120,
+                    120,
+                    3,
+                ),
+                dtype=np.uint8,
+            )
+        )
+
         return [
-            SimpleNamespace(
-                image=np.zeros(
-                    (
-                        120,
-                        120,
-                        3,
-                    ),
-                    dtype=np.uint8,
-                )
-            ),
-            SimpleNamespace(
-                image=np.zeros(
-                    (
-                        120,
-                        120,
-                        3,
-                    ),
-                    dtype=np.uint8,
-                )
-            ),
+            SimpleNamespace(image=image),
+            SimpleNamespace(image=image),
         ]
 
 
@@ -81,6 +73,13 @@ class FakeModel:
         frame_bgr,
         detection,
     ) -> float:
+        assert isinstance(frame_bgr, np.ndarray)
+        assert frame_bgr.shape == (
+            120,
+            120,
+            3,
+        )
+
         return 0.9
 
 

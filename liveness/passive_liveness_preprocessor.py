@@ -32,7 +32,7 @@ class PassiveLivenessPreprocessor:
             detection=detection,
         )
 
-        resized = cv2.resize(
+        resized_bgr = cv2.resize(
             face_crop,
             (
                 self.input_width,
@@ -40,12 +40,8 @@ class PassiveLivenessPreprocessor:
             ),
         )
 
-        rgb = cv2.cvtColor(
-            resized,
-            cv2.COLOR_BGR2RGB,
-        )
+        normalized = resized_bgr.astype(np.float32) / 255.0
 
-        normalized = rgb.astype(np.float32) / 255.0
         chw = np.transpose(
             normalized,
             (

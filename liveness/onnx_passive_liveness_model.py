@@ -14,7 +14,7 @@ class ONNXPassiveLivenessModel:
         self,
         model_path: Path,
         preprocessor: PassiveLivenessPreprocessor,
-        real_class_index: int = 1,
+        real_class_index: int = 0,
         providers: list[str] | None = None,
     ) -> None:
         if not model_path.exists():
@@ -61,7 +61,7 @@ class ONNXPassiveLivenessModel:
         if output.size == 1:
             return float(output[0])
 
-        probabilities = self._softmax(output)
+        probabilities = self._to_probabilities(output)
 
         if self.real_class_index >= probabilities.size:
             raise ValueError(
@@ -69,6 +69,25 @@ class ONNXPassiveLivenessModel:
             )
 
         return float(probabilities[self.real_class_index])
+
+    def _to_probabilities(
+        self,
+        values: np.ndarray,
+    ) -> np.ndarray:
+        if self._looks_like_probabilities(values):
+            return values.astype(np.float32)
+
+        return self._softmax(values)
+
+    def _looks_like_probabilities(
+        self,
+        values: np.ndarray,
+    ) -> bool:
+        return (
+            bool(np.all(values >= 0.0))
+            and bool(np.all(values <= 1.0))
+            and bool(np.isclose(np.sum(values), 1.0, atol=1e-3))
+        )
 
     def _softmax(
         self,

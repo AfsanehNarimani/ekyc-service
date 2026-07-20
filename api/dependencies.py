@@ -323,9 +323,7 @@ def get_onnx_passive_liveness_model() -> ONNXPassiveLivenessModel:
 
 @lru_cache
 def get_face_detector() -> InsightFaceDetector:
-    return InsightFaceDetector(
-        threshold=settings.detector_threshold,
-    )
+    return InsightFaceDetector()
 
 @lru_cache
 def get_single_face_validator() -> SingleFaceValidator:
