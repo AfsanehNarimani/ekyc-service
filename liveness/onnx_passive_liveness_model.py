@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
+import pytest
 
 from core.face_detection import FaceDetection
 from liveness.passive_liveness_preprocessor import (
@@ -14,7 +15,7 @@ class ONNXPassiveLivenessModel:
         self,
         model_path: Path,
         preprocessor: PassiveLivenessPreprocessor,
-        real_class_index: int = 0,
+        real_class_index: int = 1,
         providers: list[str] | None = None,
     ) -> None:
         if not model_path.exists():
@@ -71,7 +72,7 @@ class ONNXPassiveLivenessModel:
         if probabilities.size == 1:
             return float(probabilities[0])
 
-        if self.real_class_index >= probabilities.size:
+        if not 0 <= self.real_class_index < probabilities.size:
             raise ValueError(
                 "real_class_index is out of range for passive liveness output."
             )
@@ -105,3 +106,19 @@ class ONNXPassiveLivenessModel:
         exp_values = np.exp(shifted)
 
         return exp_values / np.sum(exp_values)
+
+    def test_onnx_passive_liveness_model_rejects_negative_real_class_index(self):
+        model = ONNXPassiveLivenessModel.__new__(ONNXPassiveLivenessModel)
+        model.real_class_index = -1
+
+        with pytest.raises(ValueError):
+            model._extract_real_score(
+                np.array(
+                    [
+                        0.05,
+                        0.90,
+                        0.05,
+                    ],
+                    dtype=np.float32,
+                )
+            )
