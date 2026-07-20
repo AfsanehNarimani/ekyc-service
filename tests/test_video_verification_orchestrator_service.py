@@ -115,10 +115,7 @@ class FakeFinalDecisionService:
             face_match_passed
             and actions_passed
             and liveness_passed
-            and (
-                passive_liveness_passed
-                or not passive_liveness_enforced
-            )
+            and (passive_liveness_passed or not passive_liveness_enforced)
         )
 
         return FinalDecision(

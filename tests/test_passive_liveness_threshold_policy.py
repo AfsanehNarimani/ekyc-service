@@ -16,9 +16,7 @@ def test_passive_liveness_threshold_policy_returns_threshold():
 
 
 def test_passive_liveness_threshold_policy_rejects_unknown_level():
-    policy = PassiveLivenessThresholdPolicy(
-        level_to_threshold={}
-    )
+    policy = PassiveLivenessThresholdPolicy(level_to_threshold={})
 
     with pytest.raises(ValueError):
         policy.get_threshold(9)

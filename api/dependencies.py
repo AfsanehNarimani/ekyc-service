@@ -280,6 +280,7 @@ def get_media_cleanup_service() -> MediaCleanupService:
 def get_readiness_service() -> ReadinessService:
     return ReadinessService()
 
+
 @lru_cache
 def get_passive_liveness_threshold_policy() -> PassiveLivenessThresholdPolicy:
     return PassiveLivenessThresholdPolicy(
@@ -305,6 +306,7 @@ def get_passive_liveness_checker():
         f"Unsupported passive_liveness_backend: {settings.passive_liveness_backend}"
     )
 
+
 @lru_cache
 def get_passive_liveness_preprocessor() -> PassiveLivenessPreprocessor:
     return PassiveLivenessPreprocessor(
@@ -322,9 +324,11 @@ def get_onnx_passive_liveness_model() -> ONNXPassiveLivenessModel:
         real_class_index=settings.passive_liveness_real_class_index,
     )
 
+
 @lru_cache
 def get_face_detector() -> InsightFaceDetector:
     return InsightFaceDetector()
+
 
 @lru_cache
 def get_single_face_validator() -> SingleFaceValidator:

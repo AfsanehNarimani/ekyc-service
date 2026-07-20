@@ -134,7 +134,7 @@ class VideoVerificationOrchestratorService:
                 passive_liveness_result.score,
                 passive_liveness_result.reason,
             )
-            
+
             passive_liveness_enforced = (
                 settings.passive_liveness_decision_mode == "enforce"
             )
