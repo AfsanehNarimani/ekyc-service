@@ -58,6 +58,9 @@ class Settings(BaseSettings):
     passive_liveness_threshold_level_2: float = 0.60
     passive_liveness_threshold_level_3: float = 0.80
 
+    passive_liveness_backend: str = "stub"
+    passive_liveness_model_name: str = "minifasnet_v2"
+    passive_liveness_real_class_index: int = 1
     passive_liveness_model_path: Path = (
         project_root / "models" / "passive_liveness" / "minifasnet_v2.onnx"
     )

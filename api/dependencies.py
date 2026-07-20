@@ -292,9 +292,17 @@ def get_passive_liveness_threshold_policy() -> PassiveLivenessThresholdPolicy:
 
 
 @lru_cache
-def get_passive_liveness_checker() -> StubPassiveLivenessChecker:
-    return StubPassiveLivenessChecker(
-        threshold_policy=get_passive_liveness_threshold_policy(),
+def get_passive_liveness_checker():
+    if settings.passive_liveness_backend == "stub":
+        return StubPassiveLivenessChecker(
+            threshold_policy=get_passive_liveness_threshold_policy(),
+        )
+
+    if settings.passive_liveness_backend == "onnx":
+        return get_onnx_passive_liveness_checker()
+
+    raise ValueError(
+        f"Unsupported passive_liveness_backend: {settings.passive_liveness_backend}"
     )
 
 @lru_cache
@@ -310,6 +318,7 @@ def get_onnx_passive_liveness_model() -> ONNXPassiveLivenessModel:
     return ONNXPassiveLivenessModel(
         model_path=settings.passive_liveness_model_path,
         preprocessor=get_passive_liveness_preprocessor(),
+        real_class_index=settings.passive_liveness_real_class_index,
     )
 
 @lru_cache

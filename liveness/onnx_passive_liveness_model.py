@@ -14,12 +14,17 @@ class ONNXPassiveLivenessModel:
         self,
         model_path: Path,
         preprocessor: PassiveLivenessPreprocessor,
+        real_class_index: int = 1,
         providers: list[str] | None = None,
     ) -> None:
         if not model_path.exists():
-            raise FileNotFoundError(f"Passive liveness model not found: {model_path}")
+            raise FileNotFoundError(
+                f"Passive liveness model not found: {model_path}"
+            )
 
         self.preprocessor = preprocessor
+        self.real_class_index = real_class_index
+
         self.session = ort.InferenceSession(
             str(model_path),
             providers=providers or ["CPUExecutionProvider"],
@@ -58,10 +63,12 @@ class ONNXPassiveLivenessModel:
 
         probabilities = self._softmax(output)
 
-        # Convention for MiniFASNet-style exports is commonly:
-        # class 0 = spoof, class 1 = real
-        # If your ONNX export uses a different order, we will change this index.
-        return float(probabilities[1])
+        if self.real_class_index >= probabilities.size:
+            raise ValueError(
+                "real_class_index is out of range for passive liveness output."
+            )
+
+        return float(probabilities[self.real_class_index])
 
     def _softmax(
         self,
