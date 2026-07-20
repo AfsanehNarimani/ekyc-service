@@ -64,26 +64,12 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
 
                 frame_bgr = self._pil_rgb_to_bgr(frame.image)
 
-                probabilities = self.model.predict_probabilities(
+                score = self.model.predict_real_score(
                     frame_bgr=frame_bgr,
                     detection=detection,
                 )
 
-                score = self.model._extract_real_score(probabilities)
-
                 frame_scores.append(score)
-
-                print(
-                    "passive_liveness_frame",
-                    {
-                        "frame_index": frame.frame_index,
-                        "timestamp_seconds": round(frame.timestamp_seconds, 2),
-                        "class_0": round(float(probabilities[0]), 6),
-                        "class_1": round(float(probabilities[1]), 6),
-                        "class_2": round(float(probabilities[2]), 6),
-                        "selected_real_score": round(float(score), 6),
-                    },
-                )
 
             except (
                 NoFaceDetectedError,
@@ -114,11 +100,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
             model_name="onnx_passive_liveness",
             processed_frames=len(frame_scores),
             skipped_frames=skipped_frames,
-            reason=(
-                "passed_passive_liveness"
-                if passed
-                else "failed_passive_liveness"
-            ),
+            reason=("passed_passive_liveness" if passed else "failed_passive_liveness"),
             frame_scores=frame_scores,
         )
 

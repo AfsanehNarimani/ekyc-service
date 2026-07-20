@@ -18,9 +18,7 @@ class ONNXPassiveLivenessModel:
         providers: list[str] | None = None,
     ) -> None:
         if not model_path.exists():
-            raise FileNotFoundError(
-                f"Passive liveness model not found: {model_path}"
-            )
+            raise FileNotFoundError(f"Passive liveness model not found: {model_path}")
 
         self.preprocessor = preprocessor
         self.real_class_index = real_class_index
@@ -38,6 +36,18 @@ class ONNXPassiveLivenessModel:
         frame_bgr: np.ndarray,
         detection: FaceDetection,
     ) -> float:
+        probabilities = self.predict_probabilities(
+            frame_bgr=frame_bgr,
+            detection=detection,
+        )
+
+        return self._extract_real_score(probabilities)
+
+    def predict_probabilities(
+        self,
+        frame_bgr: np.ndarray,
+        detection: FaceDetection,
+    ) -> np.ndarray:
         model_input = self.preprocessor.preprocess(
             frame_bgr=frame_bgr,
             detection=detection,
@@ -52,16 +62,14 @@ class ONNXPassiveLivenessModel:
 
         logits_or_probs = np.asarray(outputs[0]).reshape(-1)
 
-        return self._extract_real_score(logits_or_probs)
+        return self._to_probabilities(logits_or_probs)
 
     def _extract_real_score(
         self,
-        output: np.ndarray,
+        probabilities: np.ndarray,
     ) -> float:
-        if output.size == 1:
-            return float(output[0])
-
-        probabilities = self._to_probabilities(output)
+        if probabilities.size == 1:
+            return float(probabilities[0])
 
         if self.real_class_index >= probabilities.size:
             raise ValueError(

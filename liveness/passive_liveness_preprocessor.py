@@ -16,18 +16,21 @@ class PassiveLivenessPreprocessor:
         self,
         input_width: int,
         input_height: int,
-        bbox_margin_ratio: float = 0.2,
+        crop_scale: float = 2.7,
     ) -> None:
+        if crop_scale <= 1.0:
+            raise ValueError("crop_scale must be greater than 1.0.")
+
         self.input_width = input_width
         self.input_height = input_height
-        self.bbox_margin_ratio = bbox_margin_ratio
+        self.crop_scale = crop_scale
 
     def preprocess(
         self,
         frame_bgr: np.ndarray,
         detection: FaceDetection,
     ) -> PassiveLivenessInput:
-        face_crop = self._crop_face(
+        face_crop = self.crop_face(
             frame_bgr=frame_bgr,
             detection=detection,
         )
@@ -58,7 +61,7 @@ class PassiveLivenessPreprocessor:
 
         return PassiveLivenessInput(tensor=tensor)
 
-    def _crop_face(
+    def crop_face(
         self,
         frame_bgr: np.ndarray,
         detection: FaceDetection,
@@ -70,15 +73,26 @@ class PassiveLivenessPreprocessor:
         box_width = x2 - x1
         box_height = y2 - y1
 
-        margin_x = box_width * self.bbox_margin_ratio
-        margin_y = box_height * self.bbox_margin_ratio
+        if box_width <= 0 or box_height <= 0:
+            raise ValueError("Invalid face bounding box.")
 
-        left = max(0, int(x1 - margin_x))
-        top = max(0, int(y1 - margin_y))
-        right = min(image_width, int(x2 + margin_x))
-        bottom = min(image_height, int(y2 + margin_y))
+        center_x = x1 + box_width / 2.0
+        center_y = y1 + box_height / 2.0
+
+        crop_width = box_width * self.crop_scale
+        crop_height = box_height * self.crop_scale
+
+        left = int(round(center_x - crop_width / 2.0))
+        top = int(round(center_y - crop_height / 2.0))
+        right = int(round(center_x + crop_width / 2.0))
+        bottom = int(round(center_y + crop_height / 2.0))
+
+        left = max(0, left)
+        top = max(0, top)
+        right = min(image_width, right)
+        bottom = min(image_height, bottom)
 
         if right <= left or bottom <= top:
-            raise ValueError("Invalid face crop bounding box.")
+            raise ValueError("Invalid passive liveness crop.")
 
         return frame_bgr[top:bottom, left:right]
