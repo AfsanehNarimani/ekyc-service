@@ -58,5 +58,13 @@ class Settings(BaseSettings):
     passive_liveness_threshold_level_2: float = 0.60
     passive_liveness_threshold_level_3: float = 0.80
 
+    passive_liveness_model_path: Path = (
+        project_root / "models" / "passive_liveness" / "minifasnet_v2.onnx"
+    )
+    passive_liveness_input_width: int = 80
+    passive_liveness_input_height: int = 80
+    passive_liveness_frame_interval_seconds: float = 1.0
+    passive_liveness_max_frames: int = 20
+
 
 settings = Settings()
