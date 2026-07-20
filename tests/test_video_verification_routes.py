@@ -72,6 +72,7 @@ class FakeVideoVerificationOrchestratorService:
                 actions_passed=True,
                 liveness_passed=True,
                 passive_liveness_passed=True,
+                passive_liveness_enforced=False,
             ),
             processing_time_ms=123.45,
         )

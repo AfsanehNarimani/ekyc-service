@@ -29,4 +29,5 @@ class StubPassiveLivenessChecker(BasePassiveLivenessChecker):
             processed_frames=0,
             skipped_frames=0,
             reason="stub_passive_liveness_passed",
+            frame_scores=[],
         )

@@ -10,3 +10,4 @@ class PassiveLivenessResult:
     processed_frames: int
     skipped_frames: int
     reason: str
+    frame_scores: list[float] | None = None

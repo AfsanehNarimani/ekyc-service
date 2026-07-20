@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from core.face_detection import FaceDetection
 from liveness.passive_liveness_preprocessor import (
@@ -36,6 +37,7 @@ def test_passive_liveness_preprocessor_returns_nchw_tensor():
     result = PassiveLivenessPreprocessor(
         input_width=80,
         input_height=80,
+        crop_scale=2.7,
     ).preprocess(
         frame_bgr=frame,
         detection=detection,
@@ -48,3 +50,12 @@ def test_passive_liveness_preprocessor_returns_nchw_tensor():
         80,
     )
     assert result.tensor.dtype == np.float32
+
+
+def test_passive_liveness_preprocessor_rejects_invalid_crop_scale():
+    with pytest.raises(ValueError):
+        PassiveLivenessPreprocessor(
+            input_width=80,
+            input_height=80,
+            crop_scale=1.0,
+        )

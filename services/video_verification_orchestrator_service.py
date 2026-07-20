@@ -1,6 +1,7 @@
 import logging
 import time
 from pathlib import Path
+from config import settings
 
 from core.liveness_action import LivenessAction
 from core.media_reference import MediaReference
@@ -133,12 +134,17 @@ class VideoVerificationOrchestratorService:
                 passive_liveness_result.score,
                 passive_liveness_result.reason,
             )
+            
+            passive_liveness_enforced = (
+                settings.passive_liveness_decision_mode == "enforce"
+            )
 
             final_decision = self.final_decision_service.decide(
                 face_match_passed=face_match_result.is_match,
                 actions_passed=action_check_result.passed,
                 liveness_passed=liveness_result.passed,
                 passive_liveness_passed=passive_liveness_result.passed,
+                passive_liveness_enforced=passive_liveness_enforced,
             )
 
             processing_time_ms = round(

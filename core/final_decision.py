@@ -10,3 +10,4 @@ class FinalDecision:
     actions_passed: bool
     liveness_passed: bool
     passive_liveness_passed: bool
+    passive_liveness_enforced: bool

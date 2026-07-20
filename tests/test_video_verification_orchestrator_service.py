@@ -109,12 +109,16 @@ class FakeFinalDecisionService:
         actions_passed: bool,
         liveness_passed: bool,
         passive_liveness_passed: bool,
+        passive_liveness_enforced: bool,
     ) -> FinalDecision:
         approved = (
             face_match_passed
             and actions_passed
             and liveness_passed
-            and passive_liveness_passed
+            and (
+                passive_liveness_passed
+                or not passive_liveness_enforced
+            )
         )
 
         return FinalDecision(
@@ -125,6 +129,7 @@ class FakeFinalDecisionService:
             actions_passed=actions_passed,
             liveness_passed=liveness_passed,
             passive_liveness_passed=passive_liveness_passed,
+            passive_liveness_enforced=passive_liveness_enforced,
         )
 
 
@@ -199,3 +204,4 @@ def test_video_verification_orchestrator_runs_full_flow():
         Path("/tmp/fake.jpg"),
         Path("/tmp/fake.mp4"),
     ]
+    assert result.final_decision.passive_liveness_enforced is False

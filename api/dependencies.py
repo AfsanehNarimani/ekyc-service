@@ -310,6 +310,7 @@ def get_passive_liveness_preprocessor() -> PassiveLivenessPreprocessor:
     return PassiveLivenessPreprocessor(
         input_width=settings.passive_liveness_input_width,
         input_height=settings.passive_liveness_input_height,
+        crop_scale=settings.passive_liveness_crop_scale,
     )
 
 
@@ -340,4 +341,6 @@ def get_onnx_passive_liveness_checker() -> ONNXPassiveLivenessChecker:
         threshold_policy=get_passive_liveness_threshold_policy(),
         frame_interval_seconds=settings.passive_liveness_frame_interval_seconds,
         max_frames=settings.passive_liveness_max_frames,
+        neutral_yaw_threshold=30.0,
+        neutral_pitch_threshold=30.0,
     )

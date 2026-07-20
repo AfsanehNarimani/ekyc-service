@@ -76,6 +76,7 @@ def test_verify_video_response_schema_accepts_valid_response():
             "actions_passed": True,
             "liveness_passed": True,
             "passive_liveness_passed": True,
+            "passive_liveness_enforced": False,
         },
         processing_time_ms=123.45,
     )
@@ -87,3 +88,4 @@ def test_verify_video_response_schema_accepts_valid_response():
     assert response.face_match.model_name == "edgeface"
     assert response.passive_liveness.model_name == "stub_passive_liveness"
     assert response.processing_time_ms == 123.45
+    assert response.final_decision.passive_liveness_enforced is False

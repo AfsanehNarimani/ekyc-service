@@ -62,6 +62,7 @@ class FinalDecisionResponse(BaseModel):
     actions_passed: bool
     liveness_passed: bool
     passive_liveness_passed: bool
+    passive_liveness_enforced: bool
 
 
 class VerifyVideoResponse(BaseModel):

@@ -65,7 +65,9 @@ class Settings(BaseSettings):
 
     passive_liveness_backend: str = "stub"
     passive_liveness_model_name: str = "minifasnet_v2"
-    passive_liveness_real_class_index: int = 0
+    passive_liveness_real_class_index: int = 1
+    passive_liveness_decision_mode: str = "report_only"
+    passive_liveness_crop_scale: float = 2.7
     passive_liveness_model_path: Path = (
         project_root / "models" / "passive_liveness" / "minifasnet_v2.onnx"
     )

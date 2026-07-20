@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 
 from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
+from core.face_detection import FaceDetection
 from core.passive_liveness_result import PassiveLivenessResult
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
@@ -25,6 +26,8 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
         threshold_policy: PassiveLivenessThresholdPolicy,
         frame_interval_seconds: float,
         max_frames: int,
+        neutral_yaw_threshold: float = 30.0,
+        neutral_pitch_threshold: float = 30.0,
     ) -> None:
         self.frame_extractor = frame_extractor
         self.detector = detector
@@ -33,6 +36,8 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
         self.threshold_policy = threshold_policy
         self.frame_interval_seconds = frame_interval_seconds
         self.max_frames = max_frames
+        self.neutral_yaw_threshold = neutral_yaw_threshold
+        self.neutral_pitch_threshold = neutral_pitch_threshold
 
     def check(
         self,
@@ -53,14 +58,32 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 detections = self.detector.detect(frame.image)
                 detection = self.validator.validate(detections)
 
+                if not self._is_neutral_pose(detection):
+                    skipped_frames += 1
+                    continue
+
                 frame_bgr = self._pil_rgb_to_bgr(frame.image)
 
-                score = self.model.predict_real_score(
+                probabilities = self.model.predict_probabilities(
                     frame_bgr=frame_bgr,
                     detection=detection,
                 )
 
+                score = self.model._extract_real_score(probabilities)
+
                 frame_scores.append(score)
+
+                print(
+                    "passive_liveness_frame",
+                    {
+                        "frame_index": frame.frame_index,
+                        "timestamp_seconds": round(frame.timestamp_seconds, 2),
+                        "class_0": round(float(probabilities[0]), 6),
+                        "class_1": round(float(probabilities[1]), 6),
+                        "class_2": round(float(probabilities[2]), 6),
+                        "selected_real_score": round(float(score), 6),
+                    },
+                )
 
             except (
                 NoFaceDetectedError,
@@ -77,7 +100,8 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 model_name="onnx_passive_liveness",
                 processed_frames=0,
                 skipped_frames=skipped_frames,
-                reason="no_usable_frame_for_passive_liveness",
+                reason="no_neutral_usable_frame_for_passive_liveness",
+                frame_scores=[],
             )
 
         final_score = float(np.median(frame_scores))
@@ -95,6 +119,21 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 if passed
                 else "failed_passive_liveness"
             ),
+            frame_scores=frame_scores,
+        )
+
+    def _is_neutral_pose(
+        self,
+        detection: FaceDetection,
+    ) -> bool:
+        if detection.pose is None:
+            return True
+
+        pitch, yaw, _roll = detection.pose
+
+        return (
+            abs(yaw) <= self.neutral_yaw_threshold
+            and abs(pitch) <= self.neutral_pitch_threshold
         )
 
     def _pil_rgb_to_bgr(

@@ -71,6 +71,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
             actions_passed=True,
             liveness_passed=True,
             passive_liveness_passed=True,
+            passive_liveness_enforced=False,
         ),
         processing_time_ms=123.45,
     )
@@ -96,3 +97,4 @@ def test_video_verification_response_mapper_maps_result_to_response():
     assert response.final_decision.approved is True
     assert response.final_decision.passive_liveness_passed is True
     assert response.processing_time_ms == 123.45
+    assert response.final_decision.passive_liveness_enforced is False
