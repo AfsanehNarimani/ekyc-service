@@ -72,3 +72,20 @@ def test_onnx_passive_liveness_model_rejects_negative_real_class_index():
                 dtype=np.float32,
             )
         )
+
+
+def test_onnx_passive_liveness_model_rejects_negative_real_class_index():
+    model = ONNXPassiveLivenessModel.__new__(ONNXPassiveLivenessModel)
+    model.real_class_index = -1
+
+    with pytest.raises(ValueError):
+        model._extract_real_score(
+            np.array(
+                [
+                    0.05,
+                    0.90,
+                    0.05,
+                ],
+                dtype=np.float32,
+            )
+        )
