@@ -17,13 +17,18 @@ class PassiveLivenessPreprocessor:
         input_width: int,
         input_height: int,
         crop_scale: float = 2.7,
+        pixel_divisor: float = 1.0,
     ) -> None:
         if crop_scale <= 1.0:
             raise ValueError("crop_scale must be greater than 1.0.")
 
+        if pixel_divisor <= 0.0:
+            raise ValueError("pixel_divisor must be greater than zero.")
+
         self.input_width = input_width
         self.input_height = input_height
         self.crop_scale = crop_scale
+        self.pixel_divisor = pixel_divisor
 
     def preprocess(
         self,
@@ -43,10 +48,10 @@ class PassiveLivenessPreprocessor:
             ),
         )
 
-        normalized = resized_bgr.astype(np.float32) / 255.0
+        model_pixels = resized_bgr.astype(np.float32) / self.pixel_divisor
 
         chw = np.transpose(
-            normalized,
+            model_pixels,
             (
                 2,
                 0,

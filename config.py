@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     passive_liveness_threshold_level_3: float = 0.80
 
     passive_liveness_backend: str = "stub"
-    passive_liveness_model_name: str = "minifasnet_v2"
+    passive_liveness_model_name: str = "minifasnet_v1se_v2_ensemble"
     passive_liveness_real_class_index: int = 1
     passive_liveness_decision_mode: str = "report_only"
     passive_liveness_crop_scale: float = 2.7
@@ -76,6 +76,8 @@ class Settings(BaseSettings):
     passive_liveness_input_height: int = 80
     passive_liveness_frame_interval_seconds: float = 1.0
     passive_liveness_max_frames: int = 20
+
+    passive_liveness_pixel_divisor: float = 1.0
 
     passive_liveness_v1se_crop_scale: float = 4.0
     passive_liveness_v1se_model_path: Path = (

@@ -316,6 +316,7 @@ def get_passive_liveness_preprocessor() -> PassiveLivenessPreprocessor:
         input_width=settings.passive_liveness_input_width,
         input_height=settings.passive_liveness_input_height,
         crop_scale=settings.passive_liveness_crop_scale,
+        pixel_divisor=settings.passive_liveness_pixel_divisor,
     )
 
 
@@ -334,6 +335,7 @@ def get_passive_liveness_v1se_preprocessor() -> PassiveLivenessPreprocessor:
         input_width=settings.passive_liveness_input_width,
         input_height=settings.passive_liveness_input_height,
         crop_scale=settings.passive_liveness_v1se_crop_scale,
+        pixel_divisor=settings.passive_liveness_pixel_divisor,
     )
 
 
