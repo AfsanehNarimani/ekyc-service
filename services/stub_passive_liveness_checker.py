@@ -1,10 +1,9 @@
-from pathlib import Path
-
 from core.passive_liveness_result import PassiveLivenessResult
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 
 
 class StubPassiveLivenessChecker(BasePassiveLivenessChecker):
@@ -16,7 +15,7 @@ class StubPassiveLivenessChecker(BasePassiveLivenessChecker):
 
     def check(
         self,
-        video_path: Path,
+        video_analysis: VideoFrameAnalysisResult,
         strictness_level: int,
     ) -> PassiveLivenessResult:
         threshold = self.threshold_policy.get_threshold(strictness_level)

@@ -1,10 +1,11 @@
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
 from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
 
 
-def test_stub_passive_liveness_checker_returns_passed_result(tmp_path):
+def test_stub_passive_liveness_checker_returns_passed_result():
     checker = StubPassiveLivenessChecker(
         threshold_policy=PassiveLivenessThresholdPolicy(
             level_to_threshold={
@@ -14,7 +15,11 @@ def test_stub_passive_liveness_checker_returns_passed_result(tmp_path):
     )
 
     result = checker.check(
-        video_path=tmp_path / "video.mp4",
+        video_analysis=VideoFrameAnalysisResult(
+            frames=(),
+            total_frames=0,
+            skipped_frames=0,
+        ),
         strictness_level=2,
     )
 

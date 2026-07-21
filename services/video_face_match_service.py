@@ -1,19 +1,15 @@
-from pathlib import Path
-
-import numpy as np
 from PIL import Image
 
-from core.exceptions import (
-    MultipleFacesDetectedError,
-    NoFaceDetectedError,
-    NoUsableVideoFrameError,
-)
+from core.analyzed_video_frame import VideoFrameAnalysisResult
+from core.exceptions import NoUsableVideoFrameError
+from core.face_detection import FaceDetection
 from core.video_face_match_result import VideoFaceMatchResult
 from face.base_embedder import BaseFaceEmbedder
+from face.face_match_threshold_policy import (
+    FaceMatchThresholdPolicy,
+)
 from face.face_matcher import FaceMatcher
-from face.face_match_threshold_policy import FaceMatchThresholdPolicy
 from face.face_preprocessor import FacePreprocessor
-from video.video_frame_extractor import VideoFrameExtractor
 
 
 class VideoFaceMatchService:
@@ -21,38 +17,55 @@ class VideoFaceMatchService:
         self,
         preprocessor: FacePreprocessor,
         embedder: BaseFaceEmbedder,
-        frame_extractor: VideoFrameExtractor,
         threshold_policy: FaceMatchThresholdPolicy,
+        neutral_yaw_threshold: float,
+        neutral_pitch_threshold: float,
     ) -> None:
         self.preprocessor = preprocessor
         self.embedder = embedder
-        self.frame_extractor = frame_extractor
         self.threshold_policy = threshold_policy
+        self.neutral_yaw_threshold = neutral_yaw_threshold
+        self.neutral_pitch_threshold = neutral_pitch_threshold
 
     def match_id_card_to_video(
         self,
         national_id_image: Image.Image,
-        video_path: Path,
+        video_analysis: VideoFrameAnalysisResult,
         strictness_level: int,
     ) -> VideoFaceMatchResult:
-        threshold = self.threshold_policy.get_threshold(strictness_level)
+        threshold = self.threshold_policy.get_threshold(
+            strictness_level,
+        )
 
-        reference_face = self.preprocessor.preprocess(national_id_image)
-        reference_embedding = self.embedder.extract(reference_face)
-
-        frames = self.frame_extractor.extract(video_path)
+        reference_face = self.preprocessor.preprocess(
+            national_id_image,
+        )
+        reference_embedding = self.embedder.extract(
+            reference_face,
+        )
 
         frame_scores: list[float] = []
-        skipped_frames = 0
+        skipped_frames = video_analysis.skipped_frames
 
         matcher = FaceMatcher(
             threshold=threshold,
         )
 
-        for frame in frames:
+        for analyzed_frame in video_analysis.frames:
             try:
-                candidate_face = self.preprocessor.preprocess(frame.image)
-                candidate_embedding = self.embedder.extract(candidate_face)
+                if not self._is_neutral_pose(
+                    analyzed_frame.detection,
+                ):
+                    skipped_frames += 1
+                    continue
+
+                candidate_face = self.preprocessor.preprocess_with_detection(
+                    image=analyzed_frame.frame.image,
+                    detection=analyzed_frame.detection,
+                )
+                candidate_embedding = self.embedder.extract(
+                    candidate_face,
+                )
 
                 match_result = matcher.match(
                     reference=reference_embedding,
@@ -61,7 +74,7 @@ class VideoFaceMatchService:
 
                 frame_scores.append(match_result.score)
 
-            except (NoFaceDetectedError, MultipleFacesDetectedError):
+            except ValueError:
                 skipped_frames += 1
 
         if not frame_scores:
@@ -69,23 +82,29 @@ class VideoFaceMatchService:
                 "No usable video frame could be used for face matching."
             )
 
-        median_score = float(
-            np.median(
-                np.array(
-                    frame_scores,
-                    dtype=np.float32,
-                )
-            )
-        )
         best_score = float(max(frame_scores))
 
         return VideoFaceMatchResult(
-            is_match=median_score >= threshold,
-            score=median_score,
+            is_match=best_score >= threshold,
+            score=best_score,
             best_score=best_score,
             threshold=threshold,
             model_name=reference_embedding.model_name,
             processed_frames=len(frame_scores),
             skipped_frames=skipped_frames,
             frame_scores=frame_scores,
+        )
+
+    def _is_neutral_pose(
+        self,
+        detection: FaceDetection,
+    ) -> bool:
+        if detection.pose is None:
+            return True
+
+        pitch, yaw, _roll = detection.pose
+
+        return (
+            abs(yaw) <= self.neutral_yaw_threshold
+            and abs(pitch) <= self.neutral_pitch_threshold
         )

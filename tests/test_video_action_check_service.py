@@ -1,52 +1,19 @@
 import numpy as np
 from PIL import Image
 
+from core.analyzed_video_frame import (
+    AnalyzedVideoFrame,
+    VideoFrameAnalysisResult,
+)
 from core.face_detection import FaceDetection
 from core.liveness_action import LivenessAction
 from core.video_frame import VideoFrame
-from face.single_face_validator import SingleFaceValidator
-from liveness.head_pose_action_classifier import HeadPoseActionClassifier
-from services.video_action_check_service import VideoActionCheckService
-
-
-class FakeFrameExtractor:
-    def extract(
-        self,
-        video_path,
-    ):
-        return [
-            VideoFrame(0, 0.0, Image.new("RGB", (112, 112))),
-            VideoFrame(1, 1.0, Image.new("RGB", (112, 112))),
-            VideoFrame(2, 2.0, Image.new("RGB", (112, 112))),
-            VideoFrame(3, 3.0, Image.new("RGB", (112, 112))),
-            VideoFrame(4, 4.0, Image.new("RGB", (112, 112))),
-            VideoFrame(5, 5.0, Image.new("RGB", (112, 112))),
-        ]
-
-
-class FakeDetector:
-    def __init__(
-        self,
-        poses,
-    ) -> None:
-        self.poses = poses
-        self.index = 0
-
-    def detect(
-        self,
-        image,
-    ):
-        pose = self.poses[self.index]
-        self.index += 1
-
-        return [
-            FaceDetection(
-                bbox=(0.0, 0.0, 100.0, 100.0),
-                landmarks=np.zeros((5, 2), dtype=np.float32),
-                score=0.99,
-                pose=pose,
-            )
-        ]
+from liveness.head_pose_action_classifier import (
+    HeadPoseActionClassifier,
+)
+from services.video_action_check_service import (
+    VideoActionCheckService,
+)
 
 
 def make_classifier() -> HeadPoseActionClassifier:
@@ -58,10 +25,59 @@ def make_classifier() -> HeadPoseActionClassifier:
     )
 
 
-def test_video_action_check_service_passes_expected_actions(tmp_path):
+def make_video_analysis(
+    poses: list[tuple[float, float, float]],
+) -> VideoFrameAnalysisResult:
+    analyzed_frames = []
+
+    for index, pose in enumerate(poses):
+        analyzed_frames.append(
+            AnalyzedVideoFrame(
+                frame=VideoFrame(
+                    frame_index=index,
+                    timestamp_seconds=float(index),
+                    image=Image.new(
+                        "RGB",
+                        (
+                            112,
+                            112,
+                        ),
+                    ),
+                ),
+                detection=FaceDetection(
+                    bbox=(
+                        0.0,
+                        0.0,
+                        100.0,
+                        100.0,
+                    ),
+                    landmarks=np.zeros(
+                        (
+                            5,
+                            2,
+                        ),
+                        dtype=np.float32,
+                    ),
+                    score=0.99,
+                    pose=pose,
+                ),
+            )
+        )
+
+    return VideoFrameAnalysisResult(
+        frames=tuple(analyzed_frames),
+        total_frames=len(analyzed_frames),
+        skipped_frames=0,
+    )
+
+
+def test_video_action_check_service_passes_expected_actions():
     service = VideoActionCheckService(
-        frame_extractor=FakeFrameExtractor(),
-        detector=FakeDetector(
+        classifier=make_classifier(),
+    )
+
+    result = service.check_actions(
+        video_analysis=make_video_analysis(
             poses=[
                 (0.0, 0.0, 0.0),
                 (0.0, 20.0, 0.0),
@@ -71,12 +87,6 @@ def test_video_action_check_service_passes_expected_actions(tmp_path):
                 (15.0, 0.0, 0.0),
             ]
         ),
-        validator=SingleFaceValidator(),
-        classifier=make_classifier(),
-    )
-
-    result = service.check_actions(
-        video_path=tmp_path / "video.mp4",
         expected_actions=[
             LivenessAction.CENTER,
             LivenessAction.LEFT,
@@ -97,10 +107,13 @@ def test_video_action_check_service_passes_expected_actions(tmp_path):
     assert result.missing_actions == []
 
 
-def test_video_action_check_service_detects_missing_action(tmp_path):
+def test_video_action_check_service_detects_missing_action():
     service = VideoActionCheckService(
-        frame_extractor=FakeFrameExtractor(),
-        detector=FakeDetector(
+        classifier=make_classifier(),
+    )
+
+    result = service.check_actions(
+        video_analysis=make_video_analysis(
             poses=[
                 (0.0, 0.0, 0.0),
                 (0.0, 20.0, 0.0),
@@ -110,12 +123,6 @@ def test_video_action_check_service_detects_missing_action(tmp_path):
                 (15.0, 0.0, 0.0),
             ]
         ),
-        validator=SingleFaceValidator(),
-        classifier=make_classifier(),
-    )
-
-    result = service.check_actions(
-        video_path=tmp_path / "video.mp4",
         expected_actions=[
             LivenessAction.CENTER,
             LivenessAction.LEFT,

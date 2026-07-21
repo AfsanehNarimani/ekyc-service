@@ -35,7 +35,7 @@ class FakeVideoFaceMatchService:
     def match_id_card_to_video(
         self,
         national_id_image,
-        video_path: Path,
+        video_analysis,
         strictness_level: int,
     ) -> VideoFaceMatchResult:
         return VideoFaceMatchResult(
@@ -53,7 +53,7 @@ class FakeVideoFaceMatchService:
 class FakeVideoActionCheckService:
     def check_actions(
         self,
-        video_path: Path,
+        video_analysis,
         expected_actions: list[LivenessAction],
     ) -> ActionCheckResult:
         return ActionCheckResult(
@@ -70,7 +70,7 @@ class FakeVideoActionCheckService:
 class FakeVideoLivenessService:
     def check_liveness(
         self,
-        video_path: Path,
+        video_analysis,
         strictness_level: int,
     ) -> VideoLivenessResult:
         return VideoLivenessResult(
@@ -88,7 +88,7 @@ class FakeVideoLivenessService:
 class FakePassiveLivenessChecker:
     def check(
         self,
-        video_path: Path,
+        video_analysis,
         strictness_level: int,
     ) -> PassiveLivenessResult:
         return PassiveLivenessResult(
@@ -157,9 +157,12 @@ def make_expected_action_policy() -> ExpectedActionPolicy:
 def test_video_verification_orchestrator_runs_full_flow():
     media_cleanup_service = FakeMediaCleanupService()
 
+    video_frame_analysis_service = FakeVideoFrameAnalysisService()
+
     service = VideoVerificationOrchestratorService(
         media_loader=FakeMediaLoader(),
         image_file_loader=FakeImageFileLoader(),
+        video_frame_analysis_service=(video_frame_analysis_service),
         face_match_service=FakeVideoFaceMatchService(),
         action_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
@@ -202,3 +205,18 @@ def test_video_verification_orchestrator_runs_full_flow():
         Path("/tmp/fake.mp4"),
     ]
     assert result.final_decision.passive_liveness_enforced is False
+
+    assert video_frame_analysis_service.call_count == 1
+
+
+class FakeVideoFrameAnalysisService:
+    def __init__(self) -> None:
+        self.call_count = 0
+        self.analysis = object()
+
+    def analyze(
+        self,
+        video_path: Path,
+    ):
+        self.call_count += 1
+        return self.analysis

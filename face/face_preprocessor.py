@@ -3,6 +3,7 @@ from PIL import Image
 from face.face_aligner import FaceAligner
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
+from core.face_detection import FaceDetection
 
 
 class FacePreprocessor:
@@ -23,6 +24,16 @@ class FacePreprocessor:
         detections = self.detector.detect(image)
         detection = self.validator.validate(detections)
 
+        return self.preprocess_with_detection(
+            image=image,
+            detection=detection,
+        )
+
+    def preprocess_with_detection(
+        self,
+        image: Image.Image,
+        detection: FaceDetection,
+    ) -> Image.Image:
         return self.aligner.align(
             image=image,
             detection=detection,

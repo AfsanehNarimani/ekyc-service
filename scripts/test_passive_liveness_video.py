@@ -1,7 +1,10 @@
 import argparse
 from pathlib import Path
 
-from api.dependencies import get_passive_liveness_checker
+from api.dependencies import (
+    get_passive_liveness_checker,
+    get_video_frame_analysis_service,
+)
 
 
 def main() -> None:
@@ -11,10 +14,13 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    video_analysis = get_video_frame_analysis_service().analyze(
+        video_path=Path(args.video),
+    )
     checker = get_passive_liveness_checker()
 
     result = checker.check(
-        video_path=Path(args.video),
+        video_analysis=video_analysis,
         strictness_level=args.level,
     )
 

@@ -1,58 +1,46 @@
-from pathlib import Path
-
 import numpy as np
 
-from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 from core.video_liveness_result import VideoLivenessResult
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
-from liveness.liveness_threshold_policy import LivenessThresholdPolicy
-from video.video_frame_extractor import VideoFrameExtractor
+from liveness.liveness_threshold_policy import (
+    LivenessThresholdPolicy,
+)
 
 
 class VideoLivenessService:
     def __init__(
         self,
-        frame_extractor: VideoFrameExtractor,
-        detector: InsightFaceDetector,
-        validator: SingleFaceValidator,
         threshold_policy: LivenessThresholdPolicy,
     ) -> None:
-        self.frame_extractor = frame_extractor
-        self.detector = detector
-        self.validator = validator
         self.threshold_policy = threshold_policy
 
     def check_liveness(
         self,
-        video_path: Path,
+        video_analysis: VideoFrameAnalysisResult,
         strictness_level: int,
     ) -> VideoLivenessResult:
-        thresholds = self.threshold_policy.get_thresholds(strictness_level)
-        frames = self.frame_extractor.extract(video_path)
+        thresholds = self.threshold_policy.get_thresholds(
+            strictness_level,
+        )
 
         poses: list[tuple[float, float]] = []
-        skipped_frames = 0
+        skipped_frames = video_analysis.skipped_frames
 
-        for frame in frames:
-            try:
-                detections = self.detector.detect(frame.image)
-                detection = self.validator.validate(detections)
+        for analyzed_frame in video_analysis.frames:
+            pose = analyzed_frame.detection.pose
 
-                if detection.pose is None:
-                    skipped_frames += 1
-                    continue
-
-                pitch, yaw, _roll = detection.pose
-                poses.append(
-                    (
-                        float(pitch),
-                        float(yaw),
-                    )
-                )
-
-            except (NoFaceDetectedError, MultipleFacesDetectedError):
+            if pose is None:
                 skipped_frames += 1
+                continue
+
+            pitch, yaw, _roll = pose
+
+            poses.append(
+                (
+                    float(pitch),
+                    float(yaw),
+                )
+            )
 
         processed_frames = len(poses)
 
@@ -64,7 +52,7 @@ class VideoLivenessService:
                 skipped_frames=skipped_frames,
                 min_required_frames=thresholds.min_required_frames,
                 pose_variation_score=0.0,
-                min_pose_variation_score=thresholds.min_pose_variation_score,
+                min_pose_variation_score=(thresholds.min_pose_variation_score),
                 reason="not_enough_usable_frames",
             )
 
@@ -78,7 +66,7 @@ class VideoLivenessService:
                 skipped_frames=skipped_frames,
                 min_required_frames=thresholds.min_required_frames,
                 pose_variation_score=pose_variation_score,
-                min_pose_variation_score=thresholds.min_pose_variation_score,
+                min_pose_variation_score=(thresholds.min_pose_variation_score),
                 reason="not_enough_pose_variation",
             )
 
@@ -89,7 +77,7 @@ class VideoLivenessService:
             skipped_frames=skipped_frames,
             min_required_frames=thresholds.min_required_frames,
             pose_variation_score=pose_variation_score,
-            min_pose_variation_score=thresholds.min_pose_variation_score,
+            min_pose_variation_score=(thresholds.min_pose_variation_score),
             reason="passed_basic_liveness",
         )
 

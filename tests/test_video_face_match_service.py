@@ -1,20 +1,34 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 from PIL import Image
 
+from core.analyzed_video_frame import (
+    AnalyzedVideoFrame,
+    VideoFrameAnalysisResult,
+)
 from core.exceptions import NoUsableVideoFrameError
+from core.face_detection import FaceDetection
 from core.face_embedding import FaceEmbedding
 from core.video_frame import VideoFrame
-from face.face_match_threshold_policy import FaceMatchThresholdPolicy
-from services.video_face_match_service import VideoFaceMatchService
+from face.face_match_threshold_policy import (
+    FaceMatchThresholdPolicy,
+)
+from services.video_face_match_service import (
+    VideoFaceMatchService,
+)
 
 
 class FakePreprocessor:
     def preprocess(
         self,
         image: Image.Image,
+    ) -> Image.Image:
+        return image
+
+    def preprocess_with_detection(
+        self,
+        image: Image.Image,
+        detection: FaceDetection,
     ) -> Image.Image:
         return image
 
@@ -40,61 +54,98 @@ class FakeEmbedder:
         )
 
 
-class FakeVideoFrameExtractor:
-    def __init__(
-        self,
-        frames: list[VideoFrame],
-    ) -> None:
-        self.frames = frames
+def make_video_analysis(
+    frame_count: int,
+) -> VideoFrameAnalysisResult:
+    detection = FaceDetection(
+        bbox=(
+            0.0,
+            0.0,
+            100.0,
+            100.0,
+        ),
+        landmarks=np.zeros(
+            (
+                5,
+                2,
+            ),
+            dtype=np.float32,
+        ),
+        score=0.99,
+    )
 
-    def extract(
-        self,
-        video_path: Path,
-    ) -> list[VideoFrame]:
-        return self.frames
+    analyzed_frames = tuple(
+        AnalyzedVideoFrame(
+            frame=VideoFrame(
+                frame_index=index,
+                timestamp_seconds=float(index),
+                image=Image.new(
+                    "RGB",
+                    (
+                        112,
+                        112,
+                    ),
+                ),
+            ),
+            detection=detection,
+        )
+        for index in range(frame_count)
+    )
 
-
-def make_frame(
-    index: int,
-) -> VideoFrame:
-    return VideoFrame(
-        frame_index=index,
-        timestamp_seconds=float(index),
-        image=Image.new("RGB", (112, 112)),
+    return VideoFrameAnalysisResult(
+        frames=analyzed_frames,
+        total_frames=frame_count,
+        skipped_frames=0,
     )
 
 
-def test_video_face_match_service_accepts_matching_video(tmp_path):
-    reference_vector = np.array([1.0, 0.0, 0.0], dtype=np.float32)
-    matching_vector = np.array([1.0, 0.0, 0.0], dtype=np.float32)
-
-    service = VideoFaceMatchService(
+def make_service(
+    vectors: list[np.ndarray],
+) -> VideoFaceMatchService:
+    return VideoFaceMatchService(
         preprocessor=FakePreprocessor(),
-        embedder=FakeEmbedder(
-            vectors=[
-                reference_vector,
-                matching_vector,
-                matching_vector,
-                matching_vector,
-            ]
-        ),
-        frame_extractor=FakeVideoFrameExtractor(
-            frames=[
-                make_frame(0),
-                make_frame(1),
-                make_frame(2),
-            ]
-        ),
+        embedder=FakeEmbedder(vectors=vectors),
         threshold_policy=FaceMatchThresholdPolicy(
             level_to_threshold={
                 2: 0.55,
             }
         ),
+        neutral_yaw_threshold=8.0,
+        neutral_pitch_threshold=10.0,
+    )
+
+
+def test_video_face_match_service_accepts_matching_video():
+    reference_vector = np.array(
+        [
+            1.0,
+            0.0,
+            0.0,
+        ],
+        dtype=np.float32,
+    )
+    matching_vector = reference_vector.copy()
+
+    service = make_service(
+        vectors=[
+            reference_vector,
+            matching_vector,
+            matching_vector,
+            matching_vector,
+        ]
     )
 
     result = service.match_id_card_to_video(
-        national_id_image=Image.new("RGB", (112, 112)),
-        video_path=tmp_path / "video.mp4",
+        national_id_image=Image.new(
+            "RGB",
+            (
+                112,
+                112,
+            ),
+        ),
+        video_analysis=make_video_analysis(
+            frame_count=3,
+        ),
         strictness_level=2,
     )
 
@@ -106,37 +157,44 @@ def test_video_face_match_service_accepts_matching_video(tmp_path):
     assert result.model_name == "edgeface"
 
 
-def test_video_face_match_service_rejects_non_matching_video(tmp_path):
-    reference_vector = np.array([1.0, 0.0, 0.0], dtype=np.float32)
-    different_vector = np.array([0.0, 1.0, 0.0], dtype=np.float32)
+def test_video_face_match_service_rejects_non_matching_video():
+    reference_vector = np.array(
+        [
+            1.0,
+            0.0,
+            0.0,
+        ],
+        dtype=np.float32,
+    )
+    different_vector = np.array(
+        [
+            0.0,
+            1.0,
+            0.0,
+        ],
+        dtype=np.float32,
+    )
 
-    service = VideoFaceMatchService(
-        preprocessor=FakePreprocessor(),
-        embedder=FakeEmbedder(
-            vectors=[
-                reference_vector,
-                different_vector,
-                different_vector,
-                different_vector,
-            ]
-        ),
-        frame_extractor=FakeVideoFrameExtractor(
-            frames=[
-                make_frame(0),
-                make_frame(1),
-                make_frame(2),
-            ]
-        ),
-        threshold_policy=FaceMatchThresholdPolicy(
-            level_to_threshold={
-                2: 0.55,
-            }
-        ),
+    service = make_service(
+        vectors=[
+            reference_vector,
+            different_vector,
+            different_vector,
+            different_vector,
+        ]
     )
 
     result = service.match_id_card_to_video(
-        national_id_image=Image.new("RGB", (112, 112)),
-        video_path=tmp_path / "video.mp4",
+        national_id_image=Image.new(
+            "RGB",
+            (
+                112,
+                112,
+            ),
+        ),
+        video_analysis=make_video_analysis(
+            frame_count=3,
+        ),
         strictness_level=2,
     )
 
@@ -145,27 +203,31 @@ def test_video_face_match_service_rejects_non_matching_video(tmp_path):
     assert result.best_score == 0.0
 
 
-def test_video_face_match_service_rejects_video_with_no_frames(tmp_path):
-    service = VideoFaceMatchService(
-        preprocessor=FakePreprocessor(),
-        embedder=FakeEmbedder(
-            vectors=[
-                np.array([1.0, 0.0, 0.0], dtype=np.float32),
-            ]
-        ),
-        frame_extractor=FakeVideoFrameExtractor(
-            frames=[],
-        ),
-        threshold_policy=FaceMatchThresholdPolicy(
-            level_to_threshold={
-                2: 0.55,
-            }
-        ),
+def test_video_face_match_service_rejects_video_with_no_frames():
+    service = make_service(
+        vectors=[
+            np.array(
+                [
+                    1.0,
+                    0.0,
+                    0.0,
+                ],
+                dtype=np.float32,
+            )
+        ]
     )
 
     with pytest.raises(NoUsableVideoFrameError):
         service.match_id_card_to_video(
-            national_id_image=Image.new("RGB", (112, 112)),
-            video_path=tmp_path / "video.mp4",
+            national_id_image=Image.new(
+                "RGB",
+                (
+                    112,
+                    112,
+                ),
+            ),
+            video_analysis=make_video_analysis(
+                frame_count=0,
+            ),
             strictness_level=2,
         )

@@ -1,72 +1,58 @@
-from pathlib import Path
-
 import cv2
 import numpy as np
 
-from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 from core.face_detection import FaceDetection
 from core.passive_liveness_result import PassiveLivenessResult
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
-from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
+from liveness.base_passive_liveness_checker import (
+    BasePassiveLivenessChecker,
+)
 from liveness.passive_liveness_scoring_model import (
     PassiveLivenessScoringModel,
 )
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
-from video.video_frame_extractor import VideoFrameExtractor
 
 
 class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
     def __init__(
         self,
-        frame_extractor: VideoFrameExtractor,
-        detector: InsightFaceDetector,
-        validator: SingleFaceValidator,
         model: PassiveLivenessScoringModel,
         threshold_policy: PassiveLivenessThresholdPolicy,
-        frame_interval_seconds: float,
-        max_frames: int,
         model_name: str = "onnx_passive_liveness",
         neutral_yaw_threshold: float = 30.0,
         neutral_pitch_threshold: float = 30.0,
     ) -> None:
-        self.frame_extractor = frame_extractor
-        self.detector = detector
-        self.validator = validator
         self.model = model
         self.threshold_policy = threshold_policy
-        self.frame_interval_seconds = frame_interval_seconds
-        self.max_frames = max_frames
         self.model_name = model_name
         self.neutral_yaw_threshold = neutral_yaw_threshold
         self.neutral_pitch_threshold = neutral_pitch_threshold
 
     def check(
         self,
-        video_path: Path,
+        video_analysis: VideoFrameAnalysisResult,
         strictness_level: int,
     ) -> PassiveLivenessResult:
-        threshold = self.threshold_policy.get_threshold(strictness_level)
-
-        frame_scores: list[float] = []
-        skipped_frames = 0
-
-        frames = self.frame_extractor.extract(
-            video_path=video_path,
+        threshold = self.threshold_policy.get_threshold(
+            strictness_level,
         )
 
-        for frame in frames:
+        frame_scores: list[float] = []
+        skipped_frames = video_analysis.skipped_frames
+
+        for analyzed_frame in video_analysis.frames:
+            detection = analyzed_frame.detection
+
+            if not self._is_neutral_pose(detection):
+                skipped_frames += 1
+                continue
+
             try:
-                detections = self.detector.detect(frame.image)
-                detection = self.validator.validate(detections)
-
-                if not self._is_neutral_pose(detection):
-                    skipped_frames += 1
-                    continue
-
-                frame_bgr = self._pil_rgb_to_bgr(frame.image)
+                frame_bgr = self._pil_rgb_to_bgr(
+                    analyzed_frame.frame.image,
+                )
 
                 score = self.model.predict_real_score(
                     frame_bgr=frame_bgr,
@@ -75,11 +61,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
 
                 frame_scores.append(score)
 
-            except (
-                NoFaceDetectedError,
-                MultipleFacesDetectedError,
-                ValueError,
-            ):
+            except ValueError:
                 skipped_frames += 1
 
         if not frame_scores:
@@ -90,7 +72,7 @@ class ONNXPassiveLivenessChecker(BasePassiveLivenessChecker):
                 model_name=self.model_name,
                 processed_frames=0,
                 skipped_frames=skipped_frames,
-                reason="no_neutral_usable_frame_for_passive_liveness",
+                reason=("no_neutral_usable_frame_for_passive_liveness"),
                 frame_scores=[],
             )
 

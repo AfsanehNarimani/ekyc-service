@@ -1,70 +1,19 @@
-from pathlib import Path
-from types import SimpleNamespace
-
 import numpy as np
 from PIL import Image
 
+from core.analyzed_video_frame import (
+    AnalyzedVideoFrame,
+    VideoFrameAnalysisResult,
+)
 from core.face_detection import FaceDetection
 from core.passive_liveness_result import PassiveLivenessResult
+from core.video_frame import VideoFrame
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
-from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
-
-
-class FakeFrameExtractor:
-    def extract(
-        self,
-        video_path: Path,
-    ):
-        image = Image.fromarray(
-            np.zeros(
-                (
-                    120,
-                    120,
-                    3,
-                ),
-                dtype=np.uint8,
-            )
-        )
-
-        return [
-            SimpleNamespace(image=image),
-            SimpleNamespace(image=image),
-        ]
-
-
-class FakeDetector:
-    def detect(
-        self,
-        image,
-    ):
-        return [
-            FaceDetection(
-                bbox=(
-                    20,
-                    20,
-                    100,
-                    100,
-                ),
-                landmarks=np.zeros(
-                    (
-                        5,
-                        2,
-                    ),
-                    dtype=np.float32,
-                ),
-                score=0.99,
-            )
-        ]
-
-
-class FakeValidator:
-    def validate(
-        self,
-        detections,
-    ):
-        return detections[0]
+from services.onnx_passive_liveness_checker import (
+    ONNXPassiveLivenessChecker,
+)
 
 
 class FakeModel:
@@ -83,23 +32,71 @@ class FakeModel:
         return 0.9
 
 
+def make_video_analysis() -> VideoFrameAnalysisResult:
+    image = Image.fromarray(
+        np.zeros(
+            (
+                120,
+                120,
+                3,
+            ),
+            dtype=np.uint8,
+        )
+    )
+
+    detection = FaceDetection(
+        bbox=(
+            20,
+            20,
+            100,
+            100,
+        ),
+        landmarks=np.zeros(
+            (
+                5,
+                2,
+            ),
+            dtype=np.float32,
+        ),
+        score=0.99,
+    )
+
+    return VideoFrameAnalysisResult(
+        frames=(
+            AnalyzedVideoFrame(
+                frame=VideoFrame(
+                    frame_index=0,
+                    timestamp_seconds=0.0,
+                    image=image,
+                ),
+                detection=detection,
+            ),
+            AnalyzedVideoFrame(
+                frame=VideoFrame(
+                    frame_index=25,
+                    timestamp_seconds=1.0,
+                    image=image,
+                ),
+                detection=detection,
+            ),
+        ),
+        total_frames=2,
+        skipped_frames=0,
+    )
+
+
 def test_onnx_passive_liveness_checker_passes_when_median_score_is_above_threshold():
     checker = ONNXPassiveLivenessChecker(
-        frame_extractor=FakeFrameExtractor(),
-        detector=FakeDetector(),
-        validator=FakeValidator(),
         model=FakeModel(),
         threshold_policy=PassiveLivenessThresholdPolicy(
             level_to_threshold={
                 2: 0.6,
             }
         ),
-        frame_interval_seconds=1.0,
-        max_frames=20,
     )
 
     result = checker.check(
-        video_path=Path("/tmp/video.mp4"),
+        video_analysis=make_video_analysis(),
         strictness_level=2,
     )
 

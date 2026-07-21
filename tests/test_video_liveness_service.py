@@ -1,64 +1,69 @@
 import numpy as np
 from PIL import Image
 
+from core.analyzed_video_frame import (
+    AnalyzedVideoFrame,
+    VideoFrameAnalysisResult,
+)
 from core.face_detection import FaceDetection
 from core.video_frame import VideoFrame
-from face.single_face_validator import SingleFaceValidator
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,
     LivenessThresholds,
 )
-from services.video_liveness_service import VideoLivenessService
+from services.video_liveness_service import (
+    VideoLivenessService,
+)
 
 
-class FakeFrameExtractor:
-    def extract(
-        self,
-        video_path,
-    ):
-        return [
-            VideoFrame(0, 0.0, Image.new("RGB", (112, 112))),
-            VideoFrame(1, 1.0, Image.new("RGB", (112, 112))),
-            VideoFrame(2, 2.0, Image.new("RGB", (112, 112))),
-        ]
+def make_video_analysis(
+    poses: list[tuple[float, float, float]],
+) -> VideoFrameAnalysisResult:
+    analyzed_frames = []
 
-
-class FakeDetector:
-    def __init__(
-        self,
-        poses,
-    ) -> None:
-        self.poses = poses
-        self.index = 0
-
-    def detect(
-        self,
-        image,
-    ):
-        pose = self.poses[self.index]
-        self.index += 1
-
-        return [
-            FaceDetection(
-                bbox=(0.0, 0.0, 100.0, 100.0),
-                landmarks=np.zeros((5, 2), dtype=np.float32),
-                score=0.99,
-                pose=pose,
+    for index, pose in enumerate(poses):
+        analyzed_frames.append(
+            AnalyzedVideoFrame(
+                frame=VideoFrame(
+                    frame_index=index,
+                    timestamp_seconds=float(index),
+                    image=Image.new(
+                        "RGB",
+                        (
+                            112,
+                            112,
+                        ),
+                    ),
+                ),
+                detection=FaceDetection(
+                    bbox=(
+                        0.0,
+                        0.0,
+                        100.0,
+                        100.0,
+                    ),
+                    landmarks=np.zeros(
+                        (
+                            5,
+                            2,
+                        ),
+                        dtype=np.float32,
+                    ),
+                    score=0.99,
+                    pose=pose,
+                ),
             )
-        ]
+        )
+
+    return VideoFrameAnalysisResult(
+        frames=tuple(analyzed_frames),
+        total_frames=len(analyzed_frames),
+        skipped_frames=0,
+    )
 
 
-def test_video_liveness_service_passes_when_pose_varies(tmp_path):
-    service = VideoLivenessService(
-        frame_extractor=FakeFrameExtractor(),
-        detector=FakeDetector(
-            poses=[
-                (0.0, 0.0, 0.0),
-                (0.0, 25.0, 0.0),
-                (0.0, -25.0, 0.0),
-            ]
-        ),
-        validator=SingleFaceValidator(),
+def make_service() -> VideoLivenessService:
+    return VideoLivenessService(
         threshold_policy=LivenessThresholdPolicy(
             level_to_thresholds={
                 2: LivenessThresholds(
@@ -69,8 +74,16 @@ def test_video_liveness_service_passes_when_pose_varies(tmp_path):
         ),
     )
 
-    result = service.check_liveness(
-        video_path=tmp_path / "video.mp4",
+
+def test_video_liveness_service_passes_when_pose_varies():
+    result = make_service().check_liveness(
+        video_analysis=make_video_analysis(
+            poses=[
+                (0.0, 0.0, 0.0),
+                (0.0, 25.0, 0.0),
+                (0.0, -25.0, 0.0),
+            ]
+        ),
         strictness_level=2,
     )
 
@@ -79,29 +92,15 @@ def test_video_liveness_service_passes_when_pose_varies(tmp_path):
     assert result.processed_frames == 3
 
 
-def test_video_liveness_service_rejects_low_pose_variation(tmp_path):
-    service = VideoLivenessService(
-        frame_extractor=FakeFrameExtractor(),
-        detector=FakeDetector(
+def test_video_liveness_service_rejects_low_pose_variation():
+    result = make_service().check_liveness(
+        video_analysis=make_video_analysis(
             poses=[
                 (0.0, 1.0, 0.0),
                 (0.0, 2.0, 0.0),
                 (0.0, 3.0, 0.0),
             ]
         ),
-        validator=SingleFaceValidator(),
-        threshold_policy=LivenessThresholdPolicy(
-            level_to_thresholds={
-                2: LivenessThresholds(
-                    min_required_frames=3,
-                    min_pose_variation_score=18.0,
-                )
-            }
-        ),
-    )
-
-    result = service.check_liveness(
-        video_path=tmp_path / "video.mp4",
         strictness_level=2,
     )
 

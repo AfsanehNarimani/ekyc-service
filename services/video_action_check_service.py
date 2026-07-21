@@ -1,48 +1,32 @@
-from pathlib import Path
-
 from core.action_check_result import ActionCheckResult
-from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 from core.liveness_action import LivenessAction
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
-from liveness.head_pose_action_classifier import HeadPoseActionClassifier
-from video.video_frame_extractor import VideoFrameExtractor
+from liveness.head_pose_action_classifier import (
+    HeadPoseActionClassifier,
+)
 
 
 class VideoActionCheckService:
     def __init__(
         self,
-        frame_extractor: VideoFrameExtractor,
-        detector: InsightFaceDetector,
-        validator: SingleFaceValidator,
         classifier: HeadPoseActionClassifier,
     ) -> None:
-        self.frame_extractor = frame_extractor
-        self.detector = detector
-        self.validator = validator
         self.classifier = classifier
 
     def check_actions(
         self,
-        video_path: Path,
+        video_analysis: VideoFrameAnalysisResult,
         expected_actions: list[LivenessAction],
     ) -> ActionCheckResult:
-        frames = self.frame_extractor.extract(video_path)
-
         observed_actions: list[LivenessAction] = []
-        skipped_frames = 0
 
-        for frame in frames:
-            try:
-                detections = self.detector.detect(frame.image)
-                detection = self.validator.validate(detections)
-                action = self.classifier.classify(detection)
+        for analyzed_frame in video_analysis.frames:
+            action = self.classifier.classify(
+                analyzed_frame.detection,
+            )
 
-                if action is not None:
-                    observed_actions.append(action)
-
-            except (NoFaceDetectedError, MultipleFacesDetectedError):
-                skipped_frames += 1
+            if action is not None:
+                observed_actions.append(action)
 
         compact_actions = self._remove_consecutive_duplicates(
             observed_actions,
@@ -59,8 +43,8 @@ class VideoActionCheckService:
             observed_actions=observed_actions,
             compact_actions=compact_actions,
             missing_actions=missing_actions,
-            processed_frames=len(frames) - skipped_frames,
-            skipped_frames=skipped_frames,
+            processed_frames=len(video_analysis.frames),
+            skipped_frames=video_analysis.skipped_frames,
         )
 
     def _remove_consecutive_duplicates(

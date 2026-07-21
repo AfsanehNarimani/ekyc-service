@@ -47,16 +47,16 @@ from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
 from liveness.passive_liveness_ensemble_model import (
     PassiveLivenessEnsembleModel,
 )
+from services.video_frame_analysis_service import (
+    VideoFrameAnalysisService,
+)
 
 
 @lru_cache
 def get_face_preprocessor() -> FacePreprocessor:
     return FacePreprocessor(
-        detector=InsightFaceDetector(
-            det_thresh=settings.detector_threshold,
-            providers=["CPUExecutionProvider"],
-        ),
-        validator=SingleFaceValidator(),
+        detector=get_face_detector(),
+        validator=get_single_face_validator(),
         aligner=FaceAligner(),
     )
 
@@ -176,12 +176,6 @@ def get_liveness_threshold_policy() -> LivenessThresholdPolicy:
 @lru_cache
 def get_video_liveness_service() -> VideoLivenessService:
     return VideoLivenessService(
-        frame_extractor=get_video_frame_extractor(),
-        detector=InsightFaceDetector(
-            det_thresh=settings.detector_threshold,
-            providers=["CPUExecutionProvider"],
-        ),
-        validator=SingleFaceValidator(),
         threshold_policy=get_liveness_threshold_policy(),
     )
 
@@ -191,8 +185,9 @@ def get_video_face_match_service() -> VideoFaceMatchService:
     return VideoFaceMatchService(
         preprocessor=get_face_preprocessor(),
         embedder=get_face_embedder(),
-        frame_extractor=get_video_frame_extractor(),
         threshold_policy=get_face_match_threshold_policy(),
+        neutral_yaw_threshold=(settings.head_pose_neutral_yaw_threshold),
+        neutral_pitch_threshold=(settings.head_pose_neutral_pitch_threshold),
     )
 
 
@@ -214,12 +209,6 @@ def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
 @lru_cache
 def get_video_action_check_service() -> VideoActionCheckService:
     return VideoActionCheckService(
-        frame_extractor=get_video_frame_extractor(),
-        detector=InsightFaceDetector(
-            det_thresh=settings.detector_threshold,
-            providers=["CPUExecutionProvider"],
-        ),
-        validator=SingleFaceValidator(),
         classifier=get_head_pose_action_classifier(),
     )
 
@@ -241,6 +230,7 @@ def get_video_verification_orchestrator_service() -> (
     return VideoVerificationOrchestratorService(
         media_loader=get_media_loader(),
         image_file_loader=get_image_file_loader(),
+        video_frame_analysis_service=(get_video_frame_analysis_service()),
         face_match_service=get_video_face_match_service(),
         action_check_service=get_video_action_check_service(),
         liveness_service=get_video_liveness_service(),
@@ -361,7 +351,10 @@ def get_passive_liveness_ensemble_model() -> PassiveLivenessEnsembleModel:
 
 @lru_cache
 def get_face_detector() -> InsightFaceDetector:
-    return InsightFaceDetector()
+    return InsightFaceDetector(
+        det_thresh=settings.detector_threshold,
+        providers=["CPUExecutionProvider"],
+    )
 
 
 @lru_cache
@@ -372,14 +365,18 @@ def get_single_face_validator() -> SingleFaceValidator:
 @lru_cache
 def get_onnx_passive_liveness_checker() -> ONNXPassiveLivenessChecker:
     return ONNXPassiveLivenessChecker(
-        frame_extractor=get_video_frame_extractor(),
-        detector=get_face_detector(),
-        validator=get_single_face_validator(),
         model=get_passive_liveness_ensemble_model(),
         threshold_policy=get_passive_liveness_threshold_policy(),
-        frame_interval_seconds=settings.passive_liveness_frame_interval_seconds,
-        max_frames=settings.passive_liveness_max_frames,
         model_name=settings.passive_liveness_model_name,
         neutral_yaw_threshold=30.0,
         neutral_pitch_threshold=30.0,
+    )
+
+
+@lru_cache
+def get_video_frame_analysis_service() -> VideoFrameAnalysisService:
+    return VideoFrameAnalysisService(
+        frame_extractor=get_video_frame_extractor(),
+        detector=get_face_detector(),
+        validator=get_single_face_validator(),
     )

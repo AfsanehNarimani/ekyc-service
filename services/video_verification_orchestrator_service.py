@@ -15,6 +15,9 @@ from services.video_action_check_service import VideoActionCheckService
 from services.video_face_match_service import VideoFaceMatchService
 from services.video_final_decision_service import VideoFinalDecisionService
 from services.video_liveness_service import VideoLivenessService
+from services.video_frame_analysis_service import (
+    VideoFrameAnalysisService,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +27,7 @@ class VideoVerificationOrchestratorService:
         self,
         media_loader: MediaLoader,
         image_file_loader: ImageFileLoader,
+        video_frame_analysis_service: VideoFrameAnalysisService,
         face_match_service: VideoFaceMatchService,
         action_check_service: VideoActionCheckService,
         liveness_service: VideoLivenessService,
@@ -34,6 +38,7 @@ class VideoVerificationOrchestratorService:
     ) -> None:
         self.media_loader = media_loader
         self.image_file_loader = image_file_loader
+        self.video_frame_analysis_service = video_frame_analysis_service
         self.face_match_service = face_match_service
         self.action_check_service = action_check_service
         self.liveness_service = liveness_service
@@ -81,9 +86,13 @@ class VideoVerificationOrchestratorService:
                 national_id_image_path,
             )
 
+            video_analysis = self.video_frame_analysis_service.analyze(
+                video_path=video_path,
+            )
+
             face_match_result = self.face_match_service.match_id_card_to_video(
                 national_id_image=national_id_image,
-                video_path=video_path,
+                video_analysis=video_analysis,
                 strictness_level=face_match_level,
             )
 
@@ -96,7 +105,7 @@ class VideoVerificationOrchestratorService:
             )
 
             action_check_result = self.action_check_service.check_actions(
-                video_path=video_path,
+                video_analysis=video_analysis,
                 expected_actions=expected_actions,
             )
 
@@ -109,7 +118,7 @@ class VideoVerificationOrchestratorService:
             )
 
             liveness_result = self.liveness_service.check_liveness(
-                video_path=video_path,
+                video_analysis=video_analysis,
                 strictness_level=liveness_level,
             )
 
@@ -122,7 +131,7 @@ class VideoVerificationOrchestratorService:
             )
 
             passive_liveness_result = self.passive_liveness_checker.check(
-                video_path=video_path,
+                video_analysis=video_analysis,
                 strictness_level=liveness_level,
             )
 
