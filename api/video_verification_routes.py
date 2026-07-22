@@ -27,6 +27,8 @@ from core.exceptions import (
 from services.video_verification_orchestrator_service import (
     VideoVerificationOrchestratorService,
 )
+from api.authentication_dependencies import authenticate_service
+from authentication.authenticated_service import AuthenticatedService
 
 logger = logging.getLogger(__name__)
 
@@ -41,13 +43,16 @@ router = APIRouter(
     response_model=VerifyVideoResponse,
     responses={
         400: {"model": ErrorResponse},
+        401: {"model": ErrorResponse},
         404: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
         500: {"model": ErrorResponse},
+        503: {"model": ErrorResponse},
     },
 )
 def verify_video(
     request: VerifyVideoRequest,
+    _authenticated_service: AuthenticatedService | None = Depends(authenticate_service),
     service: VideoVerificationOrchestratorService = Depends(
         get_video_verification_orchestrator_service
     ),
@@ -138,6 +143,13 @@ def verify_video(
             trace_id,
             request.challenge_id,
             error,
+        )
+        return error_response_factory.build(
+            status_code=422,
+            code="no_usable_video_frame",
+            message=str(error),
+            trace_id=trace_id,
+            processing_time_ms=_elapsed_ms(started_at),
         )
 
     except Exception:

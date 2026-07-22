@@ -16,6 +16,16 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
+    keycloak_auth_enabled: bool = True
+    keycloak_issuer: str | None = None
+    keycloak_jwks_url: str | None = None
+    keycloak_allowed_client_id: str | None = None
+    keycloak_client_id_claim: str = "azp"
+    keycloak_algorithm: str = "RS256"
+    keycloak_jwks_cache_seconds: int = 300
+    keycloak_http_timeout_seconds: float = 5.0
+    keycloak_clock_skew_seconds: int = 10
+
     project_root: Path = Path(__file__).resolve().parent
 
     default_face_model: str = "edgeface"

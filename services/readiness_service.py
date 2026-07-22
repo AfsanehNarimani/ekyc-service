@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,6 +24,7 @@ class ReadinessService:
             self._check_default_face_model(),
             self._check_passive_liveness_model(),
             self._check_passive_liveness_decision_mode(),
+            self._check_keycloak_authentication(),
             self._check_directory(
                 name="media_temp_dir",
                 path=settings.media_temp_dir,
@@ -166,3 +168,75 @@ class ReadinessService:
             passed=False,
             message=f"unsupported decision mode: {decision_mode}",
         )
+
+    def _check_keycloak_authentication(self) -> ReadinessCheck:
+        if not settings.keycloak_auth_enabled:
+            return ReadinessCheck(
+                name="keycloak_authentication",
+                passed=True,
+                message="Keycloak authentication is disabled",
+            )
+
+        required_settings = {
+            "keycloak_issuer": settings.keycloak_issuer,
+            "keycloak_jwks_url": settings.keycloak_jwks_url,
+            "keycloak_allowed_client_id": (settings.keycloak_allowed_client_id),
+            "keycloak_client_id_claim": (settings.keycloak_client_id_claim),
+            "keycloak_algorithm": settings.keycloak_algorithm,
+        }
+
+        missing_settings = [
+            name
+            for name, value in required_settings.items()
+            if value is None or not value.strip()
+        ]
+
+        if missing_settings:
+            return ReadinessCheck(
+                name="keycloak_authentication",
+                passed=False,
+                message=("missing Keycloak settings: " + ", ".join(missing_settings)),
+            )
+
+        invalid_urls = [
+            name
+            for name, value in {
+                "keycloak_issuer": settings.keycloak_issuer,
+                "keycloak_jwks_url": settings.keycloak_jwks_url,
+            }.items()
+            if value is None or not self._is_http_url(value)
+        ]
+
+        if invalid_urls:
+            return ReadinessCheck(
+                name="keycloak_authentication",
+                passed=False,
+                message=("invalid Keycloak URLs: " + ", ".join(invalid_urls)),
+            )
+
+        if settings.keycloak_algorithm != "RS256":
+            return ReadinessCheck(
+                name="keycloak_authentication",
+                passed=False,
+                message="unsupported Keycloak JWT algorithm",
+            )
+
+        return ReadinessCheck(
+            name="keycloak_authentication",
+            passed=True,
+            message=(
+                "Keycloak JWT authentication is configured "
+                f"for claim {settings.keycloak_client_id_claim}"
+            ),
+        )
+
+    def _is_http_url(
+        self,
+        value: str,
+    ) -> bool:
+        parsed = urlparse(value)
+
+        return parsed.scheme in {
+            "http",
+            "https",
+        } and bool(parsed.netloc)

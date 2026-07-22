@@ -1,4 +1,10 @@
-.PHONY: run test test-fast lint format check clean
+.PHONY: install install-dev run test test-fast lint format check clean
+
+install:
+	python -m pip install -r requirements.txt
+
+install-dev:
+	python -m pip install -r requirements-dev.txt
 
 run:
 	uvicorn app:app --reload
@@ -10,13 +16,13 @@ test-fast:
 	pytest tests
 
 lint:
-	ruff check api core face liveness media services storage video tests app.py config.py
+	ruff check api authentication core face liveness media services storage video tests app.py config.py
 
 format:
-	black api core face liveness media services storage video tests app.py config.py
+	black api authentication core face liveness media services storage video tests app.py config.py
 
 check:
-	ruff check api core face liveness media services storage video tests app.py config.py
+	ruff check api authentication core face liveness media services storage video tests app.py config.py
 	pytest
 
 clean:

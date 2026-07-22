@@ -5,13 +5,17 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from api.error_response_factory import ErrorResponseFactory
+from authentication.exceptions import (
+    AuthenticationConfigurationError,
+    ServiceAuthenticationError,
+)
 
 
 async def request_validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
-    trace_id = await _extract_trace_id(request)
+    trace_id = await extract_trace_id(request)
 
     return ErrorResponseFactory().build(
         status_code=422,
@@ -25,7 +29,7 @@ async def request_validation_exception_handler(
     )
 
 
-async def _extract_trace_id(
+async def extract_trace_id(
     request: Request,
 ) -> str | None:
     try:
@@ -62,3 +66,33 @@ def _safe_validation_errors(
         safe_errors.append(safe_error)
 
     return safe_errors
+
+
+async def service_authentication_exception_handler(
+    request: Request,
+    exc: ServiceAuthenticationError,
+) -> JSONResponse:
+    trace_id = await extract_trace_id(request)
+
+    return ErrorResponseFactory().build(
+        status_code=401,
+        code="service_authentication_failed",
+        message="Service authentication failed.",
+        trace_id=trace_id,
+        processing_time_ms=0.0,
+    )
+
+
+async def authentication_configuration_exception_handler(
+    request: Request,
+    exc: AuthenticationConfigurationError,
+) -> JSONResponse:
+    trace_id = await extract_trace_id(request)
+
+    return ErrorResponseFactory().build(
+        status_code=503,
+        code="service_authentication_unavailable",
+        message="Service authentication is unavailable.",
+        trace_id=trace_id,
+        processing_time_ms=0.0,
+    )
