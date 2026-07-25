@@ -137,7 +137,7 @@ class FakeMediaCleanupService:
     def cleanup_temp_files(
         self,
         paths,
-        trace_id: str,
+        correlation_id: str,
     ) -> None:
         self.cleaned_paths.extend(paths)
 
@@ -173,7 +173,7 @@ def test_video_verification_orchestrator_runs_full_flow():
     )
 
     result = service.verify(
-        trace_id="trace-1",
+        correlation_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
             LivenessAction.CENTER,
@@ -188,7 +188,7 @@ def test_video_verification_orchestrator_runs_full_flow():
         liveness_level=2,
     )
 
-    assert result.trace_id == "trace-1"
+    assert result.correlation_id == "trace-1"
     assert result.challenge_id == "challenge-1"
     assert result.face_match.is_match is True
     assert result.action_check.passed is True

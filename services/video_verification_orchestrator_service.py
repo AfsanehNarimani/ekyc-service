@@ -49,7 +49,7 @@ class VideoVerificationOrchestratorService:
 
     def verify(
         self,
-        trace_id: str,
+        correlation_id: str,
         challenge_id: str,
         expected_actions: list[LivenessAction],
         national_id_image_uri: str,
@@ -60,8 +60,8 @@ class VideoVerificationOrchestratorService:
         started_at = time.perf_counter()
 
         logger.info(
-            "trace_id=%s challenge_id=%s step=verification_started",
-            trace_id,
+            "correlation_id=%s challenge_id=%s step=verification_started",
+            correlation_id,
             challenge_id,
         )
 
@@ -97,8 +97,8 @@ class VideoVerificationOrchestratorService:
             )
 
             logger.info(
-                "trace_id=%s challenge_id=%s step=face_match_done passed=%s score=%.4f",
-                trace_id,
+                "correlation_id=%s challenge_id=%s step=face_match_done passed=%s score=%.4f",
+                correlation_id,
                 challenge_id,
                 face_match_result.is_match,
                 face_match_result.score,
@@ -110,8 +110,8 @@ class VideoVerificationOrchestratorService:
             )
 
             logger.info(
-                "trace_id=%s challenge_id=%s step=action_check_done passed=%s missing=%s",
-                trace_id,
+                "correlation_id=%s challenge_id=%s step=action_check_done passed=%s missing=%s",
+                correlation_id,
                 challenge_id,
                 action_check_result.passed,
                 [action.value for action in action_check_result.missing_actions],
@@ -123,8 +123,8 @@ class VideoVerificationOrchestratorService:
             )
 
             logger.info(
-                "trace_id=%s challenge_id=%s step=liveness_done passed=%s reason=%s",
-                trace_id,
+                "correlation_id=%s challenge_id=%s step=liveness_done passed=%s reason=%s",
+                correlation_id,
                 challenge_id,
                 liveness_result.passed,
                 liveness_result.reason,
@@ -136,8 +136,8 @@ class VideoVerificationOrchestratorService:
             )
 
             logger.info(
-                "trace_id=%s challenge_id=%s step=passive_liveness_done passed=%s score=%.4f reason=%s",
-                trace_id,
+                "correlation_id=%s challenge_id=%s step=passive_liveness_done passed=%s score=%.4f reason=%s",
+                correlation_id,
                 challenge_id,
                 passive_liveness_result.passed,
                 passive_liveness_result.score,
@@ -162,8 +162,8 @@ class VideoVerificationOrchestratorService:
             )
 
             logger.info(
-                "trace_id=%s challenge_id=%s step=verification_finished approved=%s reasons=%s processing_time_ms=%.2f",
-                trace_id,
+                "correlation_id=%s challenge_id=%s step=verification_finished approved=%s reasons=%s processing_time_ms=%.2f",
+                correlation_id,
                 challenge_id,
                 final_decision.approved,
                 final_decision.rejection_reasons,
@@ -171,7 +171,7 @@ class VideoVerificationOrchestratorService:
             )
 
             return VideoVerificationResult(
-                trace_id=trace_id,
+                correlation_id=correlation_id,
                 challenge_id=challenge_id,
                 expected_actions=expected_actions,
                 face_match=face_match_result,
@@ -185,5 +185,5 @@ class VideoVerificationOrchestratorService:
         finally:
             self.media_cleanup_service.cleanup_temp_files(
                 paths=temp_candidates,
-                trace_id=trace_id,
+                correlation_id=correlation_id,
             )

@@ -17,13 +17,13 @@ async def request_validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
-    trace_id = await extract_trace_id(request)
+    correlation_id = await extract_correlation_id(request)
 
     return ErrorResponseFactory().build(
         status_code=422,
         code="request_validation_failed",
         message="Request validation failed.",
-        trace_id=trace_id,
+        correlation_id=correlation_id,
         processing_time_ms=0.0,
         details={
             "errors": _safe_validation_errors(exc),
@@ -31,7 +31,7 @@ async def request_validation_exception_handler(
     )
 
 
-async def extract_trace_id(
+async def extract_correlation_id(
     request: Request,
 ) -> str | None:
     try:
@@ -42,10 +42,10 @@ async def extract_trace_id(
     if not isinstance(body, dict):
         return None
 
-    trace_id = body.get("trace_id")
+    correlation_id = body.get("correlation_id")
 
-    if isinstance(trace_id, str) and trace_id.strip():
-        return trace_id
+    if isinstance(correlation_id, str) and correlation_id.strip():
+        return correlation_id
 
     return None
 
@@ -74,13 +74,13 @@ async def service_authentication_exception_handler(
     request: Request,
     exc: ServiceAuthenticationError,
 ) -> JSONResponse:
-    trace_id = await extract_trace_id(request)
+    correlation_id = await extract_correlation_id(request)
 
     return ErrorResponseFactory().build(
         status_code=401,
         code="service_authentication_failed",
         message="Service authentication failed.",
-        trace_id=trace_id,
+        correlation_id=correlation_id,
         processing_time_ms=0.0,
     )
 
@@ -89,13 +89,13 @@ async def authentication_configuration_exception_handler(
     request: Request,
     exc: AuthenticationConfigurationError,
 ) -> JSONResponse:
-    trace_id = await extract_trace_id(request)
+    correlation_id = await extract_correlation_id(request)
 
     return ErrorResponseFactory().build(
         status_code=503,
         code="service_authentication_unavailable",
         message="Service authentication is unavailable.",
-        trace_id=trace_id,
+        correlation_id=correlation_id,
         processing_time_ms=0.0,
     )
 
@@ -104,13 +104,13 @@ async def service_capacity_exception_handler(
     request: Request,
     exc: ServiceCapacityExceededError,
 ) -> JSONResponse:
-    trace_id = await extract_trace_id(request)
+    correlation_id = await extract_correlation_id(request)
 
     return ErrorResponseFactory().build(
         status_code=503,
         code="verification_capacity_exceeded",
         message=("Verification capacity is temporarily " "unavailable."),
-        trace_id=trace_id,
+        correlation_id=correlation_id,
         processing_time_ms=0.0,
         headers={
             "Retry-After": str(settings.capacity_retry_after_seconds),

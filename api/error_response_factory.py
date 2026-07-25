@@ -11,13 +11,13 @@ class ErrorResponseFactory:
         status_code: int,
         code: str,
         message: str,
-        trace_id: str | None = None,
+        correlation_id: str | None = None,
         processing_time_ms: float | None = None,
         details: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> JSONResponse:
         response = ErrorResponse(
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=processing_time_ms,
             error={
                 "code": code,

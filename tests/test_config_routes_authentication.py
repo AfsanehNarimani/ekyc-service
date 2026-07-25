@@ -36,7 +36,7 @@ def test_verification_config_rejects_missing_bearer_token():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] is None
+    assert body["correlation_id"] is None
     assert body["error"]["code"] == ("service_authentication_failed")
     assert body["error"]["message"] == ("Service authentication failed.")
     assert body["error"]["details"] == {}

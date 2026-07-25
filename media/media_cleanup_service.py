@@ -10,7 +10,7 @@ class MediaCleanupService:
     def cleanup_temp_file(
         self,
         path: Path,
-        trace_id: str,
+        correlation_id: str,
     ) -> None:
         try:
             resolved_path = path.resolve()
@@ -25,27 +25,27 @@ class MediaCleanupService:
             if resolved_path.exists() and resolved_path.is_file():
                 resolved_path.unlink()
                 logger.info(
-                    "trace_id=%s step=temp_file_deleted path=%s",
-                    trace_id,
+                    "correlation_id=%s step=temp_file_deleted path=%s",
+                    correlation_id,
                     resolved_path.name,
                 )
 
         except Exception:
             logger.exception(
-                "trace_id=%s step=temp_file_cleanup_failed path=%s",
-                trace_id,
+                "correlation_id=%s step=temp_file_cleanup_failed path=%s",
+                correlation_id,
                 path.name,
             )
 
     def cleanup_temp_files(
         self,
         paths: list[Path],
-        trace_id: str,
+        correlation_id: str,
     ) -> None:
         for path in paths:
             self.cleanup_temp_file(
                 path=path,
-                trace_id=trace_id,
+                correlation_id=correlation_id,
             )
 
     def _is_inside_directory(

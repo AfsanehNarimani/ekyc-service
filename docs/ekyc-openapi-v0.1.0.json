@@ -290,7 +290,7 @@
             "title": "Ok",
             "default": false
           },
-          "trace_id": {
+          "correlation_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -673,7 +673,7 @@
       },
       "VerifyVideoRequest": {
         "properties": {
-          "trace_id": {
+          "correlation_id": {
             "anyOf": [
               {
                 "type": "string",
@@ -738,7 +738,7 @@
             "type": "boolean",
             "title": "Ok"
           },
-          "trace_id": {
+          "correlation_id": {
             "type": "string",
             "title": "Trace Id"
           },
@@ -776,7 +776,7 @@
         "type": "object",
         "required": [
           "ok",
-          "trace_id",
+          "correlation_id",
           "challenge_id",
           "expected_actions",
           "face_match",

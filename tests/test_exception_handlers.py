@@ -9,7 +9,7 @@ def test_request_validation_error_returns_standard_error_response():
     response = client.post(
         "/api/verify-video",
         json={
-            "trace_id": "trace-validation-1",
+            "correlation_id": "trace-validation-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -30,7 +30,7 @@ def test_request_validation_error_returns_standard_error_response():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-validation-1"
+    assert body["correlation_id"] == "trace-validation-1"
     assert body["processing_time_ms"] == 0.0
     assert body["error"]["code"] == "request_validation_failed"
     assert body["error"]["message"] == "Request validation failed."
@@ -45,7 +45,7 @@ def test_request_validation_error_returns_standard_error_response():
     ]
 
 
-def test_request_validation_error_without_trace_id_returns_null_trace_id():
+def test_request_validation_error_without_trace_id_returns_null_correlation_id():
     client = TestClient(app)
 
     response = client.post(
@@ -71,5 +71,5 @@ def test_request_validation_error_without_trace_id_returns_null_trace_id():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] is None
+    assert body["correlation_id"] is None
     assert body["error"]["code"] == "request_validation_failed"

@@ -50,7 +50,7 @@ class FakeSigningKeyProvider:
 class FakeMissingMediaOrchestrator:
     def verify(
         self,
-        trace_id,
+        correlation_id,
         challenge_id,
         expected_actions,
         national_id_image_uri,
@@ -83,7 +83,7 @@ def test_verify_video_rejects_request_without_bearer_token():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-auth-001"
+    assert body["correlation_id"] == "trace-auth-001"
     assert body["processing_time_ms"] == 0.0
     assert body["error"]["code"] == ("service_authentication_failed")
     assert body["error"]["message"] == ("Service authentication failed.")
@@ -91,10 +91,10 @@ def test_verify_video_rejects_request_without_bearer_token():
 
 
 def make_request_body(
-    trace_id: str,
+    correlation_id: str,
 ) -> dict:
     return {
-        "trace_id": trace_id,
+        "correlation_id": correlation_id,
         "challenge_id": "challenge-auth-001",
         "expected_actions": [
             "center",
@@ -138,7 +138,7 @@ def test_verify_video_returns_503_when_keycloak_is_not_configured():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-auth-config-001"
+    assert body["correlation_id"] == "trace-auth-config-001"
     assert body["error"]["code"] == ("service_authentication_unavailable")
     assert body["error"]["message"] == ("Service authentication is unavailable.")
     assert "keycloak_issuer" not in body["error"]["message"]
@@ -203,5 +203,5 @@ def test_verify_video_accepts_valid_signed_jwt():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-valid-jwt-001"
+    assert body["correlation_id"] == "trace-valid-jwt-001"
     assert body["error"]["code"] == "media_file_not_found"
