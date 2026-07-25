@@ -38,6 +38,7 @@ class ReadinessService:
                 path=settings.embedding_dir,
             ),
             self._check_verification_capacity(),
+            self._check_insightface_detection_model(),
         ]
 
         return ReadinessResult(
@@ -266,4 +267,32 @@ class ReadinessService:
                 "maximum concurrent verifications is "
                 f"{settings.max_concurrent_verifications}"
             ),
+        )
+
+    def _check_insightface_detection_model(
+        self,
+    ) -> ReadinessCheck:
+        model_path = self._get_insightface_detection_model_path()
+
+        if model_path.exists() and model_path.is_file():
+            return ReadinessCheck(
+                name="insightface_detection_model",
+                passed=True,
+                message=("InsightFace detection model file " "exists"),
+            )
+
+        return ReadinessCheck(
+            name="insightface_detection_model",
+            passed=False,
+            message=("InsightFace detection model file " "is missing"),
+        )
+
+    def _get_insightface_detection_model_path(
+        self,
+    ) -> Path:
+        return (
+            settings.insightface_root_dir
+            / "models"
+            / settings.insightface_model_name
+            / settings.insightface_detection_model_filename
         )

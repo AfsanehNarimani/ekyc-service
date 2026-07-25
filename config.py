@@ -50,6 +50,10 @@ class Settings(BaseSettings):
     face_match_threshold: float = 0.55
     detector_threshold: float = 0.5
 
+    insightface_model_name: str = "buffalo_l"
+    insightface_root_dir: Path = Path.home() / ".insightface"
+    insightface_detection_model_filename: str = "det_10g.onnx"
+
     video_frame_interval_seconds: float = 1.0
     video_max_frames: int = 30
 

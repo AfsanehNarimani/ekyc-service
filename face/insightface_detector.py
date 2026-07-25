@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import cv2
 import numpy as np
 from insightface.app import FaceAnalysis
@@ -11,12 +13,23 @@ class InsightFaceDetector:
         self,
         det_thresh: float = 0.5,
         det_size: tuple[int, int] = (640, 640),
+        model_name: str = "buffalo_l",
+        root_dir: Path | None = None,
         providers: list[str] | None = None,
     ) -> None:
-        self.app = FaceAnalysis(
-            name="buffalo_l",
-            providers=providers or ["CPUExecutionProvider"],
+        resolved_root_dir = (
+            root_dir if root_dir is not None else Path.home() / ".insightface"
         )
+
+        self.app = FaceAnalysis(
+            name=model_name,
+            root=str(resolved_root_dir),
+            allowed_modules=[
+                "detection",
+            ],
+            providers=(providers or ["CPUExecutionProvider"]),
+        )
+
         self.app.prepare(
             ctx_id=0,
             det_thresh=det_thresh,
@@ -28,6 +41,7 @@ class InsightFaceDetector:
         image: Image.Image,
     ) -> list[FaceDetection]:
         image_rgb = np.asarray(image.convert("RGB"))
+
         image_bgr = cv2.cvtColor(
             image_rgb,
             cv2.COLOR_RGB2BGR,
@@ -35,7 +49,8 @@ class InsightFaceDetector:
 
         faces = self.app.get(image_bgr)
 
-        detections = []
+        detections: list[FaceDetection] = []
+
         for face in faces:
             pose = getattr(
                 face,
@@ -44,6 +59,7 @@ class InsightFaceDetector:
             )
 
             pose_tuple = None
+
             if pose is not None:
                 pose_tuple = tuple(float(value) for value in pose)
 

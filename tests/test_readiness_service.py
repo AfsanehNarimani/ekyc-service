@@ -6,7 +6,10 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def configure_readiness_settings(monkeypatch):
+def configure_readiness_settings(
+    monkeypatch,
+    tmp_path,
+):
     monkeypatch.setattr(
         settings,
         "passive_liveness_backend",

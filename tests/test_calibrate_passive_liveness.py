@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from scripts.calibrate_passive_liveness import (

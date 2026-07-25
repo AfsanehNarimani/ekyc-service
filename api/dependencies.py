@@ -353,6 +353,8 @@ def get_passive_liveness_ensemble_model() -> PassiveLivenessEnsembleModel:
 def get_face_detector() -> InsightFaceDetector:
     return InsightFaceDetector(
         det_thresh=settings.detector_threshold,
+        model_name=settings.insightface_model_name,
+        root_dir=settings.insightface_root_dir,
         providers=["CPUExecutionProvider"],
     )
 
