@@ -19,3 +19,7 @@ logs/
 # macOS
 .DS_Store
 .idea/
+
+# Passive liveness calibration data
+calibration/data/
+calibration/results/

@@ -1,0 +1,4 @@
+sample_id,label,video_uri,device,attack_type,notes
+real-001,bona_fide,/path/to/real-001.mp4,iphone-15,none,indoor normal light
+replay-001,attack,/path/to/replay-001.mp4,iphone-15,screen_replay,replayed from laptop
+print-001,attack,/path/to/print-001.mp4,iphone-15,printed_photo,printed face image
