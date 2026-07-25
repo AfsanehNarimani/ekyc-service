@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     insightface_model_name: str = "buffalo_l"
     insightface_root_dir: Path = Path.home() / ".insightface"
     insightface_detection_model_filename: str = "det_10g.onnx"
+    insightface_pose_model_filename: str = "1k3d68.onnx"
 
     video_frame_interval_seconds: float = 1.0
     video_max_frames: int = 30

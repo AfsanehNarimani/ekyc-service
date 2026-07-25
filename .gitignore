@@ -23,3 +23,5 @@ logs/
 # Passive liveness calibration data
 calibration/data/
 calibration/results/
+
+.env.docker
