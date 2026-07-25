@@ -1,799 +1,799 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "eKYC Service",
-    "version": "0.1.0"
-  },
-  "paths": {
-    "/api/verification-config": {
-      "get": {
-        "tags": [
-          "Verification Config"
-        ],
-        "summary": "Get Verification Config",
-        "operationId": "get_verification_config_api_verification_config_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationConfigResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
+    "openapi": "3.1.0",
+    "info": {
+        "title": "eKYC Service",
+        "version": "0.1.0"
     },
-    "/api/verify-video": {
-      "post": {
-        "tags": [
-          "Video Verification"
-        ],
-        "summary": "Verify Video",
-        "operationId": "verify_video_api_verify_video_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyVideoRequest"
-              }
+    "paths": {
+        "/api/verification-config": {
+            "get": {
+                "tags": [
+                    "Verification Config"
+                ],
+                "summary": "Get Verification Config",
+                "operationId": "get_verification_config_api_verification_config_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerificationConfigResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
             }
-          },
-          "required": true
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerifyVideoResponse"
-                }
-              }
+        "/api/verify-video": {
+            "post": {
+                "tags": [
+                    "Video Verification"
+                ],
+                "summary": "Verify Video",
+                "operationId": "verify_video_api_verify_video_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyVideoRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyVideoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "headers": {
+                            "Retry-After": {
+                                "description": "Seconds before retrying when verification capacity is exhausted.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "headers": {
-              "Retry-After": {
-                "description": "Seconds before retrying when verification capacity is exhausted.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/ready": {
-      "get": {
-        "tags": [
-          "Health"
-        ],
-        "summary": "Readiness",
-        "operationId": "readiness_ready_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReadinessResponse"
+        "/ready": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Readiness",
+                "operationId": "readiness_ready_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReadinessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service is not ready",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReadinessResponse"
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          },
-          "503": {
-            "description": "Service is not ready",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReadinessResponse"
+        },
+        "/health": {
+            "get": {
+                "summary": "Health Check",
+                "operationId": "health_check_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     },
-    "/health": {
-      "get": {
-        "summary": "Health Check",
-        "operationId": "health_check_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "ActionCheckResponse": {
-        "properties": {
-          "passed": {
-            "type": "boolean",
-            "title": "Passed"
-          },
-          "required_actions": {
-            "items": {
-              "type": "string"
+    "components": {
+        "schemas": {
+            "ActionCheckResponse": {
+                "properties": {
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed"
+                    },
+                    "required_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Required Actions"
+                    },
+                    "observed_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Observed Actions"
+                    },
+                    "compact_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Compact Actions"
+                    },
+                    "missing_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Missing Actions"
+                    },
+                    "processed_frames": {
+                        "type": "integer",
+                        "title": "Processed Frames"
+                    },
+                    "skipped_frames": {
+                        "type": "integer",
+                        "title": "Skipped Frames"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "passed",
+                    "required_actions",
+                    "observed_actions",
+                    "compact_actions",
+                    "missing_actions",
+                    "processed_frames",
+                    "skipped_frames"
+                ],
+                "title": "ActionCheckResponse"
             },
-            "type": "array",
-            "title": "Required Actions"
-          },
-          "observed_actions": {
-            "items": {
-              "type": "string"
+            "ErrorDetailResponse": {
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "title": "Code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "details": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Details"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "code",
+                    "message"
+                ],
+                "title": "ErrorDetailResponse"
             },
-            "type": "array",
-            "title": "Observed Actions"
-          },
-          "compact_actions": {
-            "items": {
-              "type": "string"
+            "ErrorResponse": {
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "title": "Ok",
+                        "default": false
+                    },
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Correlation Id"
+                    },
+                    "processing_time_ms": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Processing Time Ms"
+                    },
+                    "error": {
+                        "$ref": "#/components/schemas/ErrorDetailResponse"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "error"
+                ],
+                "title": "ErrorResponse"
             },
-            "type": "array",
-            "title": "Compact Actions"
-          },
-          "missing_actions": {
-            "items": {
-              "type": "string"
+            "FaceMatchLevelConfigResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "threshold": {
+                        "type": "number",
+                        "title": "Threshold"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "threshold"
+                ],
+                "title": "FaceMatchLevelConfigResponse"
             },
-            "type": "array",
-            "title": "Missing Actions"
-          },
-          "processed_frames": {
-            "type": "integer",
-            "title": "Processed Frames"
-          },
-          "skipped_frames": {
-            "type": "integer",
-            "title": "Skipped Frames"
-          }
-        },
-        "type": "object",
-        "required": [
-          "passed",
-          "required_actions",
-          "observed_actions",
-          "compact_actions",
-          "missing_actions",
-          "processed_frames",
-          "skipped_frames"
-        ],
-        "title": "ActionCheckResponse"
-      },
-      "ErrorDetailResponse": {
-        "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          },
-          "details": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Details"
-          }
-        },
-        "type": "object",
-        "required": [
-          "code",
-          "message"
-        ],
-        "title": "ErrorDetailResponse"
-      },
-      "ErrorResponse": {
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "title": "Ok",
-            "default": false
-          },
-          "correlation_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Trace Id"
-          },
-          "processing_time_ms": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Processing Time Ms"
-          },
-          "error": {
-            "$ref": "#/components/schemas/ErrorDetailResponse"
-          }
-        },
-        "type": "object",
-        "required": [
-          "error"
-        ],
-        "title": "ErrorResponse"
-      },
-      "FaceMatchLevelConfigResponse": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "threshold": {
-            "type": "number",
-            "title": "Threshold"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "threshold"
-        ],
-        "title": "FaceMatchLevelConfigResponse"
-      },
-      "FaceMatchResponse": {
-        "properties": {
-          "passed": {
-            "type": "boolean",
-            "title": "Passed"
-          },
-          "score": {
-            "type": "number",
-            "title": "Score"
-          },
-          "best_score": {
-            "type": "number",
-            "title": "Best Score"
-          },
-          "threshold": {
-            "type": "number",
-            "title": "Threshold"
-          },
-          "model_name": {
-            "type": "string",
-            "title": "Model Name"
-          },
-          "processed_frames": {
-            "type": "integer",
-            "title": "Processed Frames"
-          },
-          "skipped_frames": {
-            "type": "integer",
-            "title": "Skipped Frames"
-          }
-        },
-        "type": "object",
-        "required": [
-          "passed",
-          "score",
-          "best_score",
-          "threshold",
-          "model_name",
-          "processed_frames",
-          "skipped_frames"
-        ],
-        "title": "FaceMatchResponse"
-      },
-      "FinalDecisionResponse": {
-        "properties": {
-          "approved": {
-            "type": "boolean",
-            "title": "Approved"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "rejection_reasons": {
-            "items": {
-              "type": "string"
+            "FaceMatchResponse": {
+                "properties": {
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed"
+                    },
+                    "score": {
+                        "type": "number",
+                        "title": "Score"
+                    },
+                    "best_score": {
+                        "type": "number",
+                        "title": "Best Score"
+                    },
+                    "threshold": {
+                        "type": "number",
+                        "title": "Threshold"
+                    },
+                    "model_name": {
+                        "type": "string",
+                        "title": "Model Name"
+                    },
+                    "processed_frames": {
+                        "type": "integer",
+                        "title": "Processed Frames"
+                    },
+                    "skipped_frames": {
+                        "type": "integer",
+                        "title": "Skipped Frames"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "passed",
+                    "score",
+                    "best_score",
+                    "threshold",
+                    "model_name",
+                    "processed_frames",
+                    "skipped_frames"
+                ],
+                "title": "FaceMatchResponse"
             },
-            "type": "array",
-            "title": "Rejection Reasons"
-          },
-          "face_match_passed": {
-            "type": "boolean",
-            "title": "Face Match Passed"
-          },
-          "actions_passed": {
-            "type": "boolean",
-            "title": "Actions Passed"
-          },
-          "liveness_passed": {
-            "type": "boolean",
-            "title": "Liveness Passed"
-          },
-          "passive_liveness_passed": {
-            "type": "boolean",
-            "title": "Passive Liveness Passed"
-          },
-          "passive_liveness_enforced": {
-            "type": "boolean",
-            "title": "Passive Liveness Enforced"
-          }
-        },
-        "type": "object",
-        "required": [
-          "approved",
-          "status",
-          "rejection_reasons",
-          "face_match_passed",
-          "actions_passed",
-          "liveness_passed",
-          "passive_liveness_passed",
-          "passive_liveness_enforced"
-        ],
-        "title": "FinalDecisionResponse"
-      },
-      "LivenessAction": {
-        "type": "string",
-        "enum": [
-          "center",
-          "left",
-          "right",
-          "up",
-          "down"
-        ],
-        "title": "LivenessAction"
-      },
-      "LivenessLevelConfigResponse": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "min_required_frames": {
-            "type": "integer",
-            "title": "Min Required Frames"
-          },
-          "min_pose_variation_score": {
-            "type": "number",
-            "title": "Min Pose Variation Score"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "min_required_frames",
-          "min_pose_variation_score"
-        ],
-        "title": "LivenessLevelConfigResponse"
-      },
-      "LivenessResponse": {
-        "properties": {
-          "passed": {
-            "type": "boolean",
-            "title": "Passed"
-          },
-          "strictness_level": {
-            "type": "integer",
-            "title": "Strictness Level"
-          },
-          "processed_frames": {
-            "type": "integer",
-            "title": "Processed Frames"
-          },
-          "skipped_frames": {
-            "type": "integer",
-            "title": "Skipped Frames"
-          },
-          "min_required_frames": {
-            "type": "integer",
-            "title": "Min Required Frames"
-          },
-          "pose_variation_score": {
-            "type": "number",
-            "title": "Pose Variation Score"
-          },
-          "min_pose_variation_score": {
-            "type": "number",
-            "title": "Min Pose Variation Score"
-          },
-          "reason": {
-            "type": "string",
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "passed",
-          "strictness_level",
-          "processed_frames",
-          "skipped_frames",
-          "min_required_frames",
-          "pose_variation_score",
-          "min_pose_variation_score",
-          "reason"
-        ],
-        "title": "LivenessResponse"
-      },
-      "PassiveLivenessLevelConfigResponse": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "threshold": {
-            "type": "number",
-            "title": "Threshold"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "threshold"
-        ],
-        "title": "PassiveLivenessLevelConfigResponse"
-      },
-      "PassiveLivenessResponse": {
-        "properties": {
-          "passed": {
-            "type": "boolean",
-            "title": "Passed"
-          },
-          "score": {
-            "type": "number",
-            "title": "Score"
-          },
-          "threshold": {
-            "type": "number",
-            "title": "Threshold"
-          },
-          "model_name": {
-            "type": "string",
-            "title": "Model Name"
-          },
-          "processed_frames": {
-            "type": "integer",
-            "title": "Processed Frames"
-          },
-          "skipped_frames": {
-            "type": "integer",
-            "title": "Skipped Frames"
-          },
-          "reason": {
-            "type": "string",
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "passed",
-          "score",
-          "threshold",
-          "model_name",
-          "processed_frames",
-          "skipped_frames",
-          "reason"
-        ],
-        "title": "PassiveLivenessResponse"
-      },
-      "ReadinessCheckResponse": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "passed": {
-            "type": "boolean",
-            "title": "Passed"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "passed",
-          "message"
-        ],
-        "title": "ReadinessCheckResponse"
-      },
-      "ReadinessResponse": {
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "title": "Ok"
-          },
-          "ready": {
-            "type": "boolean",
-            "title": "Ready"
-          },
-          "checks": {
-            "items": {
-              "$ref": "#/components/schemas/ReadinessCheckResponse"
+            "FinalDecisionResponse": {
+                "properties": {
+                    "approved": {
+                        "type": "boolean",
+                        "title": "Approved"
+                    },
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    },
+                    "rejection_reasons": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Rejection Reasons"
+                    },
+                    "face_match_passed": {
+                        "type": "boolean",
+                        "title": "Face Match Passed"
+                    },
+                    "actions_passed": {
+                        "type": "boolean",
+                        "title": "Actions Passed"
+                    },
+                    "liveness_passed": {
+                        "type": "boolean",
+                        "title": "Liveness Passed"
+                    },
+                    "passive_liveness_passed": {
+                        "type": "boolean",
+                        "title": "Passive Liveness Passed"
+                    },
+                    "passive_liveness_enforced": {
+                        "type": "boolean",
+                        "title": "Passive Liveness Enforced"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "approved",
+                    "status",
+                    "rejection_reasons",
+                    "face_match_passed",
+                    "actions_passed",
+                    "liveness_passed",
+                    "passive_liveness_passed",
+                    "passive_liveness_enforced"
+                ],
+                "title": "FinalDecisionResponse"
             },
-            "type": "array",
-            "title": "Checks"
-          }
-        },
-        "type": "object",
-        "required": [
-          "ok",
-          "ready",
-          "checks"
-        ],
-        "title": "ReadinessResponse"
-      },
-      "VerificationConfigResponse": {
-        "properties": {
-          "default_face_model": {
-            "type": "string",
-            "title": "Default Face Model"
-          },
-          "supported_actions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Supported Actions"
-          },
-          "face_match_levels": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/FaceMatchLevelConfigResponse"
-            },
-            "type": "object",
-            "title": "Face Match Levels"
-          },
-          "liveness_levels": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/LivenessLevelConfigResponse"
-            },
-            "type": "object",
-            "title": "Liveness Levels"
-          },
-          "passive_liveness_levels": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/PassiveLivenessLevelConfigResponse"
-            },
-            "type": "object",
-            "title": "Passive Liveness Levels"
-          }
-        },
-        "type": "object",
-        "required": [
-          "default_face_model",
-          "supported_actions",
-          "face_match_levels",
-          "liveness_levels",
-          "passive_liveness_levels"
-        ],
-        "title": "VerificationConfigResponse"
-      },
-      "VerifyVideoRequest": {
-        "properties": {
-          "correlation_id": {
-            "anyOf": [
-              {
+            "LivenessAction": {
                 "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Trace Id"
-          },
-          "challenge_id": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Challenge Id"
-          },
-          "expected_actions": {
-            "items": {
-              "$ref": "#/components/schemas/LivenessAction"
+                "enum": [
+                    "center",
+                    "left",
+                    "right",
+                    "up",
+                    "down"
+                ],
+                "title": "LivenessAction"
             },
-            "type": "array",
-            "minItems": 1,
-            "title": "Expected Actions"
-          },
-          "national_id_image_uri": {
-            "type": "string",
-            "minLength": 1,
-            "title": "National Id Image Uri"
-          },
-          "video_uri": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Video Uri"
-          },
-          "face_match_level": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 1.0,
-            "title": "Face Match Level"
-          },
-          "liveness_level": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 1.0,
-            "title": "Liveness Level"
-          }
-        },
-        "type": "object",
-        "required": [
-          "challenge_id",
-          "expected_actions",
-          "national_id_image_uri",
-          "video_uri",
-          "face_match_level",
-          "liveness_level"
-        ],
-        "title": "VerifyVideoRequest"
-      },
-      "VerifyVideoResponse": {
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "title": "Ok"
-          },
-          "correlation_id": {
-            "type": "string",
-            "title": "Trace Id"
-          },
-          "challenge_id": {
-            "type": "string",
-            "title": "Challenge Id"
-          },
-          "expected_actions": {
-            "items": {
-              "type": "string"
+            "LivenessLevelConfigResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "min_required_frames": {
+                        "type": "integer",
+                        "title": "Min Required Frames"
+                    },
+                    "min_pose_variation_score": {
+                        "type": "number",
+                        "title": "Min Pose Variation Score"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "min_required_frames",
+                    "min_pose_variation_score"
+                ],
+                "title": "LivenessLevelConfigResponse"
             },
-            "type": "array",
-            "title": "Expected Actions"
-          },
-          "face_match": {
-            "$ref": "#/components/schemas/FaceMatchResponse"
-          },
-          "liveness": {
-            "$ref": "#/components/schemas/LivenessResponse"
-          },
-          "passive_liveness": {
-            "$ref": "#/components/schemas/PassiveLivenessResponse"
-          },
-          "action_check": {
-            "$ref": "#/components/schemas/ActionCheckResponse"
-          },
-          "final_decision": {
-            "$ref": "#/components/schemas/FinalDecisionResponse"
-          },
-          "processing_time_ms": {
-            "type": "number",
-            "title": "Processing Time Ms"
-          }
+            "LivenessResponse": {
+                "properties": {
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed"
+                    },
+                    "strictness_level": {
+                        "type": "integer",
+                        "title": "Strictness Level"
+                    },
+                    "processed_frames": {
+                        "type": "integer",
+                        "title": "Processed Frames"
+                    },
+                    "skipped_frames": {
+                        "type": "integer",
+                        "title": "Skipped Frames"
+                    },
+                    "min_required_frames": {
+                        "type": "integer",
+                        "title": "Min Required Frames"
+                    },
+                    "pose_variation_score": {
+                        "type": "number",
+                        "title": "Pose Variation Score"
+                    },
+                    "min_pose_variation_score": {
+                        "type": "number",
+                        "title": "Min Pose Variation Score"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "title": "Reason"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "passed",
+                    "strictness_level",
+                    "processed_frames",
+                    "skipped_frames",
+                    "min_required_frames",
+                    "pose_variation_score",
+                    "min_pose_variation_score",
+                    "reason"
+                ],
+                "title": "LivenessResponse"
+            },
+            "PassiveLivenessLevelConfigResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "threshold": {
+                        "type": "number",
+                        "title": "Threshold"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "threshold"
+                ],
+                "title": "PassiveLivenessLevelConfigResponse"
+            },
+            "PassiveLivenessResponse": {
+                "properties": {
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed"
+                    },
+                    "score": {
+                        "type": "number",
+                        "title": "Score"
+                    },
+                    "threshold": {
+                        "type": "number",
+                        "title": "Threshold"
+                    },
+                    "model_name": {
+                        "type": "string",
+                        "title": "Model Name"
+                    },
+                    "processed_frames": {
+                        "type": "integer",
+                        "title": "Processed Frames"
+                    },
+                    "skipped_frames": {
+                        "type": "integer",
+                        "title": "Skipped Frames"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "title": "Reason"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "passed",
+                    "score",
+                    "threshold",
+                    "model_name",
+                    "processed_frames",
+                    "skipped_frames",
+                    "reason"
+                ],
+                "title": "PassiveLivenessResponse"
+            },
+            "ReadinessCheckResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed"
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "passed",
+                    "message"
+                ],
+                "title": "ReadinessCheckResponse"
+            },
+            "ReadinessResponse": {
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "title": "Ok"
+                    },
+                    "ready": {
+                        "type": "boolean",
+                        "title": "Ready"
+                    },
+                    "checks": {
+                        "items": {
+                            "$ref": "#/components/schemas/ReadinessCheckResponse"
+                        },
+                        "type": "array",
+                        "title": "Checks"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ok",
+                    "ready",
+                    "checks"
+                ],
+                "title": "ReadinessResponse"
+            },
+            "VerificationConfigResponse": {
+                "properties": {
+                    "default_face_model": {
+                        "type": "string",
+                        "title": "Default Face Model"
+                    },
+                    "supported_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Supported Actions"
+                    },
+                    "face_match_levels": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/FaceMatchLevelConfigResponse"
+                        },
+                        "type": "object",
+                        "title": "Face Match Levels"
+                    },
+                    "liveness_levels": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/LivenessLevelConfigResponse"
+                        },
+                        "type": "object",
+                        "title": "Liveness Levels"
+                    },
+                    "passive_liveness_levels": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/PassiveLivenessLevelConfigResponse"
+                        },
+                        "type": "object",
+                        "title": "Passive Liveness Levels"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "default_face_model",
+                    "supported_actions",
+                    "face_match_levels",
+                    "liveness_levels",
+                    "passive_liveness_levels"
+                ],
+                "title": "VerificationConfigResponse"
+            },
+            "VerifyVideoRequest": {
+                "properties": {
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Correlation Id"
+                    },
+                    "challenge_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Challenge Id"
+                    },
+                    "expected_actions": {
+                        "items": {
+                            "$ref": "#/components/schemas/LivenessAction"
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Expected Actions"
+                    },
+                    "national_id_image_uri": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "National Id Image Uri"
+                    },
+                    "video_uri": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Video Uri"
+                    },
+                    "face_match_level": {
+                        "type": "integer",
+                        "maximum": 3.0,
+                        "minimum": 1.0,
+                        "title": "Face Match Level"
+                    },
+                    "liveness_level": {
+                        "type": "integer",
+                        "maximum": 3.0,
+                        "minimum": 1.0,
+                        "title": "Liveness Level"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "challenge_id",
+                    "expected_actions",
+                    "national_id_image_uri",
+                    "video_uri",
+                    "face_match_level",
+                    "liveness_level"
+                ],
+                "title": "VerifyVideoRequest"
+            },
+            "VerifyVideoResponse": {
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "title": "Ok"
+                    },
+                    "correlation_id": {
+                        "type": "string",
+                        "title": "Correlation Id"
+                    },
+                    "challenge_id": {
+                        "type": "string",
+                        "title": "Challenge Id"
+                    },
+                    "expected_actions": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Expected Actions"
+                    },
+                    "face_match": {
+                        "$ref": "#/components/schemas/FaceMatchResponse"
+                    },
+                    "liveness": {
+                        "$ref": "#/components/schemas/LivenessResponse"
+                    },
+                    "passive_liveness": {
+                        "$ref": "#/components/schemas/PassiveLivenessResponse"
+                    },
+                    "action_check": {
+                        "$ref": "#/components/schemas/ActionCheckResponse"
+                    },
+                    "final_decision": {
+                        "$ref": "#/components/schemas/FinalDecisionResponse"
+                    },
+                    "processing_time_ms": {
+                        "type": "number",
+                        "title": "Processing Time Ms"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ok",
+                    "correlation_id",
+                    "challenge_id",
+                    "expected_actions",
+                    "face_match",
+                    "liveness",
+                    "passive_liveness",
+                    "action_check",
+                    "final_decision",
+                    "processing_time_ms"
+                ],
+                "title": "VerifyVideoResponse"
+            }
         },
-        "type": "object",
-        "required": [
-          "ok",
-          "correlation_id",
-          "challenge_id",
-          "expected_actions",
-          "face_match",
-          "liveness",
-          "passive_liveness",
-          "action_check",
-          "final_decision",
-          "processing_time_ms"
-        ],
-        "title": "VerifyVideoResponse"
-      }
-    },
-    "securitySchemes": {
-      "HTTPBearer": {
-        "type": "http",
-        "scheme": "bearer"
-      }
+        "securitySchemes": {
+            "HTTPBearer": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
     }
-  }
 }
