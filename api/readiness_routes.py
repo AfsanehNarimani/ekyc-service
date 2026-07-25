@@ -13,6 +13,12 @@ router = APIRouter(
 @router.get(
     "/ready",
     response_model=ReadinessResponse,
+    responses={
+        503: {
+            "model": ReadinessResponse,
+            "description": "Service is not ready",
+        },
+    },
 )
 def readiness(
     service: ReadinessService = Depends(get_readiness_service),

@@ -24,7 +24,10 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
 
-app = FastAPI(title=settings.app_name)
+app = FastAPI(
+    title=settings.app_name,
+    version="0.1.0",
+)
 
 app.add_exception_handler(
     RequestValidationError,

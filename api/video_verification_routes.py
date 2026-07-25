@@ -50,7 +50,20 @@ router = APIRouter(
         404: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
         500: {"model": ErrorResponse},
-        503: {"model": ErrorResponse},
+        503: {
+            "model": ErrorResponse,
+            "headers": {
+                "Retry-After": {
+                    "description": (
+                        "Seconds before retrying when "
+                        "verification capacity is exhausted."
+                    ),
+                    "schema": {
+                        "type": "integer",
+                    },
+                },
+            },
+        },
     },
 )
 def verify_video(
