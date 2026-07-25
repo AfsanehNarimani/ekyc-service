@@ -20,3 +20,7 @@ class MediaLoadError(EKYCError):
 
 class NoUsableVideoFrameError(EKYCError):
     pass
+
+
+class ServiceCapacityExceededError(Exception):
+    pass

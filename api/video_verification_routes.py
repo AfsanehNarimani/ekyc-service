@@ -29,6 +29,9 @@ from services.video_verification_orchestrator_service import (
 )
 from api.authentication_dependencies import authenticate_service
 from authentication.authenticated_service import AuthenticatedService
+from api.capacity_dependencies import (
+    acquire_verification_capacity,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +59,7 @@ def verify_video(
     service: VideoVerificationOrchestratorService = Depends(
         get_video_verification_orchestrator_service
     ),
+    _capacity_slot: None = Depends(acquire_verification_capacity),
     response_mapper: VideoVerificationResponseMapper = Depends(
         get_video_verification_response_mapper
     ),

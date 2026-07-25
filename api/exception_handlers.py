@@ -9,6 +9,8 @@ from authentication.exceptions import (
     AuthenticationConfigurationError,
     ServiceAuthenticationError,
 )
+from config import settings
+from core.exceptions import ServiceCapacityExceededError
 
 
 async def request_validation_exception_handler(
@@ -95,4 +97,22 @@ async def authentication_configuration_exception_handler(
         message="Service authentication is unavailable.",
         trace_id=trace_id,
         processing_time_ms=0.0,
+    )
+
+
+async def service_capacity_exception_handler(
+    request: Request,
+    exc: ServiceCapacityExceededError,
+) -> JSONResponse:
+    trace_id = await extract_trace_id(request)
+
+    return ErrorResponseFactory().build(
+        status_code=503,
+        code="verification_capacity_exceeded",
+        message=("Verification capacity is temporarily " "unavailable."),
+        trace_id=trace_id,
+        processing_time_ms=0.0,
+        headers={
+            "Retry-After": str(settings.capacity_retry_after_seconds),
+        },
     )

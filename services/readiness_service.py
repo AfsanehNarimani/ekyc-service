@@ -37,6 +37,7 @@ class ReadinessService:
                 name="embedding_dir",
                 path=settings.embedding_dir,
             ),
+            self._check_verification_capacity(),
         ]
 
         return ReadinessResult(
@@ -240,3 +241,29 @@ class ReadinessService:
             "http",
             "https",
         } and bool(parsed.netloc)
+
+    def _check_verification_capacity(
+        self,
+    ) -> ReadinessCheck:
+        if settings.max_concurrent_verifications <= 0:
+            return ReadinessCheck(
+                name="verification_capacity",
+                passed=False,
+                message=("max concurrent verifications must be " "greater than zero"),
+            )
+
+        if settings.capacity_retry_after_seconds <= 0:
+            return ReadinessCheck(
+                name="verification_capacity",
+                passed=False,
+                message=("capacity retry-after seconds must be " "greater than zero"),
+            )
+
+        return ReadinessCheck(
+            name="verification_capacity",
+            passed=True,
+            message=(
+                "maximum concurrent verifications is "
+                f"{settings.max_concurrent_verifications}"
+            ),
+        )

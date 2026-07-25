@@ -8,6 +8,7 @@ from api.exception_handlers import (
     authentication_configuration_exception_handler,
     request_validation_exception_handler,
     service_authentication_exception_handler,
+    service_capacity_exception_handler,
 )
 from api.video_verification_routes import router as video_verification_router
 from api.readiness_routes import router as readiness_router
@@ -16,6 +17,7 @@ from authentication.exceptions import (
     AuthenticationConfigurationError,
     ServiceAuthenticationError,
 )
+from core.exceptions import ServiceCapacityExceededError
 
 logging.basicConfig(
     level=settings.log_level,
@@ -37,6 +39,11 @@ app.add_exception_handler(
 app.add_exception_handler(
     AuthenticationConfigurationError,
     authentication_configuration_exception_handler,
+)
+
+app.add_exception_handler(
+    ServiceCapacityExceededError,
+    service_capacity_exception_handler,
 )
 
 # app.include_router(challenge_router)

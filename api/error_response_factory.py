@@ -14,6 +14,7 @@ class ErrorResponseFactory:
         trace_id: str | None = None,
         processing_time_ms: float | None = None,
         details: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> JSONResponse:
         response = ErrorResponse(
             trace_id=trace_id,
@@ -28,4 +29,5 @@ class ErrorResponseFactory:
         return JSONResponse(
             status_code=status_code,
             content=response.model_dump(),
+            headers=headers,
         )

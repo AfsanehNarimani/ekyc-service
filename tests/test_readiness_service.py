@@ -305,3 +305,97 @@ def test_readiness_service_fails_when_keycloak_settings_are_missing(
     assert "keycloak_issuer" in keycloak_check.message
     assert "keycloak_jwks_url" in keycloak_check.message
     assert "keycloak_allowed_client_id" in keycloak_check.message
+
+
+def test_readiness_service_fails_for_invalid_verification_capacity(
+    tmp_path,
+    monkeypatch,
+):
+    model_path = tmp_path / "model.onnx"
+    model_path.write_text("fake model")
+
+    monkeypatch.setattr(
+        settings,
+        "default_face_model",
+        "edgeface",
+    )
+    monkeypatch.setattr(
+        settings,
+        "edgeface_model_path",
+        model_path,
+    )
+    monkeypatch.setattr(
+        settings,
+        "media_temp_dir",
+        tmp_path / "media",
+    )
+    monkeypatch.setattr(
+        settings,
+        "reference_dir",
+        tmp_path / "references",
+    )
+    monkeypatch.setattr(
+        settings,
+        "embedding_dir",
+        tmp_path / "embeddings",
+    )
+    monkeypatch.setattr(
+        settings,
+        "max_concurrent_verifications",
+        0,
+    )
+
+    result = ReadinessService().check()
+
+    assert result.ready is False
+    assert any(
+        check.name == "verification_capacity" and check.passed is False
+        for check in result.checks
+    )
+
+
+def test_readiness_service_fails_for_invalid_retry_after(
+    tmp_path,
+    monkeypatch,
+):
+    model_path = tmp_path / "model.onnx"
+    model_path.write_text("fake model")
+
+    monkeypatch.setattr(
+        settings,
+        "default_face_model",
+        "edgeface",
+    )
+    monkeypatch.setattr(
+        settings,
+        "edgeface_model_path",
+        model_path,
+    )
+    monkeypatch.setattr(
+        settings,
+        "media_temp_dir",
+        tmp_path / "media",
+    )
+    monkeypatch.setattr(
+        settings,
+        "reference_dir",
+        tmp_path / "references",
+    )
+    monkeypatch.setattr(
+        settings,
+        "embedding_dir",
+        tmp_path / "embeddings",
+    )
+    monkeypatch.setattr(
+        settings,
+        "capacity_retry_after_seconds",
+        0,
+    )
+
+    result = ReadinessService().check()
+
+    assert result.ready is False
+    assert any(
+        check.name == "verification_capacity" and check.passed is False
+        for check in result.checks
+    )

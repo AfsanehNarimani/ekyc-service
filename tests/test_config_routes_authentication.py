@@ -23,15 +23,11 @@ def test_verification_config_rejects_missing_bearer_token():
         authenticate_service,
         None,
     )
-    app.dependency_overrides[get_keycloak_jwt_validator] = (
-        lambda: FakeValidator()
-    )
+    app.dependency_overrides[get_keycloak_jwt_validator] = lambda: FakeValidator()
 
     client = TestClient(app)
 
-    response = client.get(
-        "/api/verification-config"
-    )
+    response = client.get("/api/verification-config")
 
     app.dependency_overrides.clear()
 
@@ -41,10 +37,6 @@ def test_verification_config_rejects_missing_bearer_token():
 
     assert body["ok"] is False
     assert body["trace_id"] is None
-    assert body["error"]["code"] == (
-        "service_authentication_failed"
-    )
-    assert body["error"]["message"] == (
-        "Service authentication failed."
-    )
+    assert body["error"]["code"] == ("service_authentication_failed")
+    assert body["error"]["message"] == ("Service authentication failed.")
     assert body["error"]["details"] == {}
