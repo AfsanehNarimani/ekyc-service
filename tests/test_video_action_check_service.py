@@ -101,8 +101,8 @@ def test_video_action_check_service_passes_expected_actions():
         LivenessAction.CENTER,
         LivenessAction.LEFT,
         LivenessAction.RIGHT,
-        LivenessAction.UP,
         LivenessAction.DOWN,
+        LivenessAction.UP,
     ]
     assert result.missing_actions == []
 
@@ -134,5 +134,5 @@ def test_video_action_check_service_detects_missing_action():
 
     assert result.passed is False
     assert result.missing_actions == [
-        LivenessAction.UP,
+        LivenessAction.DOWN,
     ]

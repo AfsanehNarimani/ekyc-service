@@ -36,10 +36,10 @@ class HeadPoseActionClassifier:
         if yaw <= -self.yaw_threshold:
             return LivenessAction.RIGHT
 
-        if pitch <= -self.pitch_threshold:
+        if pitch >= self.pitch_threshold:
             return LivenessAction.UP
 
-        if pitch >= self.pitch_threshold:
+        if pitch <= -self.pitch_threshold:
             return LivenessAction.DOWN
 
         return None

@@ -25,3 +25,7 @@ calibration/data/
 calibration/results/
 
 .env.docker
+
+# Generated head-pose test outputs
+results/head_pose/
+Video-sample/
