@@ -3,8 +3,8 @@ from PIL import Image
 
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 from ai_modules.face_verification.application.enrollment_service import EnrollmentService
-from storage.embedding_store import EmbeddingStore
-from storage.reference_image_store import ReferenceImageStore
+from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
+from ai_modules.face_verification.infrastructure.persistence.reference_image_store import ReferenceImageStore
 
 
 class FakePreprocessor:

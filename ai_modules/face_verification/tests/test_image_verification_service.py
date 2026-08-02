@@ -5,7 +5,7 @@ from PIL import Image
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from ai_modules.face_verification.application.image_verification_service import ImageVerificationService
-from storage.embedding_store import EmbeddingStore
+from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
 
 
 class FakePreprocessor:

@@ -12,8 +12,8 @@ from face.single_face_validator import SingleFaceValidator
 from ai_modules.face_verification.application.enrollment_service import EnrollmentService
 from liveness.expected_action_policy import ExpectedActionPolicy
 from ai_modules.face_verification.application.image_verification_service import ImageVerificationService
-from storage.embedding_store import EmbeddingStore
-from storage.reference_image_store import ReferenceImageStore
+from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
+from ai_modules.face_verification.infrastructure.persistence.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction

@@ -1,7 +1,7 @@
 import numpy as np
 
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
-from storage.embedding_store import EmbeddingStore
+from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
 
 
 def test_embedding_store_saves_and_loads_embedding(tmp_path):

@@ -4,8 +4,8 @@ from ai_modules.face_verification.domain.enrollment_result import EnrollmentResu
 from ai_modules.face_verification.domain.person_id import PersonIDValidator
 from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
 from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
-from storage.embedding_store import EmbeddingStore
-from storage.reference_image_store import ReferenceImageStore
+from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
+from ai_modules.face_verification.infrastructure.persistence.reference_image_store import ReferenceImageStore
 
 
 class EnrollmentService:
