@@ -5,7 +5,7 @@ from PIL import Image
 
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 from ai_modules.face_verification.domain.face_model_profile import FaceModelProfile
-from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.infrastructure.embedders.base_embedder import BaseFaceEmbedder
 from ai_modules.face_verification.infrastructure.preprocessing.model_preprocessor import ModelPreprocessor
 from ai_modules.face_verification.infrastructure.inference.onnx_runner import ONNXRunner
 

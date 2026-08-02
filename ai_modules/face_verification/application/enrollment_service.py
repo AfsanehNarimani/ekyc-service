@@ -2,7 +2,7 @@ from PIL import Image
 
 from ai_modules.face_verification.domain.enrollment_result import EnrollmentResult
 from ai_modules.face_verification.domain.person_id import PersonIDValidator
-from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.infrastructure.embedders.base_embedder import BaseFaceEmbedder
 from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
 from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
 from ai_modules.face_verification.infrastructure.persistence.reference_image_store import ReferenceImageStore

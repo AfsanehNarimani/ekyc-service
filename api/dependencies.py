@@ -1,7 +1,7 @@
 from functools import lru_cache
 
 from config import settings
-from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.infrastructure.embedders.base_embedder import BaseFaceEmbedder
 from api.error_response_factory import ErrorResponseFactory
 from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import FaceAligner
 from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import FaceEmbedderFactory
