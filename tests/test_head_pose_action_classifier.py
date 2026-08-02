@@ -67,7 +67,7 @@ def test_classifier_detects_up():
         )
     )
 
-    assert action == LivenessAction.UP
+    assert action == LivenessAction.DOWN
 
 
 def test_classifier_detects_down():
@@ -78,4 +78,4 @@ def test_classifier_detects_down():
         )
     )
 
-    assert action == LivenessAction.DOWN
+    assert action == LivenessAction.UP

@@ -26,6 +26,33 @@ def configure_readiness_settings(
         False,
     )
 
+    monkeypatch.setattr(
+        settings,
+        "insightface_detection_model_filename",
+        "det_10g.onnx",
+    )
+
+    monkeypatch.setattr(
+        settings,
+        "insightface_pose_model_filename",
+        "1k3d68.onnx",
+    )
+
+    insightface_model_dir = tmp_path / "insightface" / "models" / "buffalo_l"
+
+    insightface_model_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    (insightface_model_dir / "det_10g.onnx").write_text(
+        "fake detection model",
+    )
+
+    (insightface_model_dir / "1k3d68.onnx").write_text(
+        "fake pose model",
+    )
+
 
 def test_readiness_service_passes_when_required_paths_exist(tmp_path, monkeypatch):
     model_path = tmp_path / "model.onnx"

@@ -23,7 +23,7 @@ class FakeFaceAnalysis:
         FakeFaceAnalysis.prepared_arguments = kwargs
 
 
-def test_insightface_detector_loads_only_detection_model(
+def test_insightface_detector_loads_detection_and_pose_models(
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -50,6 +50,7 @@ def test_insightface_detector_loads_only_detection_model(
         "root": "/models/insightface",
         "allowed_modules": [
             "detection",
+            "landmark_3d_68",
         ],
         "providers": [
             "CPUExecutionProvider",

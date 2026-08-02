@@ -78,12 +78,12 @@ def verify_video(
     ),
     error_response_factory: ErrorResponseFactory = Depends(get_error_response_factory),
 ) -> VerifyVideoResponse | JSONResponse:
-    trace_id = request.trace_id or uuid.uuid4().hex
+    correlation_id = request.correlation_id or uuid.uuid4().hex
     started_at = time.perf_counter()
 
     try:
         result = service.verify(
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             challenge_id=request.challenge_id,
             expected_actions=request.expected_actions,
             national_id_image_uri=request.national_id_image_uri,
@@ -96,8 +96,8 @@ def verify_video(
 
     except ValueError as error:
         logger.warning(
-            "trace_id=%s challenge_id=%s error_code=invalid_request message=%s",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=invalid_request message=%s",
+            correlation_id,
             request.challenge_id,
             error,
         )
@@ -105,14 +105,14 @@ def verify_video(
             status_code=400,
             code="invalid_request",
             message=str(error),
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=_elapsed_ms(started_at),
         )
 
     except FileNotFoundError as error:
         logger.warning(
-            "trace_id=%s challenge_id=%s error_code=media_file_not_found message=%s",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=media_file_not_found message=%s",
+            correlation_id,
             request.challenge_id,
             error,
         )
@@ -120,14 +120,14 @@ def verify_video(
             status_code=404,
             code="media_file_not_found",
             message=f"Media file not found: {error}",
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=_elapsed_ms(started_at),
         )
 
     except MediaLoadError as error:
         logger.warning(
-            "trace_id=%s challenge_id=%s error_code=media_load_failed message=%s",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=media_load_failed message=%s",
+            correlation_id,
             request.challenge_id,
             error,
         )
@@ -135,14 +135,14 @@ def verify_video(
             status_code=422,
             code="media_load_failed",
             message=str(error),
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=_elapsed_ms(started_at),
         )
 
     except InvalidVideoError as error:
         logger.warning(
-            "trace_id=%s challenge_id=%s error_code=invalid_video message=%s",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=invalid_video message=%s",
+            correlation_id,
             request.challenge_id,
             error,
         )
@@ -150,14 +150,14 @@ def verify_video(
             status_code=422,
             code="invalid_video",
             message=str(error),
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=_elapsed_ms(started_at),
         )
 
     except NoUsableVideoFrameError as error:
         logger.warning(
-            "trace_id=%s challenge_id=%s error_code=no_usable_video_frame message=%s",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=no_usable_video_frame message=%s",
+            correlation_id,
             request.challenge_id,
             error,
         )
@@ -165,21 +165,21 @@ def verify_video(
             status_code=422,
             code="no_usable_video_frame",
             message=str(error),
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             processing_time_ms=_elapsed_ms(started_at),
         )
 
     except Exception:
         logger.exception(
-            "trace_id=%s challenge_id=%s error_code=internal_server_error",
-            trace_id,
+            "correlation_id=%s challenge_id=%s error_code=internal_server_error",
+            correlation_id,
             request.challenge_id,
         )
     return error_response_factory.build(
         status_code=500,
         code="internal_server_error",
         message="Unexpected internal server error.",
-        trace_id=trace_id,
+        correlation_id=correlation_id,
         processing_time_ms=_elapsed_ms(started_at),
     )
 

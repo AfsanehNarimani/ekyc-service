@@ -11,7 +11,7 @@ from services.verification_capacity_limiter import (
 
 def make_request_body() -> dict:
     return {
-        "trace_id": "trace-capacity-001",
+        "correlation_id": "trace-capacity-001",
         "challenge_id": "challenge-capacity-001",
         "expected_actions": [
             "center",
@@ -48,7 +48,7 @@ def test_verify_video_returns_503_when_capacity_is_exhausted():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-capacity-001"
+    assert body["correlation_id"] == "trace-capacity-001"
     assert body["processing_time_ms"] == 0.0
     assert body["error"]["code"] == ("verification_capacity_exceeded")
     assert body["error"]["message"] == (

@@ -62,10 +62,10 @@ def send_verification_request(
     timeout_seconds: float,
     bearer_token: str | None,
 ) -> RequestResult:
-    trace_id = f"load-{uuid.uuid4().hex}"
+    correlation_id = f"load-{uuid.uuid4().hex}"
 
     payload: dict[str, Any] = {
-        "trace_id": trace_id,
+        "correlation_id": correlation_id,
         "challenge_id": f"challenge-{uuid.uuid4().hex}",
         "expected_actions": [
             "center",

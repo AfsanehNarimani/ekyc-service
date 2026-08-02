@@ -14,7 +14,7 @@ from core.video_verification_result import VideoVerificationResult
 class FakeVideoVerificationOrchestratorService:
     def verify(
         self,
-        trace_id: str,
+        correlation_id: str,
         challenge_id: str,
         expected_actions: list[LivenessAction],
         national_id_image_uri: str,
@@ -23,7 +23,7 @@ class FakeVideoVerificationOrchestratorService:
         liveness_level: int,
     ) -> VideoVerificationResult:
         return VideoVerificationResult(
-            trace_id=trace_id,
+            correlation_id=correlation_id,
             challenge_id=challenge_id,
             expected_actions=expected_actions,
             face_match=VideoFaceMatchResult(
@@ -81,7 +81,7 @@ class FakeVideoVerificationOrchestratorService:
 class FakeFailingVideoVerificationOrchestratorService:
     def verify(
         self,
-        trace_id: str,
+        correlation_id: str,
         challenge_id,
         expected_actions,
         national_id_image_uri,
@@ -95,7 +95,7 @@ class FakeFailingVideoVerificationOrchestratorService:
 class FakeUnexpectedFailingVideoVerificationOrchestratorService:
     def verify(
         self,
-        trace_id: str,
+        correlation_id: str,
         challenge_id,
         expected_actions,
         national_id_image_uri,
@@ -109,7 +109,7 @@ class FakeUnexpectedFailingVideoVerificationOrchestratorService:
 class FakeInvalidActionVideoVerificationOrchestratorService:
     def verify(
         self,
-        trace_id: str,
+        correlation_id: str,
         challenge_id,
         expected_actions,
         national_id_image_uri,
@@ -133,7 +133,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
     response = client.post(
         "/api/verify-video",
         json={
-            "trace_id": "trace-1",
+            "correlation_id": "trace-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -156,7 +156,7 @@ def test_verify_video_endpoint_returns_final_approved_result():
     body = response.json()
 
     assert body["ok"] is True
-    assert body["trace_id"] == "trace-1"
+    assert body["correlation_id"] == "trace-1"
     assert body["challenge_id"] == "backend-challenge-123"
 
     assert body["face_match"]["passed"] is True
@@ -185,7 +185,7 @@ def test_verify_video_endpoint_returns_standard_error_response():
     response = client.post(
         "/api/verify-video",
         json={
-            "trace_id": "trace-error-1",
+            "correlation_id": "trace-error-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -208,7 +208,7 @@ def test_verify_video_endpoint_returns_standard_error_response():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-error-1"
+    assert body["correlation_id"] == "trace-error-1"
     assert body["processing_time_ms"] >= 0
     assert body["error"]["code"] == "media_file_not_found"
     assert "Media file not found" in body["error"]["message"]
@@ -225,7 +225,7 @@ def test_verify_video_endpoint_returns_safe_internal_error_response():
     response = client.post(
         "/api/verify-video",
         json={
-            "trace_id": "trace-internal-error-1",
+            "correlation_id": "trace-internal-error-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -248,7 +248,7 @@ def test_verify_video_endpoint_returns_safe_internal_error_response():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-internal-error-1"
+    assert body["correlation_id"] == "trace-internal-error-1"
     assert body["processing_time_ms"] >= 0
     assert body["error"]["code"] == "internal_server_error"
     assert body["error"]["message"] == "Unexpected internal server error."
@@ -266,7 +266,7 @@ def test_verify_video_endpoint_rejects_invalid_expected_actions():
     response = client.post(
         "/api/verify-video",
         json={
-            "trace_id": "trace-invalid-actions-1",
+            "correlation_id": "trace-invalid-actions-1",
             "challenge_id": "backend-challenge-123",
             "expected_actions": [
                 "center",
@@ -289,7 +289,7 @@ def test_verify_video_endpoint_rejects_invalid_expected_actions():
     body = response.json()
 
     assert body["ok"] is False
-    assert body["trace_id"] == "trace-invalid-actions-1"
+    assert body["correlation_id"] == "trace-invalid-actions-1"
     assert body["processing_time_ms"] >= 0
     assert body["error"]["code"] == "invalid_request"
     assert "Invalid expected_actions" in body["error"]["message"]

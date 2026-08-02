@@ -10,7 +10,7 @@ from core.video_verification_result import VideoVerificationResult
 
 def test_video_verification_response_mapper_maps_result_to_response():
     result = VideoVerificationResult(
-        trace_id="trace-1",
+        correlation_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
             LivenessAction.CENTER,
@@ -79,7 +79,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
     response = VideoVerificationResponseMapper().to_response(result)
 
     assert response.ok is True
-    assert response.trace_id == "trace-1"
+    assert response.correlation_id == "trace-1"
     assert response.challenge_id == "challenge-1"
     assert response.expected_actions == [
         "center",

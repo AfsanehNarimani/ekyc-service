@@ -17,7 +17,7 @@ def test_media_cleanup_service_deletes_file_inside_temp_dir(tmp_path, monkeypatc
 
     MediaCleanupService().cleanup_temp_file(
         path=temp_file,
-        trace_id="trace-1",
+        correlation_id="trace-1",
     )
 
     assert temp_file.exists() is False
@@ -41,7 +41,7 @@ def test_media_cleanup_service_does_not_delete_file_outside_temp_dir(
 
     MediaCleanupService().cleanup_temp_file(
         path=local_file,
-        trace_id="trace-1",
+        correlation_id="trace-1",
     )
 
     assert local_file.exists() is True

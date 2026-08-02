@@ -38,7 +38,7 @@ class ReadinessService:
                 path=settings.embedding_dir,
             ),
             self._check_verification_capacity(),
-            self._check_insightface_detection_model(),
+            *self._check_insightface_models(),
         ]
 
         return ReadinessResult(
@@ -269,30 +269,42 @@ class ReadinessService:
             ),
         )
 
-    def _check_insightface_detection_model(
+    def _check_insightface_models(
         self,
-    ) -> ReadinessCheck:
-        model_path = self._get_insightface_detection_model_path()
+    ) -> list[ReadinessCheck]:
+        model_directory = (
+            settings.insightface_root_dir / "models" / settings.insightface_model_name
+        )
 
-        if model_path.exists() and model_path.is_file():
-            return ReadinessCheck(
-                name="insightface_detection_model",
-                passed=True,
-                message=("InsightFace detection model file " "exists"),
+        required_models = (
+            (
+                "insightface_detection_model",
+                settings.insightface_detection_model_filename,
+                "InsightFace detection model",
+            ),
+            (
+                "insightface_pose_model",
+                settings.insightface_pose_model_filename,
+                "InsightFace pose model",
+            ),
+        )
+
+        checks: list[ReadinessCheck] = []
+
+        for check_name, filename, display_name in required_models:
+            model_path = model_directory / filename
+            exists = model_path.exists() and model_path.is_file()
+
+            checks.append(
+                ReadinessCheck(
+                    name=check_name,
+                    passed=exists,
+                    message=(
+                        f"{display_name} file exists"
+                        if exists
+                        else f"{display_name} file is missing"
+                    ),
+                )
             )
 
-        return ReadinessCheck(
-            name="insightface_detection_model",
-            passed=False,
-            message=("InsightFace detection model file " "is missing"),
-        )
-
-    def _get_insightface_detection_model_path(
-        self,
-    ) -> Path:
-        return (
-            settings.insightface_root_dir
-            / "models"
-            / settings.insightface_model_name
-            / settings.insightface_detection_model_filename
-        )
+        return checks

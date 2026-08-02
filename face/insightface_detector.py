@@ -26,6 +26,7 @@ class InsightFaceDetector:
             root=str(resolved_root_dir),
             allowed_modules=[
                 "detection",
+                "landmark_3d_68",
             ],
             providers=(providers or ["CPUExecutionProvider"]),
         )
