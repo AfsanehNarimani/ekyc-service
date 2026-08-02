@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
-from core.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 
 
 class EmbeddingStore:

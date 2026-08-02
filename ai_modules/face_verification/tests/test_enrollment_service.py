@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-from core.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 from services.enrollment_service import EnrollmentService
 from storage.embedding_store import EmbeddingStore
 from storage.reference_image_store import ReferenceImageStore

@@ -5,7 +5,7 @@ from face.base_embedder import BaseFaceEmbedder
 from api.error_response_factory import ErrorResponseFactory
 from face.face_aligner import FaceAligner
 from face.face_embedder_factory import FaceEmbedderFactory
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from face.face_preprocessor import FacePreprocessor
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
@@ -19,7 +19,7 @@ from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
-from face.face_match_threshold_policy import FaceMatchThresholdPolicy
+from ai_modules.face_verification.domain.face_match_threshold_policy import FaceMatchThresholdPolicy
 from services.video_face_match_service import VideoFaceMatchService
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader

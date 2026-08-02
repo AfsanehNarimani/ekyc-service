@@ -9,7 +9,7 @@ from api.dependencies import (
     get_face_preprocessor,
     get_video_frame_analysis_service,
 )
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 
 
 def main() -> None:

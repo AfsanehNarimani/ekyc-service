@@ -8,9 +8,9 @@ from core.analyzed_video_frame import (
 )
 from core.exceptions import NoUsableVideoFrameError
 from core.face_detection import FaceDetection
-from core.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 from core.video_frame import VideoFrame
-from face.face_match_threshold_policy import (
+from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
 from services.video_face_match_service import (

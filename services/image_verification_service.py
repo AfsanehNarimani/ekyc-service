@@ -1,9 +1,9 @@
 from PIL import Image
 
-from core.image_verification_result import ImageVerificationResult
-from core.person_id import PersonIDValidator
+from ai_modules.face_verification.domain.image_verification_result import ImageVerificationResult
+from ai_modules.face_verification.domain.person_id import PersonIDValidator
 from face.base_embedder import BaseFaceEmbedder
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from face.face_preprocessor import FacePreprocessor
 from storage.embedding_store import EmbeddingStore
 

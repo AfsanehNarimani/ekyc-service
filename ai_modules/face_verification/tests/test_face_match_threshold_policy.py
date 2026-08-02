@@ -1,6 +1,6 @@
 import pytest
 
-from face.face_match_threshold_policy import FaceMatchThresholdPolicy
+from ai_modules.face_verification.domain.face_match_threshold_policy import FaceMatchThresholdPolicy
 
 
 def test_face_match_threshold_policy_returns_threshold():

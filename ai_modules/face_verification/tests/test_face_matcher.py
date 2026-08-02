@@ -1,7 +1,7 @@
 import numpy as np
 
-from core.face_embedding import FaceEmbedding
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 
 
 def test_face_matcher_accepts_identical_embeddings():

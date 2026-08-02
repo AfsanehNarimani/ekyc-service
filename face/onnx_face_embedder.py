@@ -3,8 +3,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from core.face_embedding import FaceEmbedding
-from core.face_model_profile import FaceModelProfile
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_model_profile import FaceModelProfile
 from face.base_embedder import BaseFaceEmbedder
 from face.model_preprocessor import ModelPreprocessor
 from face.onnx_runner import ONNXRunner

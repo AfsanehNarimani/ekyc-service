@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-from core.face_model_profile import FaceModelProfile
+from ai_modules.face_verification.domain.face_model_profile import FaceModelProfile
 from face.model_preprocessor import ModelPreprocessor
 
 

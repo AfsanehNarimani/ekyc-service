@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from core.face_embedding import FaceEmbedding
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from services.image_verification_service import ImageVerificationService
 from storage.embedding_store import EmbeddingStore
 

@@ -3,12 +3,12 @@ from PIL import Image
 from core.analyzed_video_frame import VideoFrameAnalysisResult
 from core.exceptions import NoUsableVideoFrameError
 from core.face_detection import FaceDetection
-from core.video_face_match_result import VideoFaceMatchResult
+from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
 from face.base_embedder import BaseFaceEmbedder
-from face.face_match_threshold_policy import (
+from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
-from face.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from face.face_preprocessor import FacePreprocessor
 
 

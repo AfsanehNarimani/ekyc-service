@@ -1,6 +1,6 @@
 import pytest
 
-from core.person_id import PersonIDValidator
+from ai_modules.face_verification.domain.person_id import PersonIDValidator
 
 
 def test_person_id_validator_accepts_valid_id():
