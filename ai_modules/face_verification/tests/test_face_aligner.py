@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 from core.face_detection import FaceDetection
-from face.face_aligner import FaceAligner
+from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import FaceAligner
 
 
 def test_face_aligner_returns_112x112_image():

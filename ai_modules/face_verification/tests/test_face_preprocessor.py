@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 from core.face_detection import FaceDetection
-from face.face_preprocessor import FacePreprocessor
+from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
 
 
 class FakeDetector:

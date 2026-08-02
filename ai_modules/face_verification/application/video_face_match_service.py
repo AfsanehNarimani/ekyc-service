@@ -4,12 +4,12 @@ from core.analyzed_video_frame import VideoFrameAnalysisResult
 from core.exceptions import NoUsableVideoFrameError
 from core.face_detection import FaceDetection
 from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
-from face.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
 from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
 from ai_modules.face_verification.domain.face_matcher import FaceMatcher
-from face.face_preprocessor import FacePreprocessor
+from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
 
 
 class VideoFaceMatchService:

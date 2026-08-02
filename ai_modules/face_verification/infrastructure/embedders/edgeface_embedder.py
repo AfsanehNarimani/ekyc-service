@@ -4,9 +4,9 @@ import numpy as np
 from PIL import Image
 
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
-from face.base_embedder import BaseFaceEmbedder
-from face.edgeface_preprocessor import EdgeFacePreprocessor
-from face.onnx_runner import ONNXRunner
+from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.infrastructure.preprocessing.edgeface_preprocessor import EdgeFacePreprocessor
+from ai_modules.face_verification.infrastructure.inference.onnx_runner import ONNXRunner
 
 
 class EdgeFaceEmbedder(BaseFaceEmbedder):

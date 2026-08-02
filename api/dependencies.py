@@ -1,12 +1,12 @@
 from functools import lru_cache
 
 from config import settings
-from face.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.application.ports.base_embedder import BaseFaceEmbedder
 from api.error_response_factory import ErrorResponseFactory
-from face.face_aligner import FaceAligner
-from face.face_embedder_factory import FaceEmbedderFactory
+from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import FaceAligner
+from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import FaceEmbedderFactory
 from ai_modules.face_verification.domain.face_matcher import FaceMatcher
-from face.face_preprocessor import FacePreprocessor
+from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
 from ai_modules.face_verification.application.enrollment_service import EnrollmentService

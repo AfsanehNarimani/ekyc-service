@@ -2,7 +2,7 @@ import pytest
 from PIL import Image
 
 from config import settings
-from face.face_embedder_factory import FaceEmbedderFactory
+from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import FaceEmbedderFactory
 
 
 def test_face_embedder_factory_has_all_profiles():

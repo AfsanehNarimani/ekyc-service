@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 from ai_modules.face_verification.domain.face_model_profile import FaceModelProfile
-from face.model_preprocessor import ModelPreprocessor
+from ai_modules.face_verification.infrastructure.preprocessing.model_preprocessor import ModelPreprocessor
 
 
 def test_model_preprocessor_builds_nchw_tensor():

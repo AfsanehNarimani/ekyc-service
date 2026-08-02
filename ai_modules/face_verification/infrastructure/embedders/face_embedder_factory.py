@@ -3,7 +3,7 @@ from pathlib import Path
 from config import settings
 from ai_modules.face_verification.domain.face_model_name import validate_face_model_name
 from ai_modules.face_verification.domain.face_model_profile import FaceModelProfile
-from face.onnx_face_embedder import ONNXFaceEmbedder
+from ai_modules.face_verification.infrastructure.embedders.onnx_face_embedder import ONNXFaceEmbedder
 
 
 class FaceEmbedderFactory:
