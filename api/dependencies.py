@@ -9,9 +9,9 @@ from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from face.face_preprocessor import FacePreprocessor
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
-from services.enrollment_service import EnrollmentService
+from ai_modules.face_verification.application.enrollment_service import EnrollmentService
 from liveness.expected_action_policy import ExpectedActionPolicy
-from services.image_verification_service import ImageVerificationService
+from ai_modules.face_verification.application.image_verification_service import ImageVerificationService
 from storage.embedding_store import EmbeddingStore
 from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
@@ -20,7 +20,7 @@ from core.liveness_action import LivenessAction
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from ai_modules.face_verification.domain.face_match_threshold_policy import FaceMatchThresholdPolicy
-from services.video_face_match_service import VideoFaceMatchService
+from ai_modules.face_verification.application.video_face_match_service import VideoFaceMatchService
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier

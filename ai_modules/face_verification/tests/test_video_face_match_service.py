@@ -13,7 +13,7 @@ from core.video_frame import VideoFrame
 from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
-from services.video_face_match_service import (
+from ai_modules.face_verification.application.video_face_match_service import (
     VideoFaceMatchService,
 )
 
