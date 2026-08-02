@@ -10,7 +10,7 @@ from core.exceptions import (
 )
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
-from video.video_frame_extractor import VideoFrameExtractor
+from video_processing.video_frame_extractor import VideoFrameExtractor
 
 
 class VideoFrameAnalysisService:

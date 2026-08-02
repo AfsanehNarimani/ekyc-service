@@ -6,7 +6,7 @@ from config import settings
 from face.insightface_detector import InsightFaceDetector
 from face.single_face_validator import SingleFaceValidator
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
-from video.video_frame_extractor import VideoFrameExtractor
+from video_processing.video_frame_extractor import VideoFrameExtractor
 
 
 def parse_args():
