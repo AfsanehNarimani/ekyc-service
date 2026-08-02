@@ -11,7 +11,7 @@ services:
       - "127.0.0.1:8000:8000"
 
     volumes:
-      - ./models/edgeface:/models/edgeface:ro
+      - ./ai_modules/face_verification/models/edgeface:/models/edgeface:ro
       - ./models/passive_liveness:/models/passive_liveness:ro
       - ${HOME}/.insightface/models/buffalo_l/det_10g.onnx:/models/insightface/models/buffalo_l/det_10g.onnx:ro
       - ${HOME}/.insightface/models/buffalo_l/1k3d68.onnx:/models/insightface/models/buffalo_l/1k3d68.onnx:ro

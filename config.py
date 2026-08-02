@@ -30,16 +30,25 @@ class Settings(BaseSettings):
 
     default_face_model: str = "edgeface"
 
-    edgeface_model_path: Path = project_root / "models" / "edgeface" / "model.onnx"
+    face_verification_models_dir: Path = (
+        project_root / "ai_modules" / "face_verification" / "models"
+    )
+
+    edgeface_model_path: Path = face_verification_models_dir / "edgeface" / "model.onnx"
+
     ghostfacenet_model_path: Path = (
-        project_root / "models" / "ghostfacenet" / "model.onnx"
+        face_verification_models_dir / "ghostfacenet" / "model.onnx"
     )
+
     mobilefacenet_model_path: Path = (
-        project_root / "models" / "mobilefacenet" / "model.onnx"
+        face_verification_models_dir / "mobilefacenet" / "model.onnx"
     )
-    arcface_model_path: Path = project_root / "models" / "arcface" / "model.onnx"
-    facenet_model_path: Path = project_root / "models" / "facenet" / "model.onnx"
-    adaface_model_path: Path = project_root / "models" / "adaface" / "model.onnx"
+
+    arcface_model_path: Path = face_verification_models_dir / "arcface" / "model.onnx"
+
+    facenet_model_path: Path = face_verification_models_dir / "facenet" / "model.onnx"
+
+    adaface_model_path: Path = face_verification_models_dir / "adaface" / "model.onnx"
 
     reference_dir: Path = project_root / "data" / "references"
     embedding_dir: Path = project_root / "data" / "embeddings"
