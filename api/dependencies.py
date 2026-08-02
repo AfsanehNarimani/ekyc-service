@@ -21,7 +21,7 @@ from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from face.face_match_threshold_policy import FaceMatchThresholdPolicy
 from services.video_face_match_service import VideoFaceMatchService
-from video.video_frame_extractor import VideoFrameExtractor
+from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 from services.readiness_service import ReadinessService

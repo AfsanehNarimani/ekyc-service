@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from core.exceptions import InvalidVideoError
-from video.video_frame_extractor import VideoFrameExtractor
+from video_processing.video_frame_extractor import VideoFrameExtractor
 
 
 def create_test_video(
