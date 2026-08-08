@@ -22,7 +22,7 @@ from services.video_frame_analysis_service import (
 logger = logging.getLogger(__name__)
 
 
-class VideoVerificationOrchestratorService:
+class HeadPoseChallengeOrchestratorService:
     def __init__(
         self,
         media_loader: MediaLoader,

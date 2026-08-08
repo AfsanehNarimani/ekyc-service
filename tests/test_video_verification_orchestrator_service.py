@@ -9,8 +9,8 @@ from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
 from liveness.expected_action_policy import ExpectedActionPolicy
-from services.video_verification_orchestrator_service import (
-    VideoVerificationOrchestratorService,
+from services.head_pose_challenge_orchestrator_service import (
+    HeadPoseChallengeOrchestratorService,
 )
 
 
@@ -159,7 +159,7 @@ def test_video_verification_orchestrator_runs_full_flow():
 
     video_frame_analysis_service = FakeVideoFrameAnalysisService()
 
-    service = VideoVerificationOrchestratorService(
+    service = HeadPoseChallengeOrchestratorService(
         media_loader=FakeMediaLoader(),
         image_file_loader=FakeImageFileLoader(),
         video_frame_analysis_service=(video_frame_analysis_service),
