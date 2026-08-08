@@ -12,7 +12,7 @@ from media.image_file_loader import ImageFileLoader
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from services.video_action_check_service import VideoActionCheckService
-from ai_modules.face_verification.application.video_face_match_service import VideoFaceMatchService
+from ai_modules.face_verification.application.face_verification_service import FaceVerificationService
 from services.video_final_decision_service import VideoFinalDecisionService
 from services.video_liveness_service import VideoLivenessService
 from services.video_frame_analysis_service import (
@@ -28,7 +28,7 @@ class HeadPoseChallengeOrchestratorService:
         media_loader: MediaLoader,
         image_file_loader: ImageFileLoader,
         video_frame_analysis_service: VideoFrameAnalysisService,
-        face_match_service: VideoFaceMatchService,
+        face_match_service: FaceVerificationService,
         action_check_service: VideoActionCheckService,
         liveness_service: VideoLivenessService,
         passive_liveness_checker: BasePassiveLivenessChecker,

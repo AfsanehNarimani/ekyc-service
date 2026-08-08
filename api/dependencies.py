@@ -16,7 +16,7 @@ from core.liveness_action import LivenessAction
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from ai_modules.face_verification.domain.face_match_threshold_policy import FaceMatchThresholdPolicy
-from ai_modules.face_verification.application.video_face_match_service import VideoFaceMatchService
+from ai_modules.face_verification.application.face_verification_service import FaceVerificationService
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
@@ -143,8 +143,8 @@ def get_video_liveness_service() -> VideoLivenessService:
 
 
 @lru_cache
-def get_video_face_match_service() -> VideoFaceMatchService:
-    return VideoFaceMatchService(
+def get_video_face_match_service() -> FaceVerificationService:
+    return FaceVerificationService(
         preprocessor=get_face_preprocessor(),
         embedder=get_face_embedder(),
         threshold_policy=get_face_match_threshold_policy(),

@@ -12,7 +12,7 @@ from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
 
 
-class VideoFaceMatchService:
+class FaceVerificationService:
     def __init__(
         self,
         preprocessor: FacePreprocessor,

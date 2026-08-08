@@ -13,8 +13,8 @@ from core.video_frame import VideoFrame
 from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
-from ai_modules.face_verification.application.video_face_match_service import (
-    VideoFaceMatchService,
+from ai_modules.face_verification.application.face_verification_service import (
+    FaceVerificationService,
 )
 
 
@@ -101,8 +101,8 @@ def make_video_analysis(
 
 def make_service(
     vectors: list[np.ndarray],
-) -> VideoFaceMatchService:
-    return VideoFaceMatchService(
+) -> FaceVerificationService:
+    return FaceVerificationService(
         preprocessor=FakePreprocessor(),
         embedder=FakeEmbedder(vectors=vectors),
         threshold_policy=FaceMatchThresholdPolicy(
