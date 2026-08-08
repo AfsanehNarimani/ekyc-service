@@ -3,7 +3,7 @@ import pytest
 
 from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
 from core.face_detection import FaceDetection
-from face.single_face_validator import SingleFaceValidator
+from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 
 
 def make_detection() -> FaceDetection:

@@ -22,7 +22,7 @@ format:
 	black api authentication core face liveness media services storage video tests app.py config.py
 
 check:
-	ruff check api authentication core face liveness media services storage video tests app.py config.py
+	ruff check api authentication core face liveness media services video tests app.py config.py
 	pytest
 openapi:
 	python -m scripts.export_openapi

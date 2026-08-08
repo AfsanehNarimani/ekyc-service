@@ -7,13 +7,9 @@ from ai_modules.face_verification.infrastructure.preprocessing.face_aligner impo
 from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import FaceEmbedderFactory
 from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import FacePreprocessor
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
-from ai_modules.face_verification.application.enrollment_service import EnrollmentService
+from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
+from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 from liveness.expected_action_policy import ExpectedActionPolicy
-from ai_modules.face_verification.application.image_verification_service import ImageVerificationService
-from ai_modules.face_verification.infrastructure.persistence.embedding_store import EmbeddingStore
-from ai_modules.face_verification.infrastructure.persistence.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction
@@ -73,43 +69,9 @@ def get_face_embedder() -> BaseFaceEmbedder:
 
 
 @lru_cache
-def get_reference_store() -> ReferenceImageStore:
-    return ReferenceImageStore(
-        root_dir=settings.reference_dir,
-    )
-
-
-@lru_cache
-def get_embedding_store() -> EmbeddingStore:
-    return EmbeddingStore(
-        root_dir=settings.embedding_dir,
-    )
-
-
-@lru_cache
 def get_face_matcher() -> FaceMatcher:
     return FaceMatcher(
         threshold=settings.face_match_threshold,
-    )
-
-
-@lru_cache
-def get_enrollment_service() -> EnrollmentService:
-    return EnrollmentService(
-        preprocessor=get_face_preprocessor(),
-        embedder=get_face_embedder(),
-        reference_store=get_reference_store(),
-        embedding_store=get_embedding_store(),
-    )
-
-
-@lru_cache
-def get_image_verification_service() -> ImageVerificationService:
-    return ImageVerificationService(
-        preprocessor=get_face_preprocessor(),
-        embedder=get_face_embedder(),
-        embedding_store=get_embedding_store(),
-        matcher=get_face_matcher(),
     )
 
 

@@ -1,8 +1,8 @@
 from PIL import Image
 
 from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import FaceAligner
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
+from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
+from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 from core.face_detection import FaceDetection
 
 
