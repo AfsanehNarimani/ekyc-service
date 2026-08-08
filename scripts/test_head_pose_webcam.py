@@ -8,8 +8,8 @@ import cv2
 from PIL import Image
 
 from config import settings
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
+from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
+from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 import matplotlib.pyplot as plt
 
 

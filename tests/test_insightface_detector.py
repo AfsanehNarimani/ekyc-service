@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from face import insightface_detector
-from face.insightface_detector import (
+from ai_modules.face_verification.infrastructure.detection import insightface_detector
+from ai_modules.face_verification.infrastructure.detection.insightface_detector import (
     InsightFaceDetector,
 )
 
