@@ -1,7 +1,7 @@
 from api.video_verification_response_mapper import VideoVerificationResponseMapper
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
@@ -13,8 +13,8 @@ def test_video_verification_response_mapper_maps_result_to_response():
         correlation_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
         ],
         face_match=VideoFaceMatchResult(
             is_match=True,
@@ -29,16 +29,16 @@ def test_video_verification_response_mapper_maps_result_to_response():
         action_check=ActionCheckResult(
             passed=True,
             required_actions=[
-                HeadPoseAction.CENTER,
-                HeadPoseAction.LEFT,
+                HeadPoseActionType.CENTER,
+                HeadPoseActionType.LEFT,
             ],
             observed_actions=[
-                HeadPoseAction.CENTER,
-                HeadPoseAction.LEFT,
+                HeadPoseActionType.CENTER,
+                HeadPoseActionType.LEFT,
             ],
             compact_actions=[
-                HeadPoseAction.CENTER,
-                HeadPoseAction.LEFT,
+                HeadPoseActionType.CENTER,
+                HeadPoseActionType.LEFT,
             ],
             missing_actions=[],
             processed_frames=10,

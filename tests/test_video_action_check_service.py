@@ -6,7 +6,7 @@ from core.analyzed_video_frame import (
     VideoFrameAnalysisResult,
 )
 from core.face_detection import FaceDetection
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.video_frame import VideoFrame
 from liveness.head_pose_action_classifier import (
     HeadPoseActionClassifier,
@@ -88,21 +88,21 @@ def test_video_action_check_service_passes_expected_actions():
             ]
         ),
         expected_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
-            HeadPoseAction.RIGHT,
-            HeadPoseAction.UP,
-            HeadPoseAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ],
     )
 
     assert result.passed is True
     assert result.compact_actions == [
-        HeadPoseAction.CENTER,
-        HeadPoseAction.LEFT,
-        HeadPoseAction.RIGHT,
-        HeadPoseAction.DOWN,
-        HeadPoseAction.UP,
+        HeadPoseActionType.CENTER,
+        HeadPoseActionType.LEFT,
+        HeadPoseActionType.RIGHT,
+        HeadPoseActionType.DOWN,
+        HeadPoseActionType.UP,
     ]
     assert result.missing_actions == []
 
@@ -124,15 +124,15 @@ def test_video_action_check_service_detects_missing_action():
             ]
         ),
         expected_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
-            HeadPoseAction.RIGHT,
-            HeadPoseAction.UP,
-            HeadPoseAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ],
     )
 
     assert result.passed is False
     assert result.missing_actions == [
-        HeadPoseAction.DOWN,
+        HeadPoseActionType.DOWN,
     ]

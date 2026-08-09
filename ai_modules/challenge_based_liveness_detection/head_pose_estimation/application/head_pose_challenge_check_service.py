@@ -1,6 +1,6 @@
 from core.action_check_result import ActionCheckResult
 from core.analyzed_video_frame import VideoFrameAnalysisResult
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from liveness.head_pose_action_classifier import (
     HeadPoseActionClassifier,
 )
@@ -16,9 +16,9 @@ class HeadPoseChallengeCheckService:
     def check_actions(
         self,
         video_analysis: VideoFrameAnalysisResult,
-        expected_actions: list[HeadPoseAction],
+        expected_actions: list[HeadPoseActionType],
     ) -> ActionCheckResult:
-        observed_actions: list[HeadPoseAction] = []
+        observed_actions: list[HeadPoseActionType] = []
 
         for analyzed_frame in video_analysis.frames:
             action = self.classifier.classify(
@@ -49,9 +49,9 @@ class HeadPoseChallengeCheckService:
 
     def _remove_consecutive_duplicates(
         self,
-        actions: list[HeadPoseAction],
-    ) -> list[HeadPoseAction]:
-        compact_actions: list[HeadPoseAction] = []
+        actions: list[HeadPoseActionType],
+    ) -> list[HeadPoseActionType]:
+        compact_actions: list[HeadPoseActionType] = []
 
         for action in actions:
             if not compact_actions or compact_actions[-1] != action:
@@ -61,9 +61,9 @@ class HeadPoseChallengeCheckService:
 
     def _find_missing_actions_in_order(
         self,
-        expected_actions: list[HeadPoseAction],
-        observed_actions: list[HeadPoseAction],
-    ) -> list[HeadPoseAction]:
+        expected_actions: list[HeadPoseActionType],
+        observed_actions: list[HeadPoseActionType],
+    ) -> list[HeadPoseActionType]:
         observed_action_set = set(observed_actions)
 
         return [

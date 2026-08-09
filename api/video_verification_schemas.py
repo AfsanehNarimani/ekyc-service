@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 
 
 class VerifyVideoRequest(BaseModel):
     correlation_id: str | None = Field(default=None, min_length=1)
     challenge_id: str = Field(min_length=1)
-    expected_actions: list[HeadPoseAction] = Field(min_length=1)
+    expected_actions: list[HeadPoseActionType] = Field(min_length=1)
     national_id_image_uri: str = Field(min_length=1)
     video_uri: str = Field(min_length=1)
     face_match_level: int = Field(ge=1, le=3)

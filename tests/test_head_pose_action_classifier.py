@@ -1,7 +1,7 @@
 import numpy as np
 
 from core.face_detection import FaceDetection
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 
 
@@ -34,7 +34,7 @@ def test_classifier_detects_center():
         )
     )
 
-    assert action == HeadPoseAction.CENTER
+    assert action == HeadPoseActionType.CENTER
 
 
 def test_classifier_detects_left():
@@ -45,7 +45,7 @@ def test_classifier_detects_left():
         )
     )
 
-    assert action == HeadPoseAction.LEFT
+    assert action == HeadPoseActionType.LEFT
 
 
 def test_classifier_detects_right():
@@ -56,7 +56,7 @@ def test_classifier_detects_right():
         )
     )
 
-    assert action == HeadPoseAction.RIGHT
+    assert action == HeadPoseActionType.RIGHT
 
 
 def test_classifier_detects_up():
@@ -67,7 +67,7 @@ def test_classifier_detects_up():
         )
     )
 
-    assert action == HeadPoseAction.DOWN
+    assert action == HeadPoseActionType.DOWN
 
 
 def test_classifier_detects_down():
@@ -78,4 +78,4 @@ def test_classifier_detects_down():
         )
     )
 
-    assert action == HeadPoseAction.UP
+    assert action == HeadPoseActionType.UP

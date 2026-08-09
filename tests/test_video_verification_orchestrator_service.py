@@ -4,7 +4,7 @@ from PIL import Image
 
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
@@ -54,7 +54,7 @@ class FakeVideoActionCheckService:
     def check_actions(
         self,
         video_analysis,
-        expected_actions: list[HeadPoseAction],
+        expected_actions: list[HeadPoseActionType],
     ) -> ActionCheckResult:
         return ActionCheckResult(
             passed=True,
@@ -145,11 +145,11 @@ class FakeMediaCleanupService:
 def make_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
-            HeadPoseAction.RIGHT,
-            HeadPoseAction.UP,
-            HeadPoseAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ]
     )
 
@@ -176,11 +176,11 @@ def test_video_verification_orchestrator_runs_full_flow():
         correlation_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
-            HeadPoseAction.RIGHT,
-            HeadPoseAction.UP,
-            HeadPoseAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ],
         national_id_image_uri="s3://bucket/id.jpg",
         video_uri="s3://bucket/video.mp4",

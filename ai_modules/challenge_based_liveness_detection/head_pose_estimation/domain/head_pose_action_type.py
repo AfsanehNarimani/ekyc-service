@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class HeadPoseAction(str, Enum):
+class HeadPoseActionType(str, Enum):
     CENTER = "center"
     LEFT = "left"
     RIGHT = "right"

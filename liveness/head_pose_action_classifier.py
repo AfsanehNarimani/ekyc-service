@@ -1,5 +1,5 @@
 from core.face_detection import FaceDetection
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 
 
 class HeadPoseActionClassifier:
@@ -18,7 +18,7 @@ class HeadPoseActionClassifier:
     def classify(
         self,
         detection: FaceDetection,
-    ) -> HeadPoseAction | None:
+    ) -> HeadPoseActionType | None:
         if detection.pose is None:
             return None
 
@@ -28,18 +28,18 @@ class HeadPoseActionClassifier:
             abs(yaw) <= self.neutral_yaw_threshold
             and abs(pitch) <= self.neutral_pitch_threshold
         ):
-            return HeadPoseAction.CENTER
+            return HeadPoseActionType.CENTER
 
         if yaw >= self.yaw_threshold:
-            return HeadPoseAction.LEFT
+            return HeadPoseActionType.LEFT
 
         if yaw <= -self.yaw_threshold:
-            return HeadPoseAction.RIGHT
+            return HeadPoseActionType.RIGHT
 
         if pitch >= self.pitch_threshold:
-            return HeadPoseAction.UP
+            return HeadPoseActionType.UP
 
         if pitch <= -self.pitch_threshold:
-            return HeadPoseAction.DOWN
+            return HeadPoseActionType.DOWN
 
         return None

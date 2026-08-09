@@ -1,16 +1,16 @@
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 
 
 class ExpectedActionPolicy:
     def __init__(
         self,
-        required_actions: list[HeadPoseAction],
+        required_actions: list[HeadPoseActionType],
     ) -> None:
         self.required_actions = required_actions
 
     def validate(
         self,
-        expected_actions: list[HeadPoseAction],
+        expected_actions: list[HeadPoseActionType],
     ) -> None:
         # TODO accept all permutations after center
         if expected_actions != self.required_actions:

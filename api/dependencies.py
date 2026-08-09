@@ -10,7 +10,7 @@ from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor
 from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
 from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 from liveness.expected_action_policy import ExpectedActionPolicy
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from ai_modules.face_verification.domain.face_match_threshold_policy import FaceMatchThresholdPolicy
@@ -213,11 +213,11 @@ def get_error_response_factory() -> ErrorResponseFactory:
 def get_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            HeadPoseAction.CENTER,
-            HeadPoseAction.LEFT,
-            HeadPoseAction.RIGHT,
-            HeadPoseAction.UP,
-            HeadPoseAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ]
     )
 
