@@ -10,7 +10,7 @@ from PIL import Image
 from config import settings
 from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
 from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
-from liveness.head_pose_action_classifier import (
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import (
     HeadPoseActionClassifier,
 )
 

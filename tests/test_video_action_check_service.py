@@ -8,7 +8,7 @@ from core.analyzed_video_frame import (
 from core.face_detection import FaceDetection
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.video_frame import VideoFrame
-from liveness.head_pose_action_classifier import (
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import (
     HeadPoseActionClassifier,
 )
 from services.video_action_check_service import (
