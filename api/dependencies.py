@@ -10,8 +10,8 @@ from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor
 from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
 from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
 from liveness.expected_action_policy import ExpectedActionPolicy
-from liveness.challenge_service import ChallengeService
-from liveness.challenge_store import ChallengeStore
+# from liveness.challenge_service import ChallengeService
+# from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
@@ -71,19 +71,19 @@ def get_face_matcher() -> FaceMatcher:
     return FaceMatcher(
         threshold=settings.face_match_threshold,
     )
-
-
-@lru_cache
-def get_challenge_store() -> ChallengeStore:
-    return ChallengeStore()
-
-
-@lru_cache
-def get_challenge_service() -> ChallengeService:
-    return ChallengeService(
-        store=get_challenge_store(),
-        expires_in_seconds=120,
-    )
+#
+#
+# @lru_cache
+# def get_challenge_store() -> ChallengeStore:
+#     return ChallengeStore()
+#
+#
+# @lru_cache
+# def get_challenge_service() -> ChallengeService:
+#     return ChallengeService(
+#         store=get_challenge_store(),
+#         expires_in_seconds=120,
+#     )
 
 
 @lru_cache
@@ -215,11 +215,11 @@ def get_error_response_factory() -> ErrorResponseFactory:
 def get_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseAction.CENTER,
+            HeadPoseAction.LEFT,
+            HeadPoseAction.RIGHT,
+            HeadPoseAction.UP,
+            HeadPoseAction.DOWN,
         ]
     )
 
