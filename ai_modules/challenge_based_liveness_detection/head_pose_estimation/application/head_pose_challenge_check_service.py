@@ -14,6 +14,7 @@ class HeadPoseChallengeCheckService:
     ) -> None:
         self.head_pose_action_classifier = head_pose_action_classifier
 
+    # TODO rename the function
     def check_actions(
         self,
         video_analysis: VideoFrameAnalysisResult,
@@ -21,6 +22,7 @@ class HeadPoseChallengeCheckService:
     ) -> HeadPoseChallengeCheckResult:
         observed_actions: list[HeadPoseActionType] = []
 
+        # TODO a new class and function that gets the whole sequence of frames and pass the action sequence
         for analyzed_frame in video_analysis.frames:
             action = self.head_pose_action_classifier.classify(
                 analyzed_frame.detection,
