@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 from config import settings
 
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
@@ -51,7 +51,7 @@ class HeadPoseChallengeOrchestratorService:
         self,
         correlation_id: str,
         challenge_id: str,
-        expected_actions: list[LivenessAction],
+        expected_actions: list[HeadPoseAction],
         national_id_image_uri: str,
         video_uri: str,
         face_match_level: int,

@@ -4,7 +4,7 @@ from api.dependencies import get_video_verification_orchestrator_service
 from app import app
 from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
 from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import VideoFaceMatchResult
 from core.video_liveness_result import VideoLivenessResult
@@ -16,7 +16,7 @@ class FakeVideoVerificationOrchestratorService:
         self,
         correlation_id: str,
         challenge_id: str,
-        expected_actions: list[LivenessAction],
+        expected_actions: list[HeadPoseAction],
         national_id_image_uri: str,
         video_uri: str,
         face_match_level: int,

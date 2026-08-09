@@ -1,17 +1,17 @@
 import pytest
 
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
 from liveness.expected_action_policy import ExpectedActionPolicy
 
 
 def make_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseAction.CENTER,
+            HeadPoseAction.LEFT,
+            HeadPoseAction.RIGHT,
+            HeadPoseAction.UP,
+            HeadPoseAction.DOWN,
         ]
     )
 
@@ -21,11 +21,11 @@ def test_expected_action_policy_accepts_required_actions():
 
     policy.validate(
         [
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseAction.CENTER,
+            HeadPoseAction.LEFT,
+            HeadPoseAction.RIGHT,
+            HeadPoseAction.UP,
+            HeadPoseAction.DOWN,
         ]
     )
 
@@ -36,10 +36,10 @@ def test_expected_action_policy_rejects_missing_action():
     with pytest.raises(ValueError):
         policy.validate(
             [
-                LivenessAction.CENTER,
-                LivenessAction.LEFT,
-                LivenessAction.RIGHT,
-                LivenessAction.DOWN,
+                HeadPoseAction.CENTER,
+                HeadPoseAction.LEFT,
+                HeadPoseAction.RIGHT,
+                HeadPoseAction.DOWN,
             ]
         )
 
@@ -50,10 +50,10 @@ def test_expected_action_policy_rejects_wrong_order():
     with pytest.raises(ValueError):
         policy.validate(
             [
-                LivenessAction.CENTER,
-                LivenessAction.RIGHT,
-                LivenessAction.LEFT,
-                LivenessAction.UP,
-                LivenessAction.DOWN,
+                HeadPoseAction.CENTER,
+                HeadPoseAction.RIGHT,
+                HeadPoseAction.LEFT,
+                HeadPoseAction.UP,
+                HeadPoseAction.DOWN,
             ]
         )

@@ -6,7 +6,7 @@ from core.analyzed_video_frame import (
     VideoFrameAnalysisResult,
 )
 from core.face_detection import FaceDetection
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action import HeadPoseAction
 from core.video_frame import VideoFrame
 from liveness.head_pose_action_classifier import (
     HeadPoseActionClassifier,
@@ -88,21 +88,21 @@ def test_video_action_check_service_passes_expected_actions():
             ]
         ),
         expected_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseAction.CENTER,
+            HeadPoseAction.LEFT,
+            HeadPoseAction.RIGHT,
+            HeadPoseAction.UP,
+            HeadPoseAction.DOWN,
         ],
     )
 
     assert result.passed is True
     assert result.compact_actions == [
-        LivenessAction.CENTER,
-        LivenessAction.LEFT,
-        LivenessAction.RIGHT,
-        LivenessAction.DOWN,
-        LivenessAction.UP,
+        HeadPoseAction.CENTER,
+        HeadPoseAction.LEFT,
+        HeadPoseAction.RIGHT,
+        HeadPoseAction.DOWN,
+        HeadPoseAction.UP,
     ]
     assert result.missing_actions == []
 
@@ -124,15 +124,15 @@ def test_video_action_check_service_detects_missing_action():
             ]
         ),
         expected_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseAction.CENTER,
+            HeadPoseAction.LEFT,
+            HeadPoseAction.RIGHT,
+            HeadPoseAction.UP,
+            HeadPoseAction.DOWN,
         ],
     )
 
     assert result.passed is False
     assert result.missing_actions == [
-        LivenessAction.DOWN,
+        HeadPoseAction.DOWN,
     ]
