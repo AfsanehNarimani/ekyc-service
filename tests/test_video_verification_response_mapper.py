@@ -1,5 +1,5 @@
 from api.video_verification_response_mapper import VideoVerificationResponseMapper
-from core.action_check_result import ActionCheckResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
 from core.final_decision import FinalDecision
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
@@ -26,7 +26,7 @@ def test_video_verification_response_mapper_maps_result_to_response():
             skipped_frames=1,
             frame_scores=[0.76],
         ),
-        action_check=ActionCheckResult(
+        action_check=HeadPoseChallengeCheckResult(
             passed=True,
             required_actions=[
                 HeadPoseActionType.CENTER,

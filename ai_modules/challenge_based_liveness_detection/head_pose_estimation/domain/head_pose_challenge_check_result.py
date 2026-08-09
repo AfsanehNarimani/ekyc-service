@@ -4,7 +4,7 @@ from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.h
 
 
 @dataclass(frozen=True, slots=True)
-class ActionCheckResult:
+class HeadPoseChallengeCheckResult:
     passed: bool
     required_actions: list[HeadPoseActionType]
     observed_actions: list[HeadPoseActionType]

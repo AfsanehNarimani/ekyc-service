@@ -1,4 +1,4 @@
-from core.action_check_result import ActionCheckResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
 from core.analyzed_video_frame import VideoFrameAnalysisResult
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from liveness.head_pose_action_classifier import (
@@ -17,7 +17,7 @@ class HeadPoseChallengeCheckService:
         self,
         video_analysis: VideoFrameAnalysisResult,
         expected_actions: list[HeadPoseActionType],
-    ) -> ActionCheckResult:
+    ) -> HeadPoseChallengeCheckResult:
         observed_actions: list[HeadPoseActionType] = []
 
         for analyzed_frame in video_analysis.frames:
@@ -37,7 +37,7 @@ class HeadPoseChallengeCheckService:
             observed_actions=compact_actions,
         )
 
-        return ActionCheckResult(
+        return HeadPoseChallengeCheckResult(
             passed=len(missing_actions) == 0,
             required_actions=expected_actions,
             observed_actions=observed_actions,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from core.action_check_result import ActionCheckResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
 from core.final_decision import FinalDecision
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
@@ -14,7 +14,7 @@ class VideoVerificationResult:
     challenge_id: str
     expected_actions: list[HeadPoseActionType]
     face_match: VideoFaceMatchResult
-    action_check: ActionCheckResult
+    action_check: HeadPoseChallengeCheckResult
     liveness: VideoLivenessResult
     passive_liveness: PassiveLivenessResult
     final_decision: FinalDecision
