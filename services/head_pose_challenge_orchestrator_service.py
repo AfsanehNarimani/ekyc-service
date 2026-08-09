@@ -11,7 +11,7 @@ from liveness.expected_action_policy import ExpectedActionPolicy
 from media.image_file_loader import ImageFileLoader
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
-from services.video_action_check_service import VideoActionCheckService
+from ai_modules import HeadPoseChallengeCheckService
 from ai_modules.face_verification.application.face_verification_service import FaceVerificationService
 from services.video_final_decision_service import VideoFinalDecisionService
 from services.video_liveness_service import VideoLivenessService
@@ -29,7 +29,7 @@ class HeadPoseChallengeOrchestratorService:
         image_file_loader: ImageFileLoader,
         video_frame_analysis_service: VideoFrameAnalysisService,
         face_match_service: FaceVerificationService,
-        action_check_service: VideoActionCheckService,
+        head_pose_challenge_check_service: HeadPoseChallengeCheckService,
         liveness_service: VideoLivenessService,
         passive_liveness_checker: BasePassiveLivenessChecker,
         final_decision_service: VideoFinalDecisionService,
@@ -40,7 +40,7 @@ class HeadPoseChallengeOrchestratorService:
         self.image_file_loader = image_file_loader
         self.video_frame_analysis_service = video_frame_analysis_service
         self.face_match_service = face_match_service
-        self.action_check_service = action_check_service
+        self.head_pose_challenge_check_service = head_pose_challenge_check_service
         self.liveness_service = liveness_service
         self.passive_liveness_checker = passive_liveness_checker
         self.final_decision_service = final_decision_service
@@ -104,7 +104,7 @@ class HeadPoseChallengeOrchestratorService:
                 face_match_result.score,
             )
 
-            action_check_result = self.action_check_service.check_actions(
+            action_check_result = self.head_pose_challenge_check_service.check_actions(
                 video_analysis=video_analysis,
                 expected_actions=expected_actions,
             )

@@ -22,10 +22,8 @@ from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 from services.readiness_service import ReadinessService
 from services.verification_config_service import VerificationConfigService
-from services.head_pose_challenge_orchestrator_service import (
-    HeadPoseChallengeOrchestratorService,
-)
-from services.video_action_check_service import VideoActionCheckService
+from services.head_pose_challenge_orchestrator_service import HeadPoseChallengeOrchestratorService
+from ai_modules import HeadPoseChallengeCheckService
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,
     LivenessThresholds,
@@ -169,8 +167,8 @@ def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
 
 
 @lru_cache
-def get_video_action_check_service() -> VideoActionCheckService:
-    return VideoActionCheckService(
+def get_head_pose_challenge_check_service() -> HeadPoseChallengeCheckService:
+    return HeadPoseChallengeCheckService(
         classifier=get_head_pose_action_classifier(),
     )
 
@@ -194,7 +192,7 @@ def get_video_verification_orchestrator_service() -> (
         image_file_loader=get_image_file_loader(),
         video_frame_analysis_service=(get_video_frame_analysis_service()),
         face_match_service=get_video_face_match_service(),
-        action_check_service=get_video_action_check_service(),
+        head_pose_challenge_check_service=get_head_pose_challenge_check_service(),
         liveness_service=get_video_liveness_service(),
         passive_liveness_checker=get_passive_liveness_checker(),
         final_decision_service=get_video_final_decision_service(),
