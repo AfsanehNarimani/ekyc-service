@@ -1,24 +1,26 @@
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
-# TODO should be refactored
-from core.analyzed_video_frame import VideoFrameAnalysisResult
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import \
+    HeadPoseActionType
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import \
+    HeadPoseChallengeCheckResult
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import (
     HeadPoseActionClassifier,
 )
+# TODO should be refactored
+from core.analyzed_video_frame import VideoFrameAnalysisResult
 
 
 class HeadPoseChallengeCheckService:
     def __init__(
-        self,
-        head_pose_action_classifier: HeadPoseActionClassifier,
+            self,
+            head_pose_action_classifier: HeadPoseActionClassifier,
     ) -> None:
         self.head_pose_action_classifier = head_pose_action_classifier
 
     # TODO rename the function
     def check_actions(
-        self,
-        video_analysis: VideoFrameAnalysisResult,
-        expected_actions: list[HeadPoseActionType],
+            self,
+            video_analysis: VideoFrameAnalysisResult,
+            expected_actions: list[HeadPoseActionType],
     ) -> HeadPoseChallengeCheckResult:
         observed_actions: list[HeadPoseActionType] = []
 
@@ -50,9 +52,9 @@ class HeadPoseChallengeCheckService:
             skipped_frames=video_analysis.skipped_frames,
         )
 
+    @staticmethod
     def _remove_consecutive_duplicates(
-        self,
-        actions: list[HeadPoseActionType],
+            actions: list[HeadPoseActionType],
     ) -> list[HeadPoseActionType]:
         compact_actions: list[HeadPoseActionType] = []
 
@@ -62,10 +64,10 @@ class HeadPoseChallengeCheckService:
 
         return compact_actions
 
+    @staticmethod
     def _find_missing_actions_in_order(
-        self,
-        expected_actions: list[HeadPoseActionType],
-        observed_actions: list[HeadPoseActionType],
+            expected_actions: list[HeadPoseActionType],
+            observed_actions: list[HeadPoseActionType],
     ) -> list[HeadPoseActionType]:
         observed_action_set = set(observed_actions)
 
