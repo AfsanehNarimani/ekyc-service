@@ -70,19 +70,6 @@ def get_face_matcher() -> FaceMatcher:
     return FaceMatcher(
         threshold=settings.face_match_threshold,
     )
-#
-#
-# @lru_cache
-# def get_challenge_store() -> ChallengeStore:
-#     return ChallengeStore()
-#
-#
-# @lru_cache
-# def get_challenge_service() -> ChallengeService:
-#     return ChallengeService(
-#         store=get_challenge_store(),
-#         expires_in_seconds=120,
-#     )
 
 
 @lru_cache
