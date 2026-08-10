@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_detector import \
+    HeadPoseActionDetector
 from config import settings
 from ai_modules.face_verification.infrastructure.embedders.base_embedder import BaseFaceEmbedder
 from api.error_response_factory import ErrorResponseFactory
@@ -17,7 +19,6 @@ from ai_modules.face_verification.domain.face_match_threshold_policy import Face
 from ai_modules.face_verification.application.face_verification_service import FaceVerificationService
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import HeadPoseActionClassifier
 from services.readiness_service import ReadinessService
 from services.verification_config_service import VerificationConfigService
 from services.head_pose_challenge_orchestrator_service import HeadPoseChallengeOrchestratorService
@@ -155,8 +156,8 @@ def get_image_file_loader() -> ImageFileLoader:
 
 
 @lru_cache
-def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
-    return HeadPoseActionClassifier(
+def get_head_pose_action_detector() -> HeadPoseActionDetector:
+    return HeadPoseActionDetector(
         yaw_threshold=settings.head_pose_yaw_threshold,
         pitch_threshold=settings.head_pose_pitch_threshold,
         neutral_yaw_threshold=settings.head_pose_neutral_yaw_threshold,
@@ -167,7 +168,7 @@ def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
 @lru_cache
 def get_head_pose_challenge_check_service() -> HeadPoseChallengeCheckService:
     return HeadPoseChallengeCheckService(
-        head_pose_action_classifier=get_head_pose_action_classifier(),
+        head_pose_action_detector=get_head_pose_action_detector(),
     )
 
 

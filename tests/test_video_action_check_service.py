@@ -8,16 +8,14 @@ from core.analyzed_video_frame import (
 from core.face_detection import FaceDetection
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.video_frame import VideoFrame
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import (
-    HeadPoseActionClassifier,
-)
-from services.video_action_check_service import (
-    VideoActionCheckService,
-)
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
+    .infrastructure.head_pose_action_detector import HeadPoseActionDetector
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
+    .application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
 
 
-def make_classifier() -> HeadPoseActionClassifier:
-    return HeadPoseActionClassifier(
+def make_head_pose_action_detector() -> HeadPoseActionDetector:
+    return HeadPoseActionDetector(
         yaw_threshold=15.0,
         pitch_threshold=10.0,
         neutral_yaw_threshold=8.0,
@@ -72,8 +70,8 @@ def make_video_analysis(
 
 
 def test_video_action_check_service_passes_expected_actions():
-    service = VideoActionCheckService(
-        classifier=make_classifier(),
+    service = HeadPoseChallengeCheckService(
+        head_pose_action_detector=make_head_pose_action_detector(),
     )
 
     result = service.check_head_pose_actions(
@@ -108,8 +106,8 @@ def test_video_action_check_service_passes_expected_actions():
 
 
 def test_video_action_check_service_detects_missing_action():
-    service = VideoActionCheckService(
-        classifier=make_classifier(),
+    service = HeadPoseChallengeCheckService(
+        head_pose_action_detector=make_head_pose_action_detector(),
     )
 
     result = service.check_head_pose_actions(
