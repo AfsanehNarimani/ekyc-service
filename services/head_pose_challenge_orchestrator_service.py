@@ -104,7 +104,7 @@ class HeadPoseChallengeOrchestratorService:
                 face_match_result.score,
             )
 
-            action_check_result = self.head_pose_challenge_check_service.check_actions(
+            action_check_result = self.head_pose_challenge_check_service.check_head_pose_actions(
                 video_analysis=video_analysis,
                 expected_actions=expected_actions,
             )

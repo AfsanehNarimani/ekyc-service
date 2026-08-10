@@ -76,7 +76,7 @@ def test_video_action_check_service_passes_expected_actions():
         classifier=make_classifier(),
     )
 
-    result = service.check_actions(
+    result = service.check_head_pose_actions(
         video_analysis=make_video_analysis(
             poses=[
                 (0.0, 0.0, 0.0),
@@ -112,7 +112,7 @@ def test_video_action_check_service_detects_missing_action():
         classifier=make_classifier(),
     )
 
-    result = service.check_actions(
+    result = service.check_head_pose_actions(
         video_analysis=make_video_analysis(
             poses=[
                 (0.0, 0.0, 0.0),

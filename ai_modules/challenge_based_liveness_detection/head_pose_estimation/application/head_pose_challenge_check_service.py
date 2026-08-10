@@ -16,7 +16,7 @@ class HeadPoseChallengeCheckService:
         self.head_pose_action_classifier = head_pose_action_classifier
 
     # TODO rename the function
-    def check_actions(
+    def check_head_pose_actions(
             self,
             video_analysis: VideoFrameAnalysisResult,
             expected_actions: list[HeadPoseActionType],
