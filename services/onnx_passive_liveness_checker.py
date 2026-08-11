@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-from core.analyzed_video_frame import VideoFrameAnalysisResult
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from core.passive_liveness_result import PassiveLivenessResult
 from liveness.base_passive_liveness_checker import (
     BasePassiveLivenessChecker,

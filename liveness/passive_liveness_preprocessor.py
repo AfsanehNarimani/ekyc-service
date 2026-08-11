@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 
 
 @dataclass(frozen=True, slots=True)

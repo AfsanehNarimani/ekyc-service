@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from liveness.onnx_passive_liveness_model import ONNXPassiveLivenessModel
 
 

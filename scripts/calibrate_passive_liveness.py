@@ -7,7 +7,8 @@ from pathlib import Path
 
 from api.dependencies import (
     get_passive_liveness_checker,
-    get_video_frame_analysis_service,
+    get_video_frame_extractor,
+    get_face_detection_service,
 )
 from config import settings
 from core.passive_liveness_calibration import (
@@ -183,7 +184,8 @@ def run_calibration(
         manifest_path=manifest_path,
     )
 
-    analyzer = get_video_frame_analysis_service()
+    frame_extractor = get_video_frame_extractor()
+    face_detection_service = get_face_detection_service()
     checker = get_passive_liveness_checker()
 
     sample_results: list[CalibrationSampleResult] = []
@@ -195,8 +197,12 @@ def run_calibration(
     ):
         print(f"[{index}/{len(samples)}] " f"processing {sample.sample_id}")
 
-        video_analysis = analyzer.analyze(
+        frames = frame_extractor.extract(
             video_path=sample.video_path,
+        )
+
+        video_analysis = face_detection_service.detect_from_frames(
+            frames=frames,
         )
 
         result = checker.check(

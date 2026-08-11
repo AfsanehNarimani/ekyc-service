@@ -1,6 +1,6 @@
 import numpy as np
 
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from core.liveness_action import LivenessAction
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 

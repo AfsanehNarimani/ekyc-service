@@ -6,11 +6,13 @@ from core.action_check_result import ActionCheckResult
 from core.final_decision import FinalDecision
 from core.liveness_action import LivenessAction
 from core.passive_liveness_result import PassiveLivenessResult
-from core.video_face_match_result import VideoFaceMatchResult
+from ai_modules.face_verification.domain.video_face_match_result import (
+    VideoFaceMatchResult,
+)
 from core.video_liveness_result import VideoLivenessResult
 from liveness.expected_action_policy import ExpectedActionPolicy
-from services.video_verification_orchestrator_service import (
-    VideoVerificationOrchestratorService,
+from services.head_pose_challenge_orchestrator_service import (
+    HeadPoseChallengeOrchestratorService,
 )
 
 
@@ -31,13 +33,19 @@ class FakeImageFileLoader:
         return Image.new("RGB", (112, 112))
 
 
-class FakeVideoFaceMatchService:
-    def match_id_card_to_video(
+class FakeFaceVerificationService:
+    def __init__(self) -> None:
+        self.call_count = 0
+
+    def verify_frames_faces_with_reference_face(
         self,
-        national_id_image,
-        video_analysis,
+        reference_image,
+        reference_face_detection_result,
+        frames_face_detection_result,
         strictness_level: int,
     ) -> VideoFaceMatchResult:
+        self.call_count += 1
+
         return VideoFaceMatchResult(
             is_match=True,
             score=0.76,
@@ -142,6 +150,41 @@ class FakeMediaCleanupService:
         self.cleaned_paths.extend(paths)
 
 
+class FakeVideoFrameExtractor:
+    def __init__(self) -> None:
+        self.call_count = 0
+        self.frames = [object()]
+
+    def extract(
+        self,
+        video_path: Path,
+    ) -> list[object]:
+        self.call_count += 1
+        return self.frames
+
+
+class FakeFaceDetectionService:
+    def __init__(self) -> None:
+        self.image_call_count = 0
+        self.frames_call_count = 0
+        self.reference_detection = object()
+        self.frames_detection_result = object()
+
+    def detect_from_image(
+        self,
+        image: Image.Image,
+    ):
+        self.image_call_count += 1
+        return self.reference_detection
+
+    def detect_from_frames(
+        self,
+        frames,
+    ):
+        self.frames_call_count += 1
+        return self.frames_detection_result
+
+
 def make_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
@@ -157,13 +200,16 @@ def make_expected_action_policy() -> ExpectedActionPolicy:
 def test_video_verification_orchestrator_runs_full_flow():
     media_cleanup_service = FakeMediaCleanupService()
 
-    video_frame_analysis_service = FakeVideoFrameAnalysisService()
+    video_frame_extractor = FakeVideoFrameExtractor()
+    face_detection_service = FakeFaceDetectionService()
+    face_verification_service = FakeFaceVerificationService()
 
-    service = VideoVerificationOrchestratorService(
+    service = HeadPoseChallengeOrchestratorService(
         media_loader=FakeMediaLoader(),
         image_file_loader=FakeImageFileLoader(),
-        video_frame_analysis_service=(video_frame_analysis_service),
-        face_match_service=FakeVideoFaceMatchService(),
+        video_frame_extractor=video_frame_extractor,
+        face_detection_service=face_detection_service,
+        face_verification_service=face_verification_service,
         action_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
         passive_liveness_checker=FakePassiveLivenessChecker(),
@@ -206,17 +252,7 @@ def test_video_verification_orchestrator_runs_full_flow():
     ]
     assert result.final_decision.passive_liveness_enforced is False
 
-    assert video_frame_analysis_service.call_count == 1
-
-
-class FakeVideoFrameAnalysisService:
-    def __init__(self) -> None:
-        self.call_count = 0
-        self.analysis = object()
-
-    def analyze(
-        self,
-        video_path: Path,
-    ):
-        self.call_count += 1
-        return self.analysis
+    assert video_frame_extractor.call_count == 1
+    assert face_detection_service.image_call_count == 1
+    assert face_detection_service.frames_call_count == 1
+    assert face_verification_service.call_count == 1

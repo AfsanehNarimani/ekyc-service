@@ -2,7 +2,7 @@ from typing import Protocol
 
 import numpy as np
 
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 
 
 class PassiveLivenessScoringModel(Protocol):
