@@ -1,4 +1,4 @@
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from core.liveness_action import LivenessAction
 
 

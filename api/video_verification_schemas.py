@@ -5,7 +5,7 @@ from core.liveness_action import LivenessAction
 
 class VerifyVideoRequest(BaseModel):
     correlation_id: str | None = Field(default=None, min_length=1)
-    challenge_id: str = Field(min_length=1)
+    challenge_id: str | None = Field(default=None, min_length=1)
     expected_actions: list[LivenessAction] = Field(min_length=1)
     national_id_image_uri: str = Field(min_length=1)
     video_uri: str = Field(min_length=1)

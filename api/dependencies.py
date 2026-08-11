@@ -1,33 +1,43 @@
 from functools import lru_cache
 
 from config import settings
-from face.base_embedder import BaseFaceEmbedder
+from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
+    BaseFaceEmbedder,
+)
 from api.error_response_factory import ErrorResponseFactory
-from face.face_aligner import FaceAligner
-from face.face_embedder_factory import FaceEmbedderFactory
-from face.face_matcher import FaceMatcher
-from face.face_preprocessor import FacePreprocessor
-from face.insightface_detector import InsightFaceDetector
-from face.single_face_validator import SingleFaceValidator
-from services.enrollment_service import EnrollmentService
+from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import (
+    FaceAligner,
+)
+from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import (
+    FaceEmbedderFactory,
+)
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
+from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import (
+    FacePreprocessor,
+)
+from ai_modules.face_detection.infrastructure.insightface_detector import (
+    InsightFaceDetector,
+)
+from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
 from liveness.expected_action_policy import ExpectedActionPolicy
-from services.image_verification_service import ImageVerificationService
-from storage.embedding_store import EmbeddingStore
-from storage.reference_image_store import ReferenceImageStore
 from liveness.challenge_service import ChallengeService
 from liveness.challenge_store import ChallengeStore
 from core.liveness_action import LivenessAction
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
-from face.face_match_threshold_policy import FaceMatchThresholdPolicy
-from services.video_face_match_service import VideoFaceMatchService
+from ai_modules.face_verification.domain.face_match_threshold_policy import (
+    FaceMatchThresholdPolicy,
+)
+from ai_modules.face_verification.application.face_verification_service import (
+    FaceVerificationService,
+)
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
 from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 from services.readiness_service import ReadinessService
 from services.verification_config_service import VerificationConfigService
-from services.video_verification_orchestrator_service import (
-    VideoVerificationOrchestratorService,
+from services.head_pose_challenge_orchestrator_service import (
+    HeadPoseChallengeOrchestratorService,
 )
 from services.video_action_check_service import VideoActionCheckService
 from liveness.liveness_threshold_policy import (
@@ -47,8 +57,8 @@ from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
 from liveness.passive_liveness_ensemble_model import (
     PassiveLivenessEnsembleModel,
 )
-from services.video_frame_analysis_service import (
-    VideoFrameAnalysisService,
+from ai_modules.face_detection.application.face_detection_service import (
+    FaceDetectionService,
 )
 
 
@@ -73,43 +83,9 @@ def get_face_embedder() -> BaseFaceEmbedder:
 
 
 @lru_cache
-def get_reference_store() -> ReferenceImageStore:
-    return ReferenceImageStore(
-        root_dir=settings.reference_dir,
-    )
-
-
-@lru_cache
-def get_embedding_store() -> EmbeddingStore:
-    return EmbeddingStore(
-        root_dir=settings.embedding_dir,
-    )
-
-
-@lru_cache
 def get_face_matcher() -> FaceMatcher:
     return FaceMatcher(
         threshold=settings.face_match_threshold,
-    )
-
-
-@lru_cache
-def get_enrollment_service() -> EnrollmentService:
-    return EnrollmentService(
-        preprocessor=get_face_preprocessor(),
-        embedder=get_face_embedder(),
-        reference_store=get_reference_store(),
-        embedding_store=get_embedding_store(),
-    )
-
-
-@lru_cache
-def get_image_verification_service() -> ImageVerificationService:
-    return ImageVerificationService(
-        preprocessor=get_face_preprocessor(),
-        embedder=get_face_embedder(),
-        embedding_store=get_embedding_store(),
-        matcher=get_face_matcher(),
     )
 
 
@@ -181,13 +157,13 @@ def get_video_liveness_service() -> VideoLivenessService:
 
 
 @lru_cache
-def get_video_face_match_service() -> VideoFaceMatchService:
-    return VideoFaceMatchService(
+def get_face_verification_service() -> FaceVerificationService:
+    return FaceVerificationService(
         preprocessor=get_face_preprocessor(),
         embedder=get_face_embedder(),
         threshold_policy=get_face_match_threshold_policy(),
-        neutral_yaw_threshold=(settings.head_pose_neutral_yaw_threshold),
-        neutral_pitch_threshold=(settings.head_pose_neutral_pitch_threshold),
+        neutral_yaw_threshold=settings.head_pose_neutral_yaw_threshold,
+        neutral_pitch_threshold=settings.head_pose_neutral_pitch_threshold,
     )
 
 
@@ -225,13 +201,14 @@ def get_verification_config_service() -> VerificationConfigService:
 
 @lru_cache
 def get_video_verification_orchestrator_service() -> (
-    VideoVerificationOrchestratorService
+    HeadPoseChallengeOrchestratorService
 ):
-    return VideoVerificationOrchestratorService(
+    return HeadPoseChallengeOrchestratorService(
         media_loader=get_media_loader(),
         image_file_loader=get_image_file_loader(),
-        video_frame_analysis_service=(get_video_frame_analysis_service()),
-        face_match_service=get_video_face_match_service(),
+        video_frame_extractor=get_video_frame_extractor(),
+        face_detection_service=get_face_detection_service(),
+        face_verification_service=get_face_verification_service(),
         action_check_service=get_video_action_check_service(),
         liveness_service=get_video_liveness_service(),
         passive_liveness_checker=get_passive_liveness_checker(),
@@ -376,9 +353,8 @@ def get_onnx_passive_liveness_checker() -> ONNXPassiveLivenessChecker:
 
 
 @lru_cache
-def get_video_frame_analysis_service() -> VideoFrameAnalysisService:
-    return VideoFrameAnalysisService(
-        frame_extractor=get_video_frame_extractor(),
+def get_face_detection_service() -> FaceDetectionService:
+    return FaceDetectionService(
         detector=get_face_detector(),
         validator=get_single_face_validator(),
     )

@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from liveness.passive_liveness_preprocessor import (
     PassiveLivenessPreprocessor,
 )

@@ -3,7 +3,8 @@ from pathlib import Path
 
 from api.dependencies import (
     get_passive_liveness_checker,
-    get_video_frame_analysis_service,
+    get_face_detection_service,
+    get_video_frame_extractor,
 )
 
 
@@ -14,8 +15,15 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    video_analysis = get_video_frame_analysis_service().analyze(
+    frame_extractor = get_video_frame_extractor()
+    face_detection_service = get_face_detection_service()
+
+    frames = frame_extractor.extract(
         video_path=Path(args.video),
+    )
+
+    video_analysis = face_detection_service.detect_from_frames(
+        frames=frames,
     )
     checker = get_passive_liveness_checker()
 

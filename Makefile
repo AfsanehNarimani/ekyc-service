@@ -1,5 +1,19 @@
 .PHONY: install install-dev run test test-fast lint format check openapi clean
 
+SOURCE_PATHS = \
+	api \
+	authentication \
+	core \
+	ai_modules \
+	liveness \
+	media \
+	services \
+	video_processing \
+	scripts \
+	tests \
+	app.py \
+	config.py
+
 install:
 	python -m pip install -r requirements.txt
 
@@ -10,23 +24,24 @@ run:
 	uvicorn app:app --reload
 
 test:
-	pytest
+	python -m pytest
 
 test-fast:
-	pytest tests
+	python -m pytest -q tests ai_modules
 
 lint:
-	ruff check api authentication core face liveness media services storage video tests app.py config.py
+	ruff check $(SOURCE_PATHS)
 
 format:
-	black api authentication core face liveness media services storage video tests app.py config.py
+	black $(SOURCE_PATHS)
 
 check:
-	ruff check api authentication core face liveness media services storage video tests app.py config.py
-	pytest
+	ruff check $(SOURCE_PATHS)
+	python -m pytest
+
 openapi:
 	python -m scripts.export_openapi
-	
+
 clean:
 	find . -name "__pycache__" -type d -exec rm -rf {} +
 	find . -name ".pytest_cache" -type d -exec rm -rf {} +

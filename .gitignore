@@ -19,6 +19,7 @@ logs/
 # macOS
 .DS_Store
 .idea/
+.vscode/
 
 # Passive liveness calibration data
 calibration/data/
@@ -26,6 +27,7 @@ calibration/results/
 
 .env.docker
 
-# Generated head-pose test outputs
+# Tests & Scripts outputs
 results/head_pose/
 Video-sample/
+scripts/results/

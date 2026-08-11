@@ -1,5 +1,5 @@
 from core.action_check_result import ActionCheckResult
-from core.analyzed_video_frame import VideoFrameAnalysisResult
+from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
 from core.liveness_action import LivenessAction
 from liveness.head_pose_action_classifier import (
     HeadPoseActionClassifier,

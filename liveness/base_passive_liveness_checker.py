@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from core.passive_liveness_result import PassiveLivenessResult
-from core.analyzed_video_frame import (
+from ai_modules.face_detection.domain.analyzed_video_frame import (
     VideoFrameAnalysisResult,
 )
 

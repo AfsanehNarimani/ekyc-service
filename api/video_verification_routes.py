@@ -24,8 +24,8 @@ from core.exceptions import (
     MediaLoadError,
     NoUsableVideoFrameError,
 )
-from services.video_verification_orchestrator_service import (
-    VideoVerificationOrchestratorService,
+from services.head_pose_challenge_orchestrator_service import (
+    HeadPoseChallengeOrchestratorService,
 )
 from api.authentication_dependencies import authenticate_service
 from authentication.authenticated_service import AuthenticatedService
@@ -69,7 +69,7 @@ router = APIRouter(
 def verify_video(
     request: VerifyVideoRequest,
     _authenticated_service: AuthenticatedService | None = Depends(authenticate_service),
-    service: VideoVerificationOrchestratorService = Depends(
+    service: HeadPoseChallengeOrchestratorService = Depends(
         get_video_verification_orchestrator_service
     ),
     _capacity_slot: None = Depends(acquire_verification_capacity),
@@ -79,12 +79,13 @@ def verify_video(
     error_response_factory: ErrorResponseFactory = Depends(get_error_response_factory),
 ) -> VerifyVideoResponse | JSONResponse:
     correlation_id = request.correlation_id or uuid.uuid4().hex
+    challenge_id = request.challenge_id or uuid.uuid4().hex
     started_at = time.perf_counter()
 
     try:
         result = service.verify(
             correlation_id=correlation_id,
-            challenge_id=request.challenge_id,
+            challenge_id=challenge_id ,
             expected_actions=request.expected_actions,
             national_id_image_uri=request.national_id_image_uri,
             video_uri=request.video_uri,

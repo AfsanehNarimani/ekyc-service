@@ -1,11 +1,11 @@
 import numpy as np
 from PIL import Image
 
-from core.analyzed_video_frame import (
+from ai_modules.face_detection.domain.analyzed_video_frame import (
     AnalyzedVideoFrame,
     VideoFrameAnalysisResult,
 )
-from core.face_detection import FaceDetection
+from ai_modules.face_detection.domain.face_detection import FaceDetection
 from core.video_frame import VideoFrame
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,

@@ -1,3 +1,4 @@
+# Should be moved to the video_processing/domain
 from dataclasses import dataclass
 
 from PIL import Image
