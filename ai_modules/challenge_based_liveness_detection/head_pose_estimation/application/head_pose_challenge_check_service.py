@@ -5,7 +5,7 @@ from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
     infrastructure.head_pose_action_detector import HeadPoseActionDetector
 # TODO should be refactored
-from core.analyzed_video_frame import VideoFrameAnalysisResult
+from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
 
 
 class HeadPoseChallengeCheckService:

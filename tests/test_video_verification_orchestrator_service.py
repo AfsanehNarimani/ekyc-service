@@ -59,7 +59,7 @@ class FakeFaceVerificationService:
 
 
 class FakeVideoActionCheckService:
-    def check_actions(
+    def check_head_pose_actions(
         self,
         video_analysis,
         expected_actions: list[HeadPoseActionType],
@@ -210,7 +210,7 @@ def test_video_verification_orchestrator_runs_full_flow():
         video_frame_extractor=video_frame_extractor,
         face_detection_service=face_detection_service,
         face_verification_service=face_verification_service,
-        action_check_service=FakeVideoActionCheckService(),
+        head_pose_challenge_check_service=FakeVideoActionCheckService(),
         liveness_service=FakeVideoLivenessService(),
         passive_liveness_checker=FakePassiveLivenessChecker(),
         final_decision_service=FakeFinalDecisionService(),

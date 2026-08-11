@@ -1,5 +1,5 @@
 from ai_modules.face_detection.domain.face_detection import FaceDetection
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 
 
 class HeadPoseActionClassifier:

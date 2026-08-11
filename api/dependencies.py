@@ -38,7 +38,6 @@ from services.verification_config_service import VerificationConfigService
 from services.head_pose_challenge_orchestrator_service import (
     HeadPoseChallengeOrchestratorService,
 )
-from services.video_action_check_service import VideoActionCheckService
 from ai_modules import HeadPoseChallengeCheckService
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,
