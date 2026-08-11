@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+# TODO only expose required classes and functions of ai_modules and encapsulate others
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
     application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation \

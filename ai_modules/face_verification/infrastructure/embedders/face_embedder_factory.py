@@ -39,6 +39,7 @@ class FaceEmbedderFactory:
         self,
         model_name: str,
     ) -> ONNXFaceEmbedder:
+        # TODO add other models to the factory whenever you want to optimize the response time.
         validate_face_model_name(model_name)
 
         return ONNXFaceEmbedder(
