@@ -16,7 +16,13 @@ from core.exceptions import (
     MultipleFacesDetectedError,
     NoFaceDetectedError,
 )
+<<<<<<<< HEAD:ai_modules/face_detection/application/face_detection_service.py
 from core.video_frame import VideoFrame
+========
+from ai_modules.face_verification.infrastructure.detection.insightface_detector import InsightFaceDetector
+from ai_modules.face_verification.infrastructure.detection.single_face_validator import SingleFaceValidator
+from video_processing.video_frame_extractor import VideoFrameExtractor
+>>>>>>>> refactor/modularize_pose:services/video_frame_analysis_service.py
 
 
 class FaceDetectionService:

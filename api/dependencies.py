@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_detector import \
+    HeadPoseActionDetector
 from config import settings
 from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
     BaseFaceEmbedder,
@@ -20,9 +22,7 @@ from ai_modules.face_detection.infrastructure.insightface_detector import (
 )
 from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
 from liveness.expected_action_policy import ExpectedActionPolicy
-from liveness.challenge_service import ChallengeService
-from liveness.challenge_store import ChallengeStore
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
 from ai_modules.face_verification.domain.face_match_threshold_policy import (
@@ -33,13 +33,13 @@ from ai_modules.face_verification.application.face_verification_service import (
 )
 from video_processing.video_frame_extractor import VideoFrameExtractor
 from media.image_file_loader import ImageFileLoader
-from liveness.head_pose_action_classifier import HeadPoseActionClassifier
 from services.readiness_service import ReadinessService
 from services.verification_config_service import VerificationConfigService
 from services.head_pose_challenge_orchestrator_service import (
     HeadPoseChallengeOrchestratorService,
 )
 from services.video_action_check_service import VideoActionCheckService
+from ai_modules import HeadPoseChallengeCheckService
 from liveness.liveness_threshold_policy import (
     LivenessThresholdPolicy,
     LivenessThresholds,
@@ -86,19 +86,6 @@ def get_face_embedder() -> BaseFaceEmbedder:
 def get_face_matcher() -> FaceMatcher:
     return FaceMatcher(
         threshold=settings.face_match_threshold,
-    )
-
-
-@lru_cache
-def get_challenge_store() -> ChallengeStore:
-    return ChallengeStore()
-
-
-@lru_cache
-def get_challenge_service() -> ChallengeService:
-    return ChallengeService(
-        store=get_challenge_store(),
-        expires_in_seconds=120,
     )
 
 
@@ -173,8 +160,8 @@ def get_image_file_loader() -> ImageFileLoader:
 
 
 @lru_cache
-def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
-    return HeadPoseActionClassifier(
+def get_head_pose_action_detector() -> HeadPoseActionDetector:
+    return HeadPoseActionDetector(
         yaw_threshold=settings.head_pose_yaw_threshold,
         pitch_threshold=settings.head_pose_pitch_threshold,
         neutral_yaw_threshold=settings.head_pose_neutral_yaw_threshold,
@@ -183,9 +170,9 @@ def get_head_pose_action_classifier() -> HeadPoseActionClassifier:
 
 
 @lru_cache
-def get_video_action_check_service() -> VideoActionCheckService:
-    return VideoActionCheckService(
-        classifier=get_head_pose_action_classifier(),
+def get_head_pose_challenge_check_service() -> HeadPoseChallengeCheckService:
+    return HeadPoseChallengeCheckService(
+        head_pose_action_detector=get_head_pose_action_detector(),
     )
 
 
@@ -199,6 +186,7 @@ def get_verification_config_service() -> VerificationConfigService:
     return VerificationConfigService()
 
 
+# TODO rename function
 @lru_cache
 def get_video_verification_orchestrator_service() -> (
     HeadPoseChallengeOrchestratorService
@@ -209,7 +197,7 @@ def get_video_verification_orchestrator_service() -> (
         video_frame_extractor=get_video_frame_extractor(),
         face_detection_service=get_face_detection_service(),
         face_verification_service=get_face_verification_service(),
-        action_check_service=get_video_action_check_service(),
+        head_pose_challenge_check_service=get_head_pose_challenge_check_service(),
         liveness_service=get_video_liveness_service(),
         passive_liveness_checker=get_passive_liveness_checker(),
         final_decision_service=get_video_final_decision_service(),
@@ -232,11 +220,11 @@ def get_error_response_factory() -> ErrorResponseFactory:
 def get_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ]
     )
 

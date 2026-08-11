@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 from config import settings
 
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
@@ -11,7 +11,7 @@ from liveness.expected_action_policy import ExpectedActionPolicy
 from media.image_file_loader import ImageFileLoader
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
-from services.video_action_check_service import VideoActionCheckService
+from ai_modules import HeadPoseChallengeCheckService
 from ai_modules.face_verification.application.face_verification_service import (
     FaceVerificationService,
 )
@@ -33,8 +33,7 @@ class HeadPoseChallengeOrchestratorService:
         video_frame_extractor: VideoFrameExtractor,
         face_detection_service: FaceDetectionService,
         face_verification_service: FaceVerificationService,
-        action_check_service: VideoActionCheckService,
-        liveness_service: VideoLivenessService,
+        head_pose_challenge_check_service: HeadPoseChallengeCheckService,        liveness_service: VideoLivenessService,
         passive_liveness_checker: BasePassiveLivenessChecker,
         final_decision_service: VideoFinalDecisionService,
         expected_action_policy: ExpectedActionPolicy,
@@ -45,7 +44,7 @@ class HeadPoseChallengeOrchestratorService:
         self.video_frame_extractor = video_frame_extractor
         self.face_detection_service = face_detection_service
         self.face_verification_service = face_verification_service
-        self.action_check_service = action_check_service
+        self.head_pose_challenge_check_service = head_pose_challenge_check_service
         self.liveness_service = liveness_service
         self.passive_liveness_checker = passive_liveness_checker
         self.final_decision_service = final_decision_service
@@ -56,7 +55,7 @@ class HeadPoseChallengeOrchestratorService:
         self,
         correlation_id: str,
         challenge_id: str,
-        expected_actions: list[LivenessAction],
+        expected_actions: list[HeadPoseActionType],
         national_id_image_uri: str,
         video_uri: str,
         face_match_level: int,
@@ -124,7 +123,7 @@ class HeadPoseChallengeOrchestratorService:
                 face_verification_result.score,
             )
 
-            action_check_result = self.action_check_service.check_actions(
+            action_check_result = self.head_pose_challenge_check_service.check_head_pose_actions(
                 video_analysis=frames_face_detection_result,
                 expected_actions=expected_actions,
             )

@@ -2,9 +2,9 @@ from pathlib import Path
 
 from PIL import Image
 
-from core.action_check_result import ActionCheckResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
 from core.final_decision import FinalDecision
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import (
     VideoFaceMatchResult,
@@ -62,9 +62,9 @@ class FakeVideoActionCheckService:
     def check_actions(
         self,
         video_analysis,
-        expected_actions: list[LivenessAction],
-    ) -> ActionCheckResult:
-        return ActionCheckResult(
+        expected_actions: list[HeadPoseActionType],
+    ) -> HeadPoseChallengeCheckResult:
+        return HeadPoseChallengeCheckResult(
             passed=True,
             required_actions=expected_actions,
             observed_actions=expected_actions,
@@ -188,11 +188,11 @@ class FakeFaceDetectionService:
 def make_expected_action_policy() -> ExpectedActionPolicy:
     return ExpectedActionPolicy(
         required_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ]
     )
 
@@ -222,11 +222,11 @@ def test_video_verification_orchestrator_runs_full_flow():
         correlation_id="trace-1",
         challenge_id="challenge-1",
         expected_actions=[
-            LivenessAction.CENTER,
-            LivenessAction.LEFT,
-            LivenessAction.RIGHT,
-            LivenessAction.UP,
-            LivenessAction.DOWN,
+            HeadPoseActionType.CENTER,
+            HeadPoseActionType.LEFT,
+            HeadPoseActionType.RIGHT,
+            HeadPoseActionType.UP,
+            HeadPoseActionType.DOWN,
         ],
         national_id_image_uri="s3://bucket/id.jpg",
         video_uri="s3://bucket/video.mp4",

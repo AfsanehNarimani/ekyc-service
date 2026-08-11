@@ -2,9 +2,9 @@ from fastapi.testclient import TestClient
 
 from api.dependencies import get_video_verification_orchestrator_service
 from app import app
-from core.action_check_result import ActionCheckResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
 from core.final_decision import FinalDecision
-from core.liveness_action import LivenessAction
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_verification.domain.video_face_match_result import (
     VideoFaceMatchResult,
@@ -18,7 +18,7 @@ class FakeVideoVerificationOrchestratorService:
         self,
         correlation_id: str,
         challenge_id: str,
-        expected_actions: list[LivenessAction],
+        expected_actions: list[HeadPoseActionType],
         national_id_image_uri: str,
         video_uri: str,
         face_match_level: int,
@@ -38,7 +38,7 @@ class FakeVideoVerificationOrchestratorService:
                 skipped_frames=2,
                 frame_scores=[0.76],
             ),
-            action_check=ActionCheckResult(
+            action_check=HeadPoseChallengeCheckResult(
                 passed=True,
                 required_actions=expected_actions,
                 observed_actions=expected_actions,

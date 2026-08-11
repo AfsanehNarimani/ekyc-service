@@ -18,7 +18,7 @@ class HeadPoseActionClassifier:
     def classify(
         self,
         detection: FaceDetection,
-    ) -> LivenessAction | None:
+    ) -> HeadPoseActionType | None:
         if detection.pose is None:
             return None
 
@@ -28,18 +28,18 @@ class HeadPoseActionClassifier:
             abs(yaw) <= self.neutral_yaw_threshold
             and abs(pitch) <= self.neutral_pitch_threshold
         ):
-            return LivenessAction.CENTER
+            return HeadPoseActionType.CENTER
 
         if yaw >= self.yaw_threshold:
-            return LivenessAction.LEFT
+            return HeadPoseActionType.LEFT
 
         if yaw <= -self.yaw_threshold:
-            return LivenessAction.RIGHT
+            return HeadPoseActionType.RIGHT
 
         if pitch >= self.pitch_threshold:
-            return LivenessAction.UP
+            return HeadPoseActionType.UP
 
         if pitch <= -self.pitch_threshold:
-            return LivenessAction.DOWN
+            return HeadPoseActionType.DOWN
 
         return None
