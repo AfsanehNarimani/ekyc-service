@@ -40,6 +40,7 @@ class FaceEmbedderFactory:
         model_name: str,
     ) -> ONNXFaceEmbedder:
         # TODO add other models to the factory whenever you want to optimize the response time.
+        # TODO Check if the model is implemented do it, else raise NotImplementedError
         validate_face_model_name(model_name)
 
         return ONNXFaceEmbedder(

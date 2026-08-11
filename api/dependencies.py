@@ -80,7 +80,8 @@ def get_face_embedder() -> BaseFaceEmbedder:
     factory = FaceEmbedderFactory.from_settings(
         providers=["CPUExecutionProvider"],
     )
-
+    # TODO the line of code that determines we use default_face_model should not be in dependencies.
+    #  Maybe in a config in ai_modules/face_verification/domain
     return factory.create(
         model_name=settings.default_face_model,
     )

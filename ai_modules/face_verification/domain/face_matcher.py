@@ -1,3 +1,4 @@
+# TODO should be moved to the infrastructure since it doesn't have any information about the business
 from dataclasses import dataclass
 
 import numpy as np
