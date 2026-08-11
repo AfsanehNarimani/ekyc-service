@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
 
 
 class VerifyVideoRequest(BaseModel):

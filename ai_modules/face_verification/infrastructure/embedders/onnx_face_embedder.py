@@ -8,10 +8,10 @@ from ai_modules.face_verification.domain.face_model_profile import FaceModelProf
 from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
     BaseFaceEmbedder,
 )
+from ai_modules.face_verification.infrastructure.inference.onnx_runner import ONNXRunner
 from ai_modules.face_verification.infrastructure.preprocessing.model_preprocessor import (
     ModelPreprocessor,
 )
-from ai_modules.face_verification.infrastructure.inference.onnx_runner import ONNXRunner
 
 
 class ONNXFaceEmbedder(BaseFaceEmbedder):

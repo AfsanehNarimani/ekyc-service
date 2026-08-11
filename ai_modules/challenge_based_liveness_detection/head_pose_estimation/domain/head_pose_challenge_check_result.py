@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
 
 
 @dataclass(frozen=True, slots=True)

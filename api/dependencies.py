@@ -1,64 +1,68 @@
 from functools import lru_cache
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_detector import \
-    HeadPoseActionDetector
-from config import settings
-from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
-    BaseFaceEmbedder,
-)
-from api.error_response_factory import ErrorResponseFactory
-from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import (
-    FaceAligner,
-)
-from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import (
-    FaceEmbedderFactory,
-)
-from ai_modules.face_verification.domain.face_matcher import FaceMatcher
-from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import (
-    FacePreprocessor,
-)
-from ai_modules.face_detection.infrastructure.insightface_detector import (
-    InsightFaceDetector,
-)
-from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
-from liveness.expected_action_policy import ExpectedActionPolicy
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
-from media.media_cleanup_service import MediaCleanupService
-from media.media_loader import MediaLoader
-from ai_modules.face_verification.domain.face_match_threshold_policy import (
-    FaceMatchThresholdPolicy,
-)
-from ai_modules.face_verification.application.face_verification_service import (
-    FaceVerificationService,
-)
-from video_processing.video_frame_extractor import VideoFrameExtractor
-from media.image_file_loader import ImageFileLoader
-from services.readiness_service import ReadinessService
-from services.verification_config_service import VerificationConfigService
-from services.head_pose_challenge_orchestrator_service import (
-    HeadPoseChallengeOrchestratorService,
-)
-from ai_modules import HeadPoseChallengeCheckService
-from liveness.liveness_threshold_policy import (
-    LivenessThresholdPolicy,
-    LivenessThresholds,
-)
-from services.video_liveness_service import VideoLivenessService
-from services.video_final_decision_service import VideoFinalDecisionService
-from api.video_verification_response_mapper import VideoVerificationResponseMapper
-from liveness.passive_liveness_threshold_policy import (
-    PassiveLivenessThresholdPolicy,
-)
-from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
-from liveness.onnx_passive_liveness_model import ONNXPassiveLivenessModel
-from liveness.passive_liveness_preprocessor import PassiveLivenessPreprocessor
-from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
-from liveness.passive_liveness_ensemble_model import (
-    PassiveLivenessEnsembleModel,
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
+    application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
+    .infrastructure.head_pose_action_detector import HeadPoseActionDetector
+
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
 )
 from ai_modules.face_detection.application.face_detection_service import (
     FaceDetectionService,
 )
+from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
+from ai_modules.face_detection.infrastructure.insightface_detector import (
+    InsightFaceDetector,
+)
+from ai_modules.face_verification.application.face_verification_service import (
+    FaceVerificationService,
+)
+from ai_modules.face_verification.domain.face_match_threshold_policy import (
+    FaceMatchThresholdPolicy,
+)
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
+from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
+    BaseFaceEmbedder,
+)
+from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import (
+    FaceEmbedderFactory,
+)
+from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import (
+    FaceAligner,
+)
+from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor import (
+    FacePreprocessor,
+)
+from api.error_response_factory import ErrorResponseFactory
+from api.video_verification_response_mapper import VideoVerificationResponseMapper
+from config import settings
+from liveness.expected_action_policy import ExpectedActionPolicy
+from liveness.liveness_threshold_policy import (
+    LivenessThresholdPolicy,
+    LivenessThresholds,
+)
+from liveness.onnx_passive_liveness_model import ONNXPassiveLivenessModel
+from liveness.passive_liveness_ensemble_model import (
+    PassiveLivenessEnsembleModel,
+)
+from liveness.passive_liveness_preprocessor import PassiveLivenessPreprocessor
+from liveness.passive_liveness_threshold_policy import (
+    PassiveLivenessThresholdPolicy,
+)
+from media.image_file_loader import ImageFileLoader
+from media.media_cleanup_service import MediaCleanupService
+from media.media_loader import MediaLoader
+from services.head_pose_challenge_orchestrator_service import (
+    HeadPoseChallengeOrchestratorService,
+)
+from services.onnx_passive_liveness_checker import ONNXPassiveLivenessChecker
+from services.readiness_service import ReadinessService
+from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
+from services.verification_config_service import VerificationConfigService
+from services.video_final_decision_service import VideoFinalDecisionService
+from services.video_liveness_service import VideoLivenessService
+from video_processing.video_frame_extractor import VideoFrameExtractor
 
 
 @lru_cache

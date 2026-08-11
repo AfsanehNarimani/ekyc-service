@@ -1,8 +1,10 @@
 import pytest
 from PIL import Image
 
+from ai_modules.face_verification.infrastructure.embedders.edgeface_embedder import (
+    EdgeFaceEmbedder,
+)
 from config import settings
-from ai_modules.face_verification.infrastructure.embedders.edgeface_embedder import EdgeFaceEmbedder
 
 
 def test_edgeface_embedder_extracts_512d_embedding():

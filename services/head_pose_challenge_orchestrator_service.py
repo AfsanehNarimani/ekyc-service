@@ -1,9 +1,20 @@
 import logging
 import time
 from pathlib import Path
-from config import settings
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
+    application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
+
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
+from ai_modules.face_detection.application.face_detection_service import (
+    FaceDetectionService,
+)
+from ai_modules.face_verification.application.face_verification_service import (
+    FaceVerificationService,
+)
+from config import settings
 from core.media_reference import MediaReference
 from core.video_verification_result import VideoVerificationResult
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
@@ -11,15 +22,8 @@ from liveness.expected_action_policy import ExpectedActionPolicy
 from media.image_file_loader import ImageFileLoader
 from media.media_cleanup_service import MediaCleanupService
 from media.media_loader import MediaLoader
-from ai_modules import HeadPoseChallengeCheckService
-from ai_modules.face_verification.application.face_verification_service import (
-    FaceVerificationService,
-)
 from services.video_final_decision_service import VideoFinalDecisionService
 from services.video_liveness_service import VideoLivenessService
-from ai_modules.face_detection.application.face_detection_service import (
-    FaceDetectionService,
-)
 from video_processing.video_frame_extractor import VideoFrameExtractor
 
 logger = logging.getLogger(__name__)

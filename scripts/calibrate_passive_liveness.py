@@ -6,9 +6,9 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from api.dependencies import (
+    get_face_detection_service,
     get_passive_liveness_checker,
     get_video_frame_extractor,
-    get_face_detection_service,
 )
 from config import settings
 from core.passive_liveness_calibration import (

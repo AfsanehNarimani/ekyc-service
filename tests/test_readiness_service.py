@@ -1,8 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from config import settings
 from services.readiness_service import ReadinessService
-import pytest
 
 
 @pytest.fixture(autouse=True)

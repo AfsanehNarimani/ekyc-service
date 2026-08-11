@@ -7,6 +7,10 @@ import uuid
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
+from api.authentication_dependencies import authenticate_service
+from api.capacity_dependencies import (
+    acquire_verification_capacity,
+)
 from api.dependencies import (
     get_error_response_factory,
     get_video_verification_orchestrator_service,
@@ -19,6 +23,7 @@ from api.video_verification_schemas import (
     VerifyVideoRequest,
     VerifyVideoResponse,
 )
+from authentication.authenticated_service import AuthenticatedService
 from core.exceptions import (
     InvalidVideoError,
     MediaLoadError,
@@ -26,11 +31,6 @@ from core.exceptions import (
 )
 from services.head_pose_challenge_orchestrator_service import (
     HeadPoseChallengeOrchestratorService,
-)
-from api.authentication_dependencies import authenticate_service
-from authentication.authenticated_service import AuthenticatedService
-from api.capacity_dependencies import (
-    acquire_verification_capacity,
 )
 
 logger = logging.getLogger(__name__)

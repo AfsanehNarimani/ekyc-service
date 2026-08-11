@@ -1,5 +1,5 @@
-from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
 from ai_modules.face_detection.domain.face_detection import FaceDetection
+from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
 
 
 # TODO change it to MultiFaceHandler, add a function for handle_image and another function for handle_frames

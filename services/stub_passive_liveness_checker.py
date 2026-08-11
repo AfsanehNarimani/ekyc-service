@@ -1,9 +1,11 @@
+from ai_modules.face_detection.domain.analyzed_video_frame import (
+    VideoFrameAnalysisResult,
+)
 from core.passive_liveness_result import PassiveLivenessResult
 from liveness.base_passive_liveness_checker import BasePassiveLivenessChecker
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )
-from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
 
 
 class StubPassiveLivenessChecker(BasePassiveLivenessChecker):

@@ -2,10 +2,14 @@ import argparse
 from collections import Counter
 from pathlib import Path
 
-from config import settings
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import HeadPoseActionClassifier
-from ai_modules.face_detection.infrastructure.insightface_detector import InsightFaceDetector
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_classifier import (
+    HeadPoseActionClassifier,
+)
 from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
+from ai_modules.face_detection.infrastructure.insightface_detector import (
+    InsightFaceDetector,
+)
+from config import settings
 from video_processing.video_frame_extractor import VideoFrameExtractor
 
 

@@ -1,17 +1,19 @@
 import numpy as np
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
+    .application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
+    .infrastructure.head_pose_action_detector import HeadPoseActionDetector
 from PIL import Image
 
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
 from ai_modules.face_detection.domain.analyzed_video_frame import (
     AnalyzedVideoFrame,
     VideoFrameAnalysisResult,
 )
 from ai_modules.face_detection.domain.face_detection import FaceDetection
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
 from core.video_frame import VideoFrame
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
-    .infrastructure.head_pose_action_detector import HeadPoseActionDetector
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation \
-    .application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
 
 
 def make_head_pose_action_detector() -> HeadPoseActionDetector:

@@ -5,12 +5,14 @@ from datetime import datetime
 from pathlib import Path
 
 import cv2
+import matplotlib.pyplot as plt
 from PIL import Image
 
-from config import settings
-from ai_modules.face_detection.infrastructure.insightface_detector import InsightFaceDetector
 from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
-import matplotlib.pyplot as plt
+from ai_modules.face_detection.infrastructure.insightface_detector import (
+    InsightFaceDetector,
+)
+from config import settings
 
 
 def parse_args() -> argparse.Namespace:

@@ -1,5 +1,5 @@
-from fastapi.security import HTTPAuthorizationCredentials
 import pytest
+from fastapi.security import HTTPAuthorizationCredentials
 
 from api.authentication_dependencies import authenticate_service
 from authentication.authenticated_service import AuthenticatedService

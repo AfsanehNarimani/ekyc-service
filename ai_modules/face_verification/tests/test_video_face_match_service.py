@@ -6,16 +6,16 @@ from ai_modules.face_detection.domain.analyzed_video_frame import (
     AnalyzedVideoFrame,
     VideoFrameAnalysisResult,
 )
-from core.exceptions import NoUsableVideoFrameError
 from ai_modules.face_detection.domain.face_detection import FaceDetection
-from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
-from core.video_frame import VideoFrame
-from ai_modules.face_verification.domain.face_match_threshold_policy import (
-    FaceMatchThresholdPolicy,
-)
 from ai_modules.face_verification.application.face_verification_service import (
     FaceVerificationService,
 )
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
+from ai_modules.face_verification.domain.face_match_threshold_policy import (
+    FaceMatchThresholdPolicy,
+)
+from core.exceptions import NoUsableVideoFrameError
+from core.video_frame import VideoFrame
 
 
 class FakePreprocessor:

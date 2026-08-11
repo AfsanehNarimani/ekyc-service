@@ -4,13 +4,13 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 from api.dependencies import (
+    get_face_detection_service,
     get_face_embedder,
     get_face_preprocessor,
-    get_face_detection_service,
     get_video_frame_extractor,
 )
-from ai_modules.face_verification.domain.face_matcher import FaceMatcher
 
 
 def main() -> None:

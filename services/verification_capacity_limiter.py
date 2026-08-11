@@ -1,6 +1,6 @@
+from collections.abc import Iterator
 from contextlib import contextmanager
 from threading import BoundedSemaphore
-from typing import Iterator
 
 from core.exceptions import ServiceCapacityExceededError
 

@@ -1,13 +1,13 @@
 from PIL import Image
 
-from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import (
-    FaceAligner,
-)
+from ai_modules.face_detection.domain.face_detection import FaceDetection
+from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
 from ai_modules.face_detection.infrastructure.insightface_detector import (
     InsightFaceDetector,
 )
-from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
-from ai_modules.face_detection.domain.face_detection import FaceDetection
+from ai_modules.face_verification.infrastructure.preprocessing.face_aligner import (
+    FaceAligner,
+)
 
 
 class FacePreprocessor:

@@ -1,10 +1,10 @@
 import pytest
 from PIL import Image
 
-from config import settings
 from ai_modules.face_verification.infrastructure.embedders.face_embedder_factory import (
     FaceEmbedderFactory,
 )
+from config import settings
 
 
 def test_face_embedder_factory_has_all_profiles():

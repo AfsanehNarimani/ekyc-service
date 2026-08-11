@@ -1,6 +1,6 @@
 import pytest
 
-import api.dependencies as dependencies
+from api import dependencies
 from config import settings
 from services.stub_passive_liveness_checker import StubPassiveLivenessChecker
 

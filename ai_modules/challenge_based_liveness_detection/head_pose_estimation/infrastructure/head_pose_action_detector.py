@@ -1,11 +1,13 @@
-from typing import TypeAlias
 
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
     domain.head_pose_action_type import HeadPoseActionType
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
     infrastructure.head_pose_action_classifier import HeadPoseActionClassifier
+
 # TODO should be refactored
-from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
+from ai_modules.face_detection.domain.analyzed_video_frame import (
+    VideoFrameAnalysisResult,
+)
 
 # HeadPose: TypeAlias = tuple[float, float, float]
 # HeadPoseSequence: TypeAlias = list[HeadPose]

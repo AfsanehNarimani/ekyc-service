@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from core.passive_liveness_result import PassiveLivenessResult
 from ai_modules.face_detection.domain.analyzed_video_frame import (
     VideoFrameAnalysisResult,
 )
+from core.passive_liveness_result import PassiveLivenessResult
 
 
 class BasePassiveLivenessChecker(ABC):

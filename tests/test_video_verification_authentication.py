@@ -1,22 +1,21 @@
-from fastapi.testclient import TestClient
-
-from api.authentication_dependencies import (
-    get_keycloak_jwt_validator,
-    authenticate_service,
-)
-from app import app
-from authentication.authenticated_service import AuthenticatedService
-from authentication.exceptions import (
-    AuthenticationConfigurationError,
-)
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
+from fastapi.testclient import TestClient
 
+from api.authentication_dependencies import (
+    authenticate_service,
+    get_keycloak_jwt_validator,
+)
 from api.dependencies import (
     get_video_verification_orchestrator_service,
+)
+from app import app
+from authentication.authenticated_service import AuthenticatedService
+from authentication.exceptions import (
+    AuthenticationConfigurationError,
 )
 from authentication.keycloak_jwt_validator import (
     KeycloakJWTValidator,

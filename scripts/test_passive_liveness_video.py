@@ -2,8 +2,8 @@ import argparse
 from pathlib import Path
 
 from api.dependencies import (
-    get_passive_liveness_checker,
     get_face_detection_service,
+    get_passive_liveness_checker,
     get_video_frame_extractor,
 )
 

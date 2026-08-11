@@ -1,8 +1,7 @@
-from pathlib import Path
 import time
+from pathlib import Path
 
 import cv2
-
 
 OUTPUT_DIR = Path.home() / "Desktop"
 IMAGE_PATH = OUTPUT_DIR / "id_card.jpg"

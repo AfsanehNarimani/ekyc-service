@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from functools import lru_cache
-from typing import Iterator
 
 from fastapi import Depends
 

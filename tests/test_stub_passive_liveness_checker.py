@@ -1,4 +1,6 @@
-from ai_modules.face_detection.domain.analyzed_video_frame import VideoFrameAnalysisResult
+from ai_modules.face_detection.domain.analyzed_video_frame import (
+    VideoFrameAnalysisResult,
+)
 from liveness.passive_liveness_threshold_policy import (
     PassiveLivenessThresholdPolicy,
 )

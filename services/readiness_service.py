@@ -1,6 +1,6 @@
-from urllib.parse import urlparse
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlparse
 
 from config import settings
 

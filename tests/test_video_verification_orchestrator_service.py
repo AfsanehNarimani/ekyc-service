@@ -2,13 +2,17 @@ from pathlib import Path
 
 from PIL import Image
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
-from core.final_decision import FinalDecision
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import HeadPoseActionType
-from core.passive_liveness_result import PassiveLivenessResult
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import (
+    HeadPoseChallengeCheckResult,
+)
 from ai_modules.face_verification.domain.video_face_match_result import (
     VideoFaceMatchResult,
 )
+from core.final_decision import FinalDecision
+from core.passive_liveness_result import PassiveLivenessResult
 from core.video_liveness_result import VideoLivenessResult
 from liveness.expected_action_policy import ExpectedActionPolicy
 from services.head_pose_challenge_orchestrator_service import (

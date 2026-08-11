@@ -10,13 +10,13 @@ from api.exception_handlers import (
     service_authentication_exception_handler,
     service_capacity_exception_handler,
 )
-from api.video_verification_routes import router as video_verification_router
 from api.readiness_routes import router as readiness_router
-from config import settings
+from api.video_verification_routes import router as video_verification_router
 from authentication.exceptions import (
     AuthenticationConfigurationError,
     ServiceAuthenticationError,
 )
+from config import settings
 from core.exceptions import ServiceCapacityExceededError
 
 logging.basicConfig(

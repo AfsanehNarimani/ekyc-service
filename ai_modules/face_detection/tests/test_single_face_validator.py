@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
 from ai_modules.face_detection.domain.face_detection import FaceDetection
 from ai_modules.face_detection.domain.single_face_validator import SingleFaceValidator
+from core.exceptions import MultipleFacesDetectedError, NoFaceDetectedError
 
 
 def make_detection() -> FaceDetection:

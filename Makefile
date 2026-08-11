@@ -27,16 +27,17 @@ test:
 	python -m pytest
 
 test-fast:
+    # TODO: How just including tests and ai_modules is a fast test?
 	python -m pytest -q tests ai_modules
 
 lint:
 	ruff check $(SOURCE_PATHS)
 
 format:
+	ruff check --fix $(SOURCE_PATHS)
 	black $(SOURCE_PATHS)
 
-check:
-	ruff check $(SOURCE_PATHS)
+check: lint
 	python -m pytest
 
 openapi:
