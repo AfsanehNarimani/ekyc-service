@@ -42,7 +42,7 @@ class VideoFrameExtractor:
 
             frame_step = max(
                 1,
-                int(round(fps * self.frame_interval_seconds)),
+                round(fps * self.frame_interval_seconds),
             )
 
             frames: list[VideoFrame] = []

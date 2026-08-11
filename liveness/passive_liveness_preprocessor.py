@@ -87,10 +87,10 @@ class PassiveLivenessPreprocessor:
         crop_width = box_width * self.crop_scale
         crop_height = box_height * self.crop_scale
 
-        left = int(round(center_x - crop_width / 2.0))
-        top = int(round(center_y - crop_height / 2.0))
-        right = int(round(center_x + crop_width / 2.0))
-        bottom = int(round(center_y + crop_height / 2.0))
+        left = round(center_x - crop_width / 2.0)
+        top = round(center_y - crop_height / 2.0)
+        right = round(center_x + crop_width / 2.0)
+        bottom = round(center_y + crop_height / 2.0)
 
         left = max(0, left)
         top = max(0, top)
