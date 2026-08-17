@@ -1,9 +1,12 @@
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
-domain.head_pose_action_type import HeadPoseActionType
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
-    domain.head_pose_challenge_check_result import HeadPoseChallengeCheckResult
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
-    infrastructure.head_pose_action_detector import HeadPoseActionDetector
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
+    HeadPoseActionType,
+)
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_challenge_check_result import (
+    HeadPoseChallengeCheckResult,
+)
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.infrastructure.head_pose_action_detector import (
+    HeadPoseActionDetector,
+)
 
 # TODO should be refactored
 from ai_modules.face_detection.domain.analyzed_video_frame import (
@@ -13,15 +16,15 @@ from ai_modules.face_detection.domain.analyzed_video_frame import (
 
 class HeadPoseChallengeCheckService:
     def __init__(
-            self,
-            head_pose_action_detector: HeadPoseActionDetector,
+        self,
+        head_pose_action_detector: HeadPoseActionDetector,
     ) -> None:
         self.head_pose_action_detector = head_pose_action_detector
 
     def check_head_pose_actions(
-            self,
-            video_analysis: VideoFrameAnalysisResult,
-            expected_actions: list[HeadPoseActionType],
+        self,
+        video_analysis: VideoFrameAnalysisResult,
+        expected_actions: list[HeadPoseActionType],
     ) -> HeadPoseChallengeCheckResult:
 
         observed_actions = self.head_pose_action_detector.detect(video_analysis)
@@ -48,7 +51,7 @@ class HeadPoseChallengeCheckService:
     # TODO move to infrastructure
     @staticmethod
     def _remove_consecutive_duplicates(
-            actions: list[HeadPoseActionType],
+        actions: list[HeadPoseActionType],
     ) -> list[HeadPoseActionType]:
         compact_actions: list[HeadPoseActionType] = []
 
@@ -61,8 +64,8 @@ class HeadPoseChallengeCheckService:
     # TODO move to infrastructure
     @staticmethod
     def _find_missing_actions_in_order(
-            expected_actions: list[HeadPoseActionType],
-            observed_actions: list[HeadPoseActionType],
+        expected_actions: list[HeadPoseActionType],
+        observed_actions: list[HeadPoseActionType],
     ) -> list[HeadPoseActionType]:
         observed_action_set = set(observed_actions)
 

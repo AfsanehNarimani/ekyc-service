@@ -35,12 +35,14 @@ def generate_metadata(
 
             sample_class = extract_class_from_samples(file_relative_path)
 
-            records.append({
-                "file_name": file_relative_path,
-                "class": sample_class,
-                "source": "",
-                "active_v1": True,
-            })
+            records.append(
+                {
+                    "file_name": file_relative_path,
+                    "class": sample_class,
+                    "source": "",
+                    "active_v1": True,
+                }
+            )
 
     df = pd.DataFrame(records)
     df = df.sort_values("file_name").reset_index(drop=True)

@@ -66,7 +66,12 @@ class InsightFaceDetector:
 
             detections.append(
                 FaceDetection(
-                    bbox=(float(face.bbox[0]), float(face.bbox[1]), float(face.bbox[2]), float(face.bbox[3])),
+                    bbox=(
+                        float(face.bbox[0]),
+                        float(face.bbox[1]),
+                        float(face.bbox[2]),
+                        float(face.bbox[3]),
+                    ),
                     landmarks=face.kps.astype(np.float32),
                     score=float(face.det_score),
                     pose=pose_tuple,

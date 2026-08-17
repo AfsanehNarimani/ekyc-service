@@ -47,7 +47,7 @@ class VideoFrameExtractor:
 
             frames: list[VideoFrame] = []
             frame_index = 0
-            #todo BENCHMARK MAX_FRAMES
+            # todo BENCHMARK MAX_FRAMES
             while len(frames) < self.max_frames:
                 ok, frame_bgr = capture.read()
 

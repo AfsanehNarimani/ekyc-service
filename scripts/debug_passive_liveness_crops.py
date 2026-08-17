@@ -40,10 +40,7 @@ def is_neutral_pose(
 
     pitch, yaw, _roll = pose
 
-    return (
-        abs(pitch) <= threshold
-        and abs(yaw) <= threshold
-    )
+    return abs(pitch) <= threshold and abs(yaw) <= threshold
 
 
 def main() -> None:
@@ -102,14 +99,8 @@ def main() -> None:
             detection=detection,
         )
 
-        v2_crop_path = (
-            output_dir
-            / f"v2_crop_{frame.frame_index}.jpg"
-        )
-        v1se_crop_path = (
-            output_dir
-            / f"v1se_crop_{frame.frame_index}.jpg"
-        )
+        v2_crop_path = output_dir / f"v2_crop_{frame.frame_index}.jpg"
+        v1se_crop_path = output_dir / f"v1se_crop_{frame.frame_index}.jpg"
 
         cv2.imwrite(
             str(v2_crop_path),
@@ -140,24 +131,14 @@ def main() -> None:
             frame_bgr=frame_bgr,
             detection=detection,
         )
-        ensemble_probabilities = (
-            ensemble_model.predict_probabilities(
-                frame_bgr=frame_bgr,
-                detection=detection,
-            )
+        ensemble_probabilities = ensemble_model.predict_probabilities(
+            frame_bgr=frame_bgr,
+            detection=detection,
         )
 
-        v2_score = float(
-            v2_probabilities[v2_model.real_class_index]
-        )
-        v1se_score = float(
-            v1se_probabilities[v1se_model.real_class_index]
-        )
-        ensemble_score = float(
-            ensemble_probabilities[
-                ensemble_model.real_class_index
-            ]
-        )
+        v2_score = float(v2_probabilities[v2_model.real_class_index])
+        v1se_score = float(v1se_probabilities[v1se_model.real_class_index])
+        ensemble_score = float(ensemble_probabilities[ensemble_model.real_class_index])
 
         v2_scores.append(v2_score)
         v1se_scores.append(v1se_score)

@@ -85,7 +85,7 @@ def verify_video(
     try:
         result = service.verify(
             correlation_id=correlation_id,
-            challenge_id=challenge_id ,
+            challenge_id=challenge_id,
             expected_actions=request.expected_actions,
             national_id_image_uri=request.national_id_image_uri,
             video_uri=request.video_uri,

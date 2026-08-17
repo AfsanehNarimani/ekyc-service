@@ -2,8 +2,9 @@ import logging
 import time
 from pathlib import Path
 
-from ai_modules.challenge_based_liveness_detection.head_pose_estimation. \
-    application.head_pose_challenge_check_service import HeadPoseChallengeCheckService
+from ai_modules.challenge_based_liveness_detection.head_pose_estimation.application.head_pose_challenge_check_service import (
+    HeadPoseChallengeCheckService,
+)
 
 from ai_modules.challenge_based_liveness_detection.head_pose_estimation.domain.head_pose_action_type import (
     HeadPoseActionType,
@@ -128,9 +129,11 @@ class HeadPoseChallengeOrchestratorService:
                 face_verification_result.score,
             )
 
-            action_check_result = self.head_pose_challenge_check_service.check_head_pose_actions(
-                video_analysis=frames_face_detection_result,
-                expected_actions=expected_actions,
+            action_check_result = (
+                self.head_pose_challenge_check_service.check_head_pose_actions(
+                    video_analysis=frames_face_detection_result,
+                    expected_actions=expected_actions,
+                )
             )
 
             logger.info(
