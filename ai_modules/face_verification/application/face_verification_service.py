@@ -18,6 +18,9 @@ from ai_modules.face_verification.infrastructure.preprocessing.face_preprocessor
     FacePreprocessor,
 )
 from core.exceptions import NoUsableVideoFrameError
+from ai_modules.face_verification.domain.base_face_embedding_similarity_calculator import (
+    BaseFaceEmbeddingSimilarityCalculator,
+)
 
 
 class FaceVerificationService:
@@ -25,12 +28,14 @@ class FaceVerificationService:
         self,
         preprocessor: FacePreprocessor,
         embedder: BaseFaceEmbedder,
+        similarity_calculator: BaseFaceEmbeddingSimilarityCalculator,
         threshold_policy: FaceMatchThresholdPolicy,
         neutral_yaw_threshold: float,
         neutral_pitch_threshold: float,
     ) -> None:
         self.preprocessor = preprocessor
         self.embedder = embedder
+        self.similarity_calculator = similarity_calculator
         self.threshold_policy = threshold_policy
         self.neutral_yaw_threshold = neutral_yaw_threshold
         self.neutral_pitch_threshold = neutral_pitch_threshold
@@ -59,6 +64,7 @@ class FaceVerificationService:
 
         matcher = FaceMatcher(
             threshold=threshold,
+            similarity_calculator=self.similarity_calculator,
         )
 
         for analyzed_frame in frames_face_detection_result.frames:

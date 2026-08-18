@@ -30,15 +30,16 @@ class FaceVerificationMetricPairCalculator(BaseFaceVerificationMetricPairCalcula
                 "Threshold must be finite.",
             )
 
-        combined_similarity_scores = (*genuine_similarity_scores, *impostor_similarity_scores)
+        combined_similarity_scores = (
+            *genuine_similarity_scores,
+            *impostor_similarity_scores,
+        )
 
         if not all(
             math.isfinite(similarity_score)
             for similarity_score in combined_similarity_scores
-            ):
-            raise ValueError(
-                "Similarity scores must contain only finite values."
-        )
+        ):
+            raise ValueError("Similarity scores must contain only finite values.")
 
         false_match_count = sum(
             score >= threshold for score in impostor_similarity_scores

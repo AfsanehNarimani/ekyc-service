@@ -1,10 +1,14 @@
 import math
 from typing import Sequence
 
-from ai_modules.face_verification.evaluations.base_face_verification_threshold_candidate_generator import BaseFaceVerificationThresholdCandidateGenerator
+from ai_modules.face_verification.evaluations.base_face_verification_threshold_candidate_generator import (
+    BaseFaceVerificationThresholdCandidateGenerator,
+)
 
 
-class FaceVerificationThresholdCandidateGenerator(BaseFaceVerificationThresholdCandidateGenerator):
+class FaceVerificationThresholdCandidateGenerator(
+    BaseFaceVerificationThresholdCandidateGenerator
+):
     def generate(
         self,
         genuine_similarity_scores: Sequence[float],
@@ -16,7 +20,10 @@ class FaceVerificationThresholdCandidateGenerator(BaseFaceVerificationThresholdC
         if not impostor_similarity_scores:
             raise ValueError("Impostor similarity scores must not be empty.")
 
-        combined_similarity_scores = (*genuine_similarity_scores,*impostor_similarity_scores)
+        combined_similarity_scores = (
+            *genuine_similarity_scores,
+            *impostor_similarity_scores,
+        )
 
         if not all(
             math.isfinite(similarity_score)

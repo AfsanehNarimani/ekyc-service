@@ -33,36 +33,38 @@ def test_calculate_metric_operating_points_for_multiple_thresholds() -> None:
         0.80,
     ]
 
-    operating_points = (
-        metric_curve_calculator.calculate_for_thresholds(
-            genuine_similarity_scores=genuine_similarity_scores,
-            impostor_similarity_scores=impostor_similarity_scores,
-            thresholds=thresholds,
-        )
+    operating_points = metric_curve_calculator.calculate_for_thresholds(
+        genuine_similarity_scores=genuine_similarity_scores,
+        impostor_similarity_scores=impostor_similarity_scores,
+        thresholds=thresholds,
     )
 
     assert [
-        operating_point.threshold
-        for operating_point in operating_points
+        operating_point.threshold for operating_point in operating_points
     ] == thresholds
 
     assert [
         operating_point.metric_pair.false_match_rate
         for operating_point in operating_points
-    ] == pytest.approx([
-        0.75,
-        0.50,
-        0.25,
-    ])
+    ] == pytest.approx(
+        [
+            0.75,
+            0.50,
+            0.25,
+        ]
+    )
 
     assert [
         operating_point.metric_pair.true_match_rate
         for operating_point in operating_points
-    ] == pytest.approx([
-        1.00,
-        0.75,
-        0.25,
-    ])
+    ] == pytest.approx(
+        [
+            1.00,
+            0.75,
+            0.25,
+        ]
+    )
+
 
 def test_reject_empty_thresholds() -> None:
     metric_pair_calculator = FaceVerificationMetricPairCalculator()

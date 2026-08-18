@@ -3,6 +3,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from ai_modules.face_verification.domain.base_face_embedding_similarity_calculator import (
+    BaseFaceEmbeddingSimilarityCalculator,
+)
 from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 
 
@@ -17,22 +20,24 @@ class FaceMatcher:
     def __init__(
         self,
         threshold: float,
+        similarity_calculator: BaseFaceEmbeddingSimilarityCalculator,
     ) -> None:
         self.threshold = threshold
+        self.similarity_calculator = similarity_calculator
 
     def match(
         self,
         reference: FaceEmbedding,
         candidate: FaceEmbedding,
     ) -> FaceMatchResult:
-        score = self.cosine_similarity(
-            reference.vector,
-            candidate.vector,
+        similarity_score = self.similarity_calculator.calculate_similarity(
+            reference_embedding=reference,
+            candidate_embedding=candidate,
         )
 
         return FaceMatchResult(
-            is_match=score >= self.threshold,
-            score=score,
+            is_match=similarity_score >= self.threshold,
+            score=similarity_score,
             threshold=self.threshold,
         )
 

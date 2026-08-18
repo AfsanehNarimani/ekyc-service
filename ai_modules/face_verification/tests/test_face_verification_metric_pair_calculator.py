@@ -68,6 +68,8 @@ def test_reject_empty_impostor_similarity_scores() -> None:
             impostor_similarity_scores=[],
             threshold=0.50,
         )
+
+
 @pytest.mark.parametrize(
     "invalid_similarity_score",
     [
@@ -83,10 +85,7 @@ def test_reject_non_finite_similarity_scores(
 
     with pytest.raises(
         ValueError,
-        match=(
-            r"^Similarity scores must contain "
-            r"only finite values\.$"
-        ),
+        match=(r"^Similarity scores must contain " r"only finite values\.$"),
     ):
         calculator.calculate_at_threshold(
             genuine_similarity_scores=[
@@ -99,6 +98,7 @@ def test_reject_non_finite_similarity_scores(
             ],
             threshold=0.50,
         )
+
 
 @pytest.mark.parametrize(
     "invalid_threshold",

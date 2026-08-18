@@ -24,7 +24,9 @@ from ai_modules.face_verification.application.face_verification_service import (
 from ai_modules.face_verification.domain.face_match_threshold_policy import (
     FaceMatchThresholdPolicy,
 )
-from ai_modules.face_verification.domain.face_matcher import FaceMatcher
+from ai_modules.face_verification.domain.cosine_face_embedding_similarity_calculator import (
+    CosineFaceEmbeddingSimilarityCalculator,
+)
 from ai_modules.face_verification.infrastructure.embedders.base_embedder import (
     BaseFaceEmbedder,
 )
@@ -90,13 +92,6 @@ def get_face_embedder() -> BaseFaceEmbedder:
 
 
 @lru_cache
-def get_face_matcher() -> FaceMatcher:
-    return FaceMatcher(
-        threshold=settings.face_match_threshold,
-    )
-
-
-@lru_cache
 def get_media_loader() -> MediaLoader:
     return MediaLoader(
         temp_dir=settings.media_temp_dir,
@@ -155,6 +150,7 @@ def get_face_verification_service() -> FaceVerificationService:
     return FaceVerificationService(
         preprocessor=get_face_preprocessor(),
         embedder=get_face_embedder(),
+        similarity_calculator=get_face_embedding_similarity_calculator(),
         threshold_policy=get_face_match_threshold_policy(),
         neutral_yaw_threshold=settings.head_pose_neutral_yaw_threshold,
         neutral_pitch_threshold=settings.head_pose_neutral_pitch_threshold,
@@ -353,3 +349,10 @@ def get_face_detection_service() -> FaceDetectionService:
         detector=get_face_detector(),
         validator=get_single_face_validator(),
     )
+
+
+@lru_cache
+def get_face_embedding_similarity_calculator() -> (
+    CosineFaceEmbeddingSimilarityCalculator
+):
+    return CosineFaceEmbeddingSimilarityCalculator()

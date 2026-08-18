@@ -16,6 +16,9 @@ from ai_modules.face_verification.domain.face_match_threshold_policy import (
 )
 from core.exceptions import NoUsableVideoFrameError
 from core.video_frame import VideoFrame
+from ai_modules.face_verification.domain.cosine_face_embedding_similarity_calculator import (
+    CosineFaceEmbeddingSimilarityCalculator,
+)
 
 
 class FakePreprocessor:
@@ -108,6 +111,7 @@ def make_service(
     return FaceVerificationService(
         preprocessor=FakePreprocessor(),
         embedder=FakeEmbedder(vectors=vectors),
+        similarity_calculator=CosineFaceEmbeddingSimilarityCalculator(),
         threshold_policy=FaceMatchThresholdPolicy(
             level_to_threshold={
                 2: 0.55,

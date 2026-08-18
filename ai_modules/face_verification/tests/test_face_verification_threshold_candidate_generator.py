@@ -38,9 +38,9 @@ def test_generate_unique_sorted_threshold_candidates() -> None:
     )
 
     assert thresholds[-1] > max(
-        genuine_similarity_scores
-        + impostor_similarity_scores,
+        genuine_similarity_scores + impostor_similarity_scores,
     )
+
 
 def test_reject_empty_genuine_similarity_scores() -> None:
     generator = FaceVerificationThresholdCandidateGenerator()
@@ -73,6 +73,7 @@ def test_reject_empty_impostor_similarity_scores() -> None:
             impostor_similarity_scores=[],
         )
 
+
 @pytest.mark.parametrize(
     "invalid_similarity_score",
     [
@@ -88,10 +89,7 @@ def test_reject_non_finite_similarity_scores(
 
     with pytest.raises(
         ValueError,
-        match=(
-            r"^Similarity scores must contain "
-            r"only finite values\.$"
-        ),
+        match=(r"^Similarity scores must contain " r"only finite values\.$"),
     ):
         generator.generate(
             genuine_similarity_scores=[

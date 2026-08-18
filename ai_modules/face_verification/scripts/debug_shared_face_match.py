@@ -11,6 +11,9 @@ from api.dependencies import (
     get_face_preprocessor,
     get_video_frame_extractor,
 )
+from ai_modules.face_verification.domain.cosine_face_embedding_similarity_calculator import (
+    CosineFaceEmbeddingSimilarityCalculator,
+)
 
 
 def main() -> None:
@@ -43,7 +46,10 @@ def main() -> None:
     reference_face = preprocessor.preprocess(reference_image)
     reference_embedding = embedder.extract(reference_face)
 
-    matcher = FaceMatcher(threshold=0.0)
+    matcher = FaceMatcher(
+        threshold=0.0,
+        similarity_calculator=CosineFaceEmbeddingSimilarityCalculator(),
+    )
 
     legacy_scores: list[float] = []
     shared_scores: list[float] = []
