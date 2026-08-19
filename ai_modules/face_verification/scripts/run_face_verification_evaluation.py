@@ -1,34 +1,12 @@
 import argparse
 import csv
+import json
+import random
+from collections import Counter
 from pathlib import Path
 
-from ai_modules.face_verification.evaluations.csv_face_verification_evaluation_dataset import (
-    CsvFaceVerificationEvaluationDataset,
-)
-from ai_modules.face_verification.evaluations.face_verification_comparison_evaluator import (
-    FaceVerificationComparisonEvaluator,
-)
-from ai_modules.face_verification.evaluations.face_verification_comparison_status import (
-    FaceVerificationComparisonStatus,
-)
-from ai_modules.face_verification.evaluations.face_verification_dataset_evaluator import (
-    FaceVerificationDatasetEvaluator,
-)
-from ai_modules.face_verification.evaluations.face_verification_metric_curve_calculator import (
-    FaceVerificationMetricCurveCalculator,
-)
-from ai_modules.face_verification.evaluations.face_verification_metric_pair_calculator import (
-    FaceVerificationMetricPairCalculator,
-)
-from ai_modules.face_verification.evaluations.face_verification_metric_operating_point import (
-    FaceVerificationMetricOperatingPoint,
-)
-from ai_modules.face_verification.evaluations.face_verification_threshold_candidate_generator import (
-    FaceVerificationThresholdCandidateGenerator,
-)
-from ai_modules.face_verification.evaluations.json_lines_face_verification_evaluation_result_writer import (
-    JsonLinesFaceVerificationEvaluationResultWriter,
-)
+import numpy as np
+
 from api.dependencies import (
     get_face_detection_service,
     get_face_embedder,
@@ -37,28 +15,24 @@ from api.dependencies import (
     get_image_file_loader,
 )
 from config import settings
-
-
-LEVEL_TO_TARGET_FMR = {
-    1: 0.01,
-    2: 0.001,
-    3: 0.0001,
-}
+from ai_modules.face_verification.evaluations.face_verification_metrics import (
+    LEVEL_TARGETS,
+    calculate_rate,
+    select_threshold,
+)
+from ai_modules.face_verification.domain.face_embedding import FaceEmbedding
 
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Evaluate face verification comparisons and calculate "
-            "thresholds for verification levels."
-        ),
-    )
+    parser = argparse.ArgumentParser()
+
     parser.add_argument(
-        "--dataset-name",
+        "--pairs-path",
         required=True,
+        type=Path,
     )
     parser.add_argument(
-        "--manifest-path",
+        "--images-directory",
         required=True,
         type=Path,
     )
@@ -67,73 +41,314 @@ def parse_arguments() -> argparse.Namespace:
         required=True,
         type=Path,
     )
+    parser.add_argument(
+        "--impostor-count",
+        type=int,
+        default=1_000_000,
+    )
+    parser.add_argument(
+        "--random-seed",
+        type=int,
+        default=42,
+    )
+    parser.add_argument(
+        "--embeddings-path",
+        required=True,
+        type=Path,
+    )
 
     return parser.parse_args()
 
 
-def select_operating_point(
-    operating_points: tuple[FaceVerificationMetricOperatingPoint, ...],
-    target_false_match_rate: float,
-) -> FaceVerificationMetricOperatingPoint:
-    eligible_operating_points = [
-        operating_point
-        for operating_point in operating_points
-        if (operating_point.metric_pair.false_match_rate <= target_false_match_rate)
-    ]
+def load_images_by_subject(
+    images_directory: Path,
+) -> dict[str, tuple[Path, ...]]:
+    return {
+        directory.name: tuple(sorted(directory.glob("*.jpg")))
+        for directory in sorted(images_directory.iterdir())
+        if directory.is_dir()
+    }
 
-    return min(
-        eligible_operating_points,
-        key=lambda operating_point: operating_point.threshold,
+
+def image_path(
+    images_directory: Path,
+    subject_id: str,
+    image_number: int,
+) -> Path:
+    return images_directory / subject_id / f"{subject_id}_{image_number:04d}.jpg"
+
+
+def load_genuine_pairs(
+    pairs_path: Path,
+    images_directory: Path,
+) -> tuple[tuple[Path, Path], ...]:
+    pairs: list[tuple[Path, Path]] = []
+
+    lines = pairs_path.read_text(encoding="utf-8").splitlines()[1:]
+
+    for line in lines:
+        columns = line.split()
+
+        if len(columns) != 3:
+            continue
+
+        subject_id = columns[0]
+
+        pairs.append(
+            (
+                image_path(
+                    images_directory,
+                    subject_id,
+                    int(columns[1]),
+                ),
+                image_path(
+                    images_directory,
+                    subject_id,
+                    int(columns[2]),
+                ),
+            )
+        )
+
+    return tuple(pairs)
+
+
+def face_area(detection) -> float:
+    left, top, right, bottom = detection.bbox
+    return (right - left) * (bottom - top)
+
+
+def extract_embeddings(
+    images_by_subject: dict[
+        str,
+        tuple[Path, ...],
+    ],
+):
+    loader = get_image_file_loader()
+    detector = get_face_detection_service().detector
+    preprocessor = get_face_preprocessor()
+    embedder = get_face_embedder()
+
+    all_image_paths = [path for paths in images_by_subject.values() for path in paths]
+
+    embeddings = {}
+    failures = Counter()
+
+    for index, path in enumerate(
+        all_image_paths,
+        start=1,
+    ):
+        try:
+            image = loader.load(path)
+            detections = detector.detect(image)
+
+            if not detections:
+                failures["face_not_detected"] += 1
+                continue
+
+            primary_face = max(
+                detections,
+                key=face_area,
+            )
+
+            aligned_face = preprocessor.preprocess_with_detection(
+                image=image,
+                detection=primary_face,
+            )
+
+            embeddings[path] = embedder.extract(aligned_face)
+
+        except Exception as error:
+            failures[type(error).__name__] += 1
+
+        if index % 500 == 0:
+            print(f"Embedded {index}/{len(all_image_paths)} images")
+
+    return embeddings, failures
+
+
+def save_embeddings(
+    output_path: Path,
+    embeddings: dict[Path, FaceEmbedding],
+    failures: Counter,
+) -> None:
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    image_paths = tuple(embeddings)
+    face_embeddings = tuple(embeddings.values())
+
+    np.savez_compressed(
+        output_path,
+        image_paths=np.asarray(
+            [str(path) for path in image_paths],
+        ),
+        vectors=np.stack(
+            [embedding.vector for embedding in face_embeddings],
+        ),
+        model_names=np.asarray(
+            [embedding.model_name for embedding in face_embeddings],
+        ),
+        failure_names=np.asarray(
+            list(failures),
+        ),
+        failure_counts=np.asarray(
+            list(failures.values()),
+            dtype=np.int64,
+        ),
     )
 
 
-def write_metric_curve(
-    output_path: Path,
-    operating_points: tuple[FaceVerificationMetricOperatingPoint, ...],
-) -> None:
-    with output_path.open(
-        mode="w",
-        encoding="utf-8",
-        newline="",
-    ) as output_file:
-        writer = csv.DictWriter(
-            output_file,
-            fieldnames=[
-                "threshold",
-                "false_match_rate",
-                "true_match_rate",
-                "false_non_match_rate",
-            ],
-        )
-        writer.writeheader()
-
-        for operating_point in operating_points:
-            metric_pair = operating_point.metric_pair
-
-            writer.writerow(
-                {
-                    "threshold": operating_point.threshold,
-                    "false_match_rate": metric_pair.false_match_rate,
-                    "true_match_rate": metric_pair.true_match_rate,
-                    "false_non_match_rate": (1.0 - metric_pair.true_match_rate),
-                }
+def load_embeddings(
+    input_path: Path,
+) -> tuple[dict[Path, FaceEmbedding], Counter]:
+    with np.load(
+        input_path,
+        allow_pickle=False,
+    ) as data:
+        embeddings = {
+            Path(image_path): FaceEmbedding(
+                vector=vector,
+                model_name=str(model_name),
             )
+            for image_path, vector, model_name in zip(
+                data["image_paths"],
+                data["vectors"],
+                data["model_names"],
+                strict=True,
+            )
+        }
+
+        failures = Counter(
+            {
+                str(name): int(count)
+                for name, count in zip(
+                    data["failure_names"],
+                    data["failure_counts"],
+                    strict=True,
+                )
+            }
+        )
+
+    return embeddings, failures
 
 
-def write_verification_levels(
+def genuine_scores(
+    pairs: tuple[tuple[Path, Path], ...],
+    embeddings,
+) -> tuple[np.ndarray, int]:
+    calculator = get_face_embedding_similarity_calculator()
+
+    scores = []
+    skipped = 0
+
+    for reference_path, candidate_path in pairs:
+        reference = embeddings.get(reference_path)
+        candidate = embeddings.get(candidate_path)
+
+        if reference is None or candidate is None:
+            skipped += 1
+            continue
+
+        scores.append(
+            calculator.calculate_similarity(
+                reference_embedding=reference,
+                candidate_embedding=candidate,
+            )
+        )
+
+    return (
+        np.asarray(scores, dtype=np.float64),
+        skipped,
+    )
+
+
+def impostor_scores(
+    images_by_subject: dict[
+        str,
+        tuple[Path, ...],
+    ],
+    embeddings,
+    pair_count: int,
+    random_seed: int,
+) -> tuple[np.ndarray, int]:
+    calculator = get_face_embedding_similarity_calculator()
+    random_generator = random.Random(random_seed)
+
+    subject_ids = tuple(images_by_subject)
+
+    all_paths = [path for paths in images_by_subject.values() for path in paths]
+    image_id = {path: index for index, path in enumerate(all_paths)}
+    image_count = len(all_paths)
+
+    selected_pairs: set[int] = set()
+    scores = []
+    skipped = 0
+    generated = 0
+
+    while generated < pair_count:
+        reference_subject, candidate_subject = random_generator.sample(
+            subject_ids,
+            k=2,
+        )
+
+        reference_path = random_generator.choice(images_by_subject[reference_subject])
+        candidate_path = random_generator.choice(images_by_subject[candidate_subject])
+
+        first_id, second_id = sorted(
+            (
+                image_id[reference_path],
+                image_id[candidate_path],
+            )
+        )
+        pair_key = first_id * image_count + second_id
+
+        if pair_key in selected_pairs:
+            continue
+
+        selected_pairs.add(pair_key)
+        generated += 1
+
+        reference = embeddings.get(reference_path)
+        candidate = embeddings.get(candidate_path)
+
+        if reference is None or candidate is None:
+            skipped += 1
+            continue
+
+        scores.append(
+            calculator.calculate_similarity(
+                reference_embedding=reference,
+                candidate_embedding=candidate,
+            )
+        )
+
+        if generated % 100_000 == 0:
+            print(f"Compared {generated} impostor pairs")
+
+    return (
+        np.asarray(scores, dtype=np.float64),
+        skipped,
+    )
+
+
+def write_levels(
     output_path: Path,
-    operating_points: tuple[FaceVerificationMetricOperatingPoint, ...],
-    genuine_comparison_count: int,
-    impostor_comparison_count: int,
-) -> None:
+    genuine: np.ndarray,
+    impostor: np.ndarray,
+) -> tuple[float, ...]:
+    thresholds = []
+
     with output_path.open(
-        mode="w",
+        "w",
         encoding="utf-8",
         newline="",
-    ) as output_file:
-        writer = csv.DictWriter(
-            output_file,
-            fieldnames=[
+    ) as file:
+        writer = csv.writer(file)
+
+        writer.writerow(
+            [
                 "level",
                 "target_false_match_rate",
                 "threshold",
@@ -142,143 +357,201 @@ def write_verification_levels(
                 "false_non_match_rate",
                 "genuine_comparison_count",
                 "impostor_comparison_count",
-            ],
+            ]
         )
-        writer.writeheader()
 
-        for level, target_false_match_rate in LEVEL_TO_TARGET_FMR.items():
-            selected_operating_point = select_operating_point(
-                operating_points=operating_points,
-                target_false_match_rate=target_false_match_rate,
+        for level, target in LEVEL_TARGETS.items():
+            threshold = select_threshold(
+                impostor,
+                target,
             )
-            metric_pair = selected_operating_point.metric_pair
+            fmr = calculate_rate(
+                impostor,
+                threshold,
+            )
+
+            tmr = calculate_rate(
+                genuine,
+                threshold,
+            )
+
+            thresholds.append(threshold)
 
             writer.writerow(
-                {
-                    "level": level,
-                    "target_false_match_rate": (target_false_match_rate),
-                    "threshold": selected_operating_point.threshold,
-                    "observed_false_match_rate": (metric_pair.false_match_rate),
-                    "true_match_rate": metric_pair.true_match_rate,
-                    "false_non_match_rate": (1.0 - metric_pair.true_match_rate),
-                    "genuine_comparison_count": (genuine_comparison_count),
-                    "impostor_comparison_count": (impostor_comparison_count),
-                }
+                [
+                    level,
+                    target,
+                    threshold,
+                    fmr,
+                    tmr,
+                    1.0 - tmr,
+                    genuine.size,
+                    impostor.size,
+                ]
+            )
+
+    return tuple(thresholds)
+
+
+def write_curve(
+    output_path: Path,
+    genuine: np.ndarray,
+    impostor: np.ndarray,
+    level_thresholds: tuple[float, ...],
+) -> None:
+    thresholds = np.unique(
+        np.concatenate(
+            (
+                np.linspace(
+                    min(
+                        genuine.min(),
+                        impostor.min(),
+                    ),
+                    max(
+                        genuine.max(),
+                        impostor.max(),
+                    ),
+                    2000,
+                ),
+                level_thresholds,
+            )
+        )
+    )
+
+    sorted_genuine = np.sort(genuine)
+    sorted_impostor = np.sort(impostor)
+
+    with output_path.open(
+        "w",
+        encoding="utf-8",
+        newline="",
+    ) as file:
+        writer = csv.writer(file)
+
+        writer.writerow(
+            [
+                "threshold",
+                "false_match_rate",
+                "true_match_rate",
+                "false_non_match_rate",
+            ]
+        )
+
+        for threshold in thresholds:
+            false_matches = impostor.size - np.searchsorted(
+                sorted_impostor,
+                threshold,
+            )
+            true_matches = genuine.size - np.searchsorted(
+                sorted_genuine,
+                threshold,
+            )
+
+            fmr = false_matches / impostor.size
+            tmr = true_matches / genuine.size
+
+            writer.writerow(
+                [
+                    threshold,
+                    fmr,
+                    tmr,
+                    1.0 - tmr,
+                ]
             )
 
 
 def main() -> None:
     arguments = parse_arguments()
 
-    arguments.output_directory.mkdir(
+    pairs_path = arguments.pairs_path.resolve()
+    images_directory = arguments.images_directory.resolve()
+    output_directory = arguments.output_directory.resolve()
+    output_directory.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    evaluation_dataset = CsvFaceVerificationEvaluationDataset(
-        dataset_name=arguments.dataset_name,
-        manifest_path=arguments.manifest_path,
+    images_by_subject = load_images_by_subject(images_directory)
+    official_genuine_pairs = load_genuine_pairs(
+        pairs_path,
+        images_directory,
     )
 
-    comparison_evaluator = FaceVerificationComparisonEvaluator(
-        model_name=settings.default_face_model,
-        image_file_loader=get_image_file_loader(),
-        face_detection_service=get_face_detection_service(),
-        face_preprocessor=get_face_preprocessor(),
-        face_embedder=get_face_embedder(),
-        similarity_calculator=(get_face_embedding_similarity_calculator()),
+    embeddings_path = arguments.embeddings_path.resolve()
+
+    if embeddings_path.exists():
+        print(f"Loading cached embeddings from {embeddings_path}")
+
+        embeddings, failures = load_embeddings(
+            embeddings_path,
+        )
+    else:
+        print("Embedding cache not found. Extracting embeddings...")
+
+        embeddings, failures = extract_embeddings(
+            images_by_subject,
+        )
+
+        save_embeddings(
+            output_path=embeddings_path,
+            embeddings=embeddings,
+            failures=failures,
+        )
+
+        print(f"Saved embeddings to {embeddings_path}")
+
+    genuine, skipped_genuine = genuine_scores(
+        official_genuine_pairs,
+        embeddings,
     )
 
-    dataset_evaluator = FaceVerificationDatasetEvaluator(
-        comparison_evaluator=comparison_evaluator,
+    impostor, skipped_impostor = impostor_scores(
+        images_by_subject=(images_by_subject),
+        embeddings=embeddings,
+        pair_count=(arguments.impostor_count),
+        random_seed=(arguments.random_seed),
     )
 
-    genuine_similarity_scores: list[float] = []
-    impostor_similarity_scores: list[float] = []
-
-    total_comparison_count = 0
-    successful_comparison_count = 0
-
-    comparison_results_path = arguments.output_directory / "comparison_results.jsonl"
-
-    with JsonLinesFaceVerificationEvaluationResultWriter(
-        output_path=comparison_results_path,
-    ) as result_writer:
-        for evaluation_result in dataset_evaluator.iter_comparison_evaluation_results(
-            evaluation_dataset=evaluation_dataset,
-        ):
-            total_comparison_count += 1
-            result_writer.write_evaluation_result(
-                evaluation_result,
-            )
-
-            if evaluation_result.status is not FaceVerificationComparisonStatus.SUCCESS:
-                continue
-
-            successful_comparison_count += 1
-
-            similarity_score = evaluation_result.similarity_score
-
-            if similarity_score is None:
-                raise RuntimeError("Successful comparison has no similarity score.")
-
-            if evaluation_result.comparison_sample.is_genuine:
-                genuine_similarity_scores.append(
-                    similarity_score,
-                )
-            else:
-                impostor_similarity_scores.append(
-                    similarity_score,
-                )
-
-    if not genuine_similarity_scores:
-        raise ValueError("No successful genuine comparisons were available.")
-
-    if not impostor_similarity_scores:
-        raise ValueError("No successful impostor comparisons were available.")
-
-    threshold_generator = FaceVerificationThresholdCandidateGenerator()
-
-    thresholds = threshold_generator.generate(
-        genuine_similarity_scores=genuine_similarity_scores,
-        impostor_similarity_scores=impostor_similarity_scores,
+    np.savez_compressed(
+        output_directory / "similarity_scores.npz",
+        genuine_scores=genuine,
+        impostor_scores=impostor,
     )
 
-    metric_curve_calculator = FaceVerificationMetricCurveCalculator(
-        metric_pair_calculator=FaceVerificationMetricPairCalculator(),
+    level_thresholds = write_levels(
+        output_directory / "verification_levels.csv",
+        genuine,
+        impostor,
     )
 
-    operating_points = metric_curve_calculator.calculate_for_thresholds(
-        genuine_similarity_scores=genuine_similarity_scores,
-        impostor_similarity_scores=impostor_similarity_scores,
-        thresholds=thresholds,
+    write_curve(
+        output_directory / "metric_curve.csv",
+        genuine,
+        impostor,
+        level_thresholds,
     )
 
-    write_metric_curve(
-        output_path=(arguments.output_directory / "metric_curve.csv"),
-        operating_points=operating_points,
+    summary = {
+        "model_name": (settings.default_face_model),
+        "subject_count": len(images_by_subject),
+        "image_count": sum(len(paths) for paths in (images_by_subject.values())),
+        "successful_embedding_count": len(embeddings),
+        "embedding_failures": dict(failures),
+        "genuine_score_count": int(genuine.size),
+        "impostor_score_count": int(impostor.size),
+        "skipped_genuine_pairs": (skipped_genuine),
+        "skipped_impostor_pairs": (skipped_impostor),
+    }
+
+    (output_directory / "evaluation_summary.json").write_text(
+        json.dumps(
+            summary,
+            indent=2,
+        ),
+        encoding="utf-8",
     )
 
-    write_verification_levels(
-        output_path=(arguments.output_directory / "verification_levels.csv"),
-        operating_points=operating_points,
-        genuine_comparison_count=len(genuine_similarity_scores),
-        impostor_comparison_count=len(impostor_similarity_scores),
-    )
-
-    print(
-        {
-            "model_name": settings.default_face_model,
-            "total_comparisons": total_comparison_count,
-            "successful_comparisons": successful_comparison_count,
-            "failed_comparisons": (
-                total_comparison_count - successful_comparison_count
-            ),
-            "genuine_comparisons": len(genuine_similarity_scores),
-            "impostor_comparisons": len(impostor_similarity_scores),
-            "output_directory": str(arguments.output_directory),
-        }
-    )
+    print(summary)
 
 
 if __name__ == "__main__":

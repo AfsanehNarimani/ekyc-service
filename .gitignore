@@ -31,3 +31,8 @@ calibration/results/
 results/head_pose/
 Video-sample/
 scripts/results/
+
+# Face verification evaluation data and outputs
+datasets/lfw/
+evaluation_outputs/
+/datasets/lfw/
