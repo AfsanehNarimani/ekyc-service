@@ -40,4 +40,4 @@ class FaceVerificationThresholdCandidateGenerator(
             math.inf,
         )
 
-        return (*unique_sorted_scores, upper_boundary_threshold)
+        return *unique_sorted_scores, upper_boundary_threshold

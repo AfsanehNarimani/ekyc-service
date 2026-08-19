@@ -30,6 +30,10 @@ from core.exceptions import (
     MultipleFacesDetectedError,
     NoFaceDetectedError,
 )
+from ai_modules.face_detection.domain.face_detection import (
+    FaceDetection,
+)
+from PIL import Image
 
 
 class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluator):
@@ -64,7 +68,7 @@ class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluato
             return self._create_failure_result(
                 dataset_name=dataset_name,
                 comparison_sample=comparison_sample,
-                status=(FaceVerificationComparisonStatus.REFERENCE_IMAGE_LOAD_FAILED),
+                status=FaceVerificationComparisonStatus.REFERENCE_IMAGE_LOAD_FAILED,
                 error=error,
                 started_at=started_at,
             )
@@ -77,13 +81,13 @@ class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluato
             return self._create_failure_result(
                 dataset_name=dataset_name,
                 comparison_sample=comparison_sample,
-                status=(FaceVerificationComparisonStatus.CANDIDATE_IMAGE_LOAD_FAILED),
+                status=FaceVerificationComparisonStatus.CANDIDATE_IMAGE_LOAD_FAILED,
                 error=error,
                 started_at=started_at,
             )
 
         try:
-            reference_face_detection = self.face_detection_service.detect_from_image(
+            reference_face_detection = self._detect_primary_face(
                 reference_image,
             )
         except NoFaceDetectedError as error:
@@ -93,7 +97,7 @@ class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluato
                 dataset_name=dataset_name,
                 comparison_sample=comparison_sample,
                 model_name=self.model_name,
-                status=(FaceVerificationComparisonStatus.REFERENCE_FACE_NOT_DETECTED),
+                status=FaceVerificationComparisonStatus.REFERENCE_FACE_NOT_DETECTED,
                 processing_time_milliseconds=processing_time_milliseconds,
                 failure_detail=str(error),
             )
@@ -111,7 +115,7 @@ class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluato
                 failure_detail=str(error),
             )
         try:
-            candidate_face_detection = self.face_detection_service.detect_from_image(
+            candidate_face_detection = self._detect_primary_face(
                 candidate_image,
             )
         except NoFaceDetectedError as error:
@@ -215,6 +219,30 @@ class FaceVerificationComparisonEvaluator(BaseFaceVerificationComparisonEvaluato
             processing_time_milliseconds=processing_time_milliseconds,
             similarity_score=similarity_score,
         )
+
+    def _detect_primary_face(
+        self,
+        image: Image.Image,
+    ) -> FaceDetection:
+        detections = self.face_detection_service.detector.detect(
+            image,
+        )
+
+        if not detections:
+            return self.face_detection_service.validator.validate(detections)
+
+        return max(
+            detections,
+            key=self._calculate_face_area,
+        )
+
+    @staticmethod
+    def _calculate_face_area(
+        detection: FaceDetection,
+    ) -> float:
+        left, top, right, bottom = detection.bbox
+
+        return (right - left) * (bottom - top)
 
     def _create_failure_result(
         self,
