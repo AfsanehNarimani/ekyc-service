@@ -36,3 +36,8 @@ scripts/results/
 datasets/lfw/
 evaluation_outputs/
 /datasets/lfw/
+
+/deployment-models.zip
+/ekyc-models-minimal.tar.gz
+/ekyc-models.tar.gz
+/ekyc-models.part-*
