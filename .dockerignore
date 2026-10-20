@@ -1,7 +1,9 @@
+.venv
 .git
 .gitignore
 .github
 
+.idea
 .env
 .env.*
 !.env.example
@@ -19,6 +21,7 @@ __pycache__
 htmlcov
 
 models
+__pycache__
 data
 calibration/data
 calibration/results
