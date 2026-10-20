@@ -1,3 +1,4 @@
+import base64
 from pathlib import Path
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -38,6 +39,12 @@ class MediaLoader:
 
         if reference.is_http_uri():
             return self._download_http_uri(
+                uri=reference.uri,
+                suffix=suffix,
+            )
+
+        if reference.is_data_uri():
+            return self._decode_data_uri(
                 uri=reference.uri,
                 suffix=suffix,
             )
@@ -88,6 +95,26 @@ class MediaLoader:
             output_path.write_bytes(response.content)
         except Exception as error:
             raise MediaLoadError(f"Could not download HTTP media: {uri}") from error
+
+        return output_path
+
+    def _decode_data_uri(
+        self,
+        uri: str,
+        suffix: str,
+    ) -> Path:
+        header, _, encoded = uri.partition(",")
+
+        if not encoded or ";base64" not in header:
+            raise MediaLoadError(f"Unsupported data URI encoding: {uri[:64]}")
+
+        try:
+            payload = base64.b64decode(encoded, validate=True)
+        except ValueError as error:
+            raise MediaLoadError("Could not decode base64 data URI") from error
+
+        output_path = self._make_temp_path(suffix=suffix)
+        output_path.write_bytes(payload)
 
         return output_path
 
